@@ -51,6 +51,11 @@
     ];
   }
 
+  /**
+   * Chili = weekend daytime cook only (football/company).
+   * Only Week 1 Option A Sat + Week 2 Option B Sat. Never midweek / twice / every week.
+   * Fish nights: Samantha salmon/tilapia; Ted = leftover substitute.
+   */
   const WEEKS = {
     1: {
       id: "1",
@@ -61,8 +66,9 @@
         A: {
           id: "A",
           label: "Option A",
-          blurb: "Rotisserie · tacos · Alfredo · chili",
+          blurb: "Tacos · Alfredo · salmon · weekend chili",
           budget: "~$100–130",
+          houseNote: "Weekend chili Sat (daytime / football). One chili cook — leftover Sun lunch optional.",
           days: [
             {
               id: "mon",
@@ -71,17 +77,13 @@
               icon: "👨‍🍳",
               mealEmoji: "🍗",
               dinner: "Rotisserie + rice/potatoes + salad",
-              adultLunch: "adult lunch → chicken wrap/sandwich (opt)",
+              adultLunch: "adult lunch → chicken (opt)",
               recipe: {
                 title: "Rotisserie plate",
-                have: "rotisserie, Fresh Express salad or veg, rice/potatoes, dressing, butter",
-                steps: [
-                  "Warm rotisserie (about 10 min at 350°F).",
-                  "Rice or potatoes on the side.",
-                  "Salad + dressing; lemon optional.",
-                ],
-                enjoy: "Warm the meat; butter on potatoes; lemon on salad if you like.",
-                buy: "rotisserie if not already home",
+                have: "rotisserie, rice/potatoes, salad, dressing",
+                steps: ["Warm rotisserie; rice/potatoes; salad."],
+                enjoy: "Easy Monday start.",
+                buy: "rotisserie if not home",
               },
             },
             {
@@ -91,16 +93,15 @@
               icon: "🌮",
               mealEmoji: "🌮",
               dinner: "Taco night",
-              adultLunch: "adult lunch → leftover taco meat quesadilla (opt)",
+              adultLunch: "adult lunch → leftover taco meat Wed (opt)",
               recipe: {
                 title: "Taco night",
-                have: "tortillas, McCormick taco seasoning, Sargento taco cheese, salsa, Bush’s taco beans",
+                have: "tortillas, taco packet, cheese, salsa, beans",
                 steps: [
-                  "Brown beef or shred leftover chicken + taco packet + water/broth.",
-                  "Warm tortillas; cheese, salsa, Bush’s beans on the side.",
+                  "Beef or shredded chicken + taco packet; tortillas; cheese, salsa, beans.",
                 ],
-                enjoy: "Toast tortillas in a dry pan; melt cheese over warm beans.",
-                buy: "ground beef if not using leftover chicken; onion optional",
+                enjoy: "Warm tortillas; leftover meat → Wed rebuild.",
+                buy: "ground beef if not using chicken; tortillas/cheese/salsa if low",
               },
             },
             {
@@ -110,15 +111,12 @@
               icon: "⭐",
               mealEmoji: "🧀",
               dinner: "Taco rebuild (nachos / bowls / quesadillas)",
-              adultLunch: "adult lunch → optional leftover plate",
+              adultLunch: "adult lunch → —",
               recipe: {
                 title: "Taco rebuild",
-                have: "leftover taco meat, tortillas/chips, cheese, salsa, rice",
-                steps: [
-                  "Nachos, taco bowls, or quesadillas from leftover taco meat.",
-                  "Same flavors, new shape — not sad scraps.",
-                ],
-                enjoy: "Rebuild into nachos or bowls so dinner feels new.",
+                have: "leftover taco meat, chips/tortillas/rice, cheese, salsa",
+                steps: ["Rebuild from taco meat — nachos, bowls, or quesadillas."],
+                enjoy: "New shape, same taco night.",
                 buy: "none",
               },
             },
@@ -128,57 +126,57 @@
               short: "Thu",
               icon: "💛",
               mealEmoji: "🍝",
-              dinner: "Chicken Alfredo (cook double)",
-              adultLunch: "adult lunch → thermos Alfredo (opt)",
+              dinner: "Chicken Alfredo (double batch)",
+              adultLunch: "adult lunch → thermos Fri OK (opt)",
               recipe: {
                 title: "Chicken Alfredo",
-                have: "Bertolli Garlic Alfredo, pasta, chicken or leftover rotisserie, Parmesan",
+                have: "Bertolli Garlic Alfredo, pasta, chicken, Parmesan",
                 steps: [
-                  "Boil pasta; cook or shred chicken.",
-                  "Warm Alfredo; toss pasta + chicken + sauce.",
-                  "Parmesan + pepper. Cook double for adult leftover lunches.",
+                  "Pasta + Bertolli Garlic Alfredo + chicken; double batch.",
+                  "Extra helps Fri if Ted wants leftover Alfredo instead of fish.",
                 ],
-                enjoy: "Finish pasta in the sauce; extra black pepper on the table.",
-                buy: "chicken breast if rotisserie is gone",
+                enjoy: "Finish pasta in the sauce.",
+                buy: "chicken breasts ~2 lb; Alfredo + pasta if low",
               },
             },
             {
               id: "fri",
               day: "Friday",
               short: "Fri",
-              icon: "🌿",
-              mealEmoji: "🥘",
-              dinner: "Sheet-pan oven chicken + potatoes + veg",
-              adultLunch: "adult lunch → chicken sandwich Sat (opt)",
+              icon: "🐟",
+              mealEmoji: "🐟",
+              dinner: "Salmon (Samantha) + rice + veg",
+              adultLunch: "adult lunch → —",
+              tedNote: "Ted: leftover Alfredo or rotisserie/chicken (not fish)",
               recipe: {
-                title: "Sheet-pan oven chicken",
-                have: "chicken breasts, potatoes, oil, salt, garlic powder, paprika, salad/veg",
+                title: "Salmon night (Samantha)",
+                have: "rice, veg; leftover Alfredo/chicken for Ted",
                 steps: [
-                  "Heat oven 425°F.",
-                  "Chicken breasts + potatoes with oil, salt, garlic powder, paprika.",
-                  "Roast until chicken hits 165°F.",
+                  "Bake/pan salmon for Samantha (+ kids who want it); rice + veg.",
+                  "Ted pulls leftover Alfredo or rotisserie/chicken — no fish.",
                 ],
-                enjoy: "Don’t crowd the pan; rest chicken before slicing.",
-                buy: "chicken breasts, potatoes",
+                enjoy: "Two plates, one kitchen — Sam’s fish + Ted’s leftover sub.",
+                buy: "salmon fillets (Fri — Sam)",
               },
             },
             {
               id: "sat",
               day: "Saturday",
               short: "Sat",
-              icon: "🍲",
+              icon: "🏈",
               mealEmoji: "🌶️",
-              dinner: "Big chili pot",
-              adultLunch: "Sat lunch → chicken leftovers; Sun → chili (adults)",
+              dinner: "Chili pot (daytime / football / company)",
+              adultLunch: "Sun lunch → chili leftover optional (not a second cook)",
               recipe: {
-                title: "Big chili pot",
-                have: "beef or leftover chicken, onion, tomatoes, beans, broth, chili powder/cumin",
+                title: "Weekend chili (daytime pot)",
+                have: "tomatoes, beans, broth, chili powder/cumin",
                 steps: [
-                  "Brown beef + onion; add tomatoes, beans, broth, chili powder/cumin.",
-                  "Simmer; top with cheese + crushed Doritos.",
+                  "Daytime cook: beef, onion, tomatoes, beans, broth, chili powder/cumin.",
+                  "Cheese + Doritos on top. Company-friendly.",
+                  "Leftover Sun lunch for who wants it — do NOT cook chili twice.",
                 ],
-                enjoy: "One pot feeds Sat dinner + adult Sun lunch.",
-                buy: "ground beef if used up earlier; onion",
+                enjoy: "Football / company energy — one weekend pot only.",
+                buy: "ground beef ~1–1.5 lb (chili +/or tacos); onion",
               },
             },
             {
@@ -188,60 +186,59 @@
               icon: "☀️",
               mealEmoji: "🥞",
               dinner: "Breakfast-for-dinner",
-              adultLunch: "Sun lunch → chili over rice (adults); pack Tucker Mon kit Sun night",
+              adultLunch: "Sun lunch → chili leftover (optional); pack Tucker Mon kit",
               recipe: {
                 title: "Breakfast-for-dinner",
-                have: "eggs, bagels, butter, fruit, maple optional",
+                have: "eggs, bagels, fruit",
                 steps: [
-                  "Eggs, bagels, sausage; fruit; maple optional.",
-                  "Sun night: pack Tucker’s fixed Mon lunchbox kit (not dinner leftovers).",
+                  "Eggs, bagels, sausage; fruit.",
+                  "Pack Tucker’s fixed Mon lunchbox kit (not dinner leftovers).",
                 ],
-                enjoy: "Everything hot together; let Tucker pick scrambled vs fried eggs at dinner.",
-                buy: "sausage",
+                enjoy: "Hot plates together.",
+                buy: "breakfast sausage",
               },
             },
           ],
           groceries: [
             ...tuckerGroceries("w1"),
-            { id: "w1a-rotisserie", category: "Protein", name: "1 rotisserie (if not already home)", price: "", hint: "Check fridge / store grab" },
-            { id: "w1a-chicken", category: "Protein", name: "2–3 lb chicken breasts", price: "", hint: "" },
-            { id: "w1a-beef", category: "Protein", name: "1–1.5 lb ground beef (tacos + chili)", price: "", hint: "Some ground meat may already be home" },
-            { id: "w1a-eggs", category: "Protein", name: "Eggs (if carton low)", price: "", hint: "Check count" },
+            { id: "w1a-rotisserie", category: "Protein", name: "Rotisserie", price: "", hint: "" },
+            { id: "w1a-chicken", category: "Protein", name: "Chicken breasts ~2 lb (Alfredo)", price: "", hint: "" },
+            { id: "w1a-beef", category: "Protein", name: "Ground beef ~1–1.5 lb (chili +/or tacos)", price: "", hint: "" },
+            { id: "w1a-salmon", category: "Protein", name: "Salmon fillets (Fri — Samantha)", price: "", hint: "Ted skips fish — leftover sub that night" },
             { id: "w1a-sausage", category: "Protein", name: "Breakfast sausage (Sun)", price: "", hint: "" },
-            { id: "w1a-potatoes", category: "Produce", name: "Potatoes", price: "", hint: "" },
+            { id: "w1a-eggs", category: "Protein", name: "Eggs (if low)", price: "", hint: "" },
+            { id: "w1a-potatoes", category: "Produce", name: "Potatoes / rice sides", price: "", hint: "" },
+            { id: "w1a-onion", category: "Produce", name: "Onion", price: "", hint: "" },
+            { id: "w1a-salad", category: "Produce", name: "Salad / veg", price: "", hint: "" },
             { id: "w1a-fruit", category: "Produce", name: "Fruit for adults/snacks", price: "", hint: "" },
-            { id: "w1a-onion", category: "Produce", name: "Yellow onion (if low)", price: "", hint: "" },
-            { id: "w1a-salad", category: "Produce", name: "Salad refresh if Fresh Express low", price: "", hint: "Skip if still good" },
-            { id: "w1a-milk", category: "Dairy", name: "Milk top-up midweek if needed", price: "", hint: "fairlife / Publix already on hand" },
-            { id: "w1a-shredded", category: "Dairy", name: "Shredded cheese only if Sargento bag empty", price: "", hint: "Taco cheese already stocked — skip" },
-            { id: "w1a-tortillas", category: "Pantry", name: "Tortillas only if almost done", price: "", hint: "Skip if enough" },
-            { id: "w1a-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "Already stocked" },
-            { id: "w1a-chili-cans", category: "Pantry", name: "Chili beans/tomatoes only if not using pantry cans", price: "", hint: "Already stocked — skip" },
+            { id: "w1a-cheese", category: "Dairy", name: "Taco cheese if low", price: "", hint: "Skip if stocked" },
+            { id: "w1a-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "" },
+            { id: "w1a-tortillas", category: "Pantry", name: "Tortillas / salsa if low", price: "", hint: "Skip if stocked" },
+            { id: "w1a-alfredo", category: "Pantry", name: "Alfredo + pasta if low", price: "", hint: "Often already stocked — skip" },
+            { id: "w1a-chili-cans", category: "Pantry", name: "Chili beans/tomatoes if pantry empty", price: "", hint: "Weekend chili only this plan" },
           ],
         },
         B: {
           id: "B",
           label: "Option B",
-          blurb: "Sausage sheet-pan · quesadillas · potato bar",
+          blurb: "Chicken-heavy · tilapia · burgers · no chili",
           budget: "~$100–130",
+          houseNote: "No chili this week (Week 1 A has the weekend chili). Skip chili ingredients.",
           days: [
             {
               id: "mon",
               day: "Monday",
               short: "Mon",
-              icon: "🌿",
-              mealEmoji: "🌭",
-              dinner: "Sausage sheet-pan + potatoes + peppers",
-              adultLunch: "adult lunch → wrap from leftovers (opt)",
+              icon: "🥘",
+              mealEmoji: "🍗",
+              dinner: "Sheet-pan oven chicken + potatoes + peppers",
+              adultLunch: "adult lunch → leftovers (opt)",
               recipe: {
-                title: "Sausage sheet-pan",
+                title: "Sheet-pan oven chicken",
                 have: "oil, salt, garlic powder, paprika",
-                steps: [
-                  "425°F sausage + cubed potatoes + peppers.",
-                  "Toss with oil, salt, garlic powder, paprika; roast ~25 min.",
-                ],
-                enjoy: "Don’t crowd the pan so peppers and potatoes brown.",
-                buy: "sausage, potatoes, peppers",
+                steps: ["425°F chicken + potatoes + peppers; oil, salt, garlic, paprika."],
+                enjoy: "Spread out for browning.",
+                buy: "chicken breasts; peppers; potatoes",
               },
             },
             {
@@ -250,84 +247,82 @@
               short: "Tue",
               icon: "⭐",
               mealEmoji: "🫓",
-              dinner: "Quesadilla night",
+              dinner: "Quesadilla night (chicken/cheese)",
               adultLunch: "adult lunch → extra quesadilla (opt)",
               recipe: {
                 title: "Quesadilla night",
-                have: "tortillas, cheese, chicken, salsa, Bush’s beans",
-                steps: [
-                  "Tortilla + cheese + shredded chicken; skillet both sides.",
-                  "Salsa + beans on the side. Make an extra for adult lunch if you want.",
-                ],
-                enjoy: "Crispy cheese edges = diner vibes.",
-                buy: "chicken if none leftover",
+                have: "tortillas, cheese, chicken, salsa/beans",
+                steps: ["Tortillas + cheese + chicken; salsa/beans side."],
+                enjoy: "Crispy cheese edges.",
+                buy: "tortillas/cheese if low",
               },
             },
             {
               id: "wed",
               day: "Wednesday",
               short: "Wed",
-              icon: "☁️",
-              mealEmoji: "🍲",
-              dinner: "Big chili pot",
-              adultLunch: "adult lunch → chili thermos (opt)",
+              icon: "🍗",
+              mealEmoji: "🍚",
+              dinner: "Oven chicken thighs/breasts + rice + salad",
+              adultLunch: "adult lunch → —",
               recipe: {
-                title: "Big chili pot",
-                have: "beef or chicken, onion, tomatoes, beans, broth, chili seasoning",
-                steps: [
-                  "Brown meat + onion; add tomatoes/beans/broth/spices.",
-                  "Simmer; cheese on top.",
-                ],
-                enjoy: "Big pot → dinner tonight + adult lunches tomorrow.",
-                buy: "ground beef or sausage if needed; onion",
+                title: "Oven chicken + rice",
+                have: "chicken, rice, salad",
+                steps: ["Oven chicken + rice + salad — extra chicken variety."],
+                enjoy: "Rest chicken before slicing.",
+                buy: "enough chicken for Mon + Wed",
               },
             },
             {
               id: "thu",
               day: "Thursday",
               short: "Thu",
-              icon: "💛",
-              mealEmoji: "🌮",
-              dinner: "Chili rebuild bowls / nachos",
-              adultLunch: "adult lunch → optional chili again",
+              icon: "🐟",
+              mealEmoji: "🐟",
+              dinner: "Tilapia (Samantha) + rice + veg",
+              adultLunch: "adult lunch → —",
+              tedNote: "Ted: leftover chicken/quesadilla (not fish)",
               recipe: {
-                title: "Chili rebuild",
-                have: "leftover chili, chips or rice, cheese",
-                steps: ["Nachos or rice bowls from leftover chili.", "Same chili, new shape."],
-                enjoy: "Lime + cheese if you have them.",
-                buy: "none",
+                title: "Tilapia night (Samantha)",
+                have: "rice, veg; leftover chicken/quesadilla for Ted",
+                steps: [
+                  "Seasoned tilapia bake/pan for Samantha; rice + veg.",
+                  "Ted eats leftover chicken/quesadilla — no fish.",
+                ],
+                enjoy: "Sam’s fish night; Ted’s leftover sub ready from earlier in the week.",
+                buy: "tilapia Thu",
               },
             },
             {
               id: "fri",
               day: "Friday",
               short: "Fri",
-              icon: "🍗",
-              mealEmoji: "🍚",
-              dinner: "Oven chicken + rice + salad",
-              adultLunch: "adult lunch → sandwich Sat (opt)",
+              icon: "🛒",
+              mealEmoji: "🥪",
+              dinner: "Rotisserie or leftover chicken sandwiches + salad",
+              adultLunch: "adult lunch → —",
               recipe: {
-                title: "Oven chicken + rice",
-                have: "chicken breasts, rice, Fresh Express salad",
-                steps: ["Roast chicken breasts; cook rice; salad on the side."],
-                enjoy: "Rest chicken before slicing for adult sandwiches.",
-                buy: "chicken breasts",
+                title: "Busy-night chicken sandwiches",
+                have: "bread/bagels, salad; rotisserie or leftover chicken",
+                steps: ["Rotisserie or leftover chicken sandwiches + salad."],
+                enjoy: "Keep Friday light and fast.",
+                buy: "rotisserie if no leftovers",
               },
             },
             {
               id: "sat",
               day: "Saturday",
               short: "Sat",
-              icon: "🥞",
-              mealEmoji: "🍳",
-              dinner: "Breakfast-for-dinner",
-              adultLunch: "—",
+              icon: "🍔",
+              mealEmoji: "🍔",
+              dinner: "Burger night + simple sides",
+              adultLunch: "adult lunch → —",
               recipe: {
-                title: "Breakfast-for-dinner",
-                have: "eggs, bagels, butter, fruit, maple optional",
-                steps: ["Eggs, bagels, sausage; fruit; maple optional."],
-                enjoy: "Hot plates together.",
-                buy: "sausage if not bought earlier",
+                title: "Burger night",
+                have: "ground beef; chips/pickles optional",
+                steps: ["Burger patties; buns optional; chips/pickles."],
+                enjoy: "Simple sides are enough — no chili this week.",
+                buy: "burger beef Sat; buns optional",
               },
             },
             {
@@ -335,37 +330,38 @@
               day: "Sunday",
               short: "Sun",
               icon: "☀️",
-              mealEmoji: "🥔",
-              dinner: "Baked potato bar (chili/cheese/butter)",
-              adultLunch: "Sun lunch → Campbell’s Chunky or chili (adults); pack Tucker Mon kit",
+              mealEmoji: "🥞",
+              dinner: "Breakfast-for-dinner",
+              adultLunch: "pack Tucker Mon kit Sun night",
               recipe: {
-                title: "Baked potato bar",
-                have: "potatoes, chili leftover, cheese, butter; Campbell’s Chunky optional for adult lunch",
+                title: "Breakfast-for-dinner",
+                have: "eggs, bagels, fruit",
                 steps: [
-                  "Bake or microwave potatoes; toppings from chili/cheese/butter.",
-                  "Sun night: pack Tucker’s fixed Mon lunchbox kit (not dinner leftovers).",
+                  "Eggs, bagels, sausage.",
+                  "Pack Tucker’s fixed Mon lunchbox kit (not dinner leftovers).",
                 ],
-                enjoy: "Everyone builds their own potato.",
-                buy: "potatoes if not already bought",
+                enjoy: "Hot plates together.",
+                buy: "breakfast sausage",
               },
             },
           ],
           groceries: [
             ...tuckerGroceries("w1"),
-            { id: "w1b-sausage", category: "Protein", name: "Dinner sausage (sheet-pan) + breakfast sausage if wanted", price: "", hint: "" },
-            { id: "w1b-chicken", category: "Protein", name: "2–3 lb chicken breasts", price: "", hint: "" },
-            { id: "w1b-beef", category: "Protein", name: "Ground beef for chili (or use chicken)", price: "", hint: "" },
-            { id: "w1b-eggs", category: "Protein", name: "Eggs (if carton low)", price: "", hint: "" },
-            { id: "w1b-potatoes", category: "Produce", name: "Potatoes (sheet-pan + potato bar)", price: "", hint: "" },
-            { id: "w1b-peppers", category: "Produce", name: "Bell peppers (sheet-pan)", price: "", hint: "" },
-            { id: "w1b-onion", category: "Produce", name: "Yellow onion (chili)", price: "", hint: "" },
+            { id: "w1b-chicken", category: "Protein", name: "Chicken breasts (enough Mon + Wed)", price: "", hint: "" },
+            { id: "w1b-tilapia", category: "Protein", name: "Tilapia (Thu — Samantha)", price: "", hint: "Ted skips fish — leftover chicken/quesadilla" },
+            { id: "w1b-rotisserie", category: "Protein", name: "Rotisserie if no leftover chicken (Fri)", price: "", hint: "" },
+            { id: "w1b-beef", category: "Protein", name: "Burger beef (Sat)", price: "", hint: "Skip chili ingredients this week" },
+            { id: "w1b-sausage", category: "Protein", name: "Breakfast sausage (Sun)", price: "", hint: "" },
+            { id: "w1b-eggs", category: "Protein", name: "Eggs (if low)", price: "", hint: "" },
+            { id: "w1b-potatoes", category: "Produce", name: "Potatoes", price: "", hint: "" },
+            { id: "w1b-peppers", category: "Produce", name: "Peppers", price: "", hint: "" },
+            { id: "w1b-salad", category: "Produce", name: "Salad refresh", price: "", hint: "" },
             { id: "w1b-fruit", category: "Produce", name: "Fruit for adults/snacks", price: "", hint: "" },
-            { id: "w1b-salad", category: "Produce", name: "Salad kit if Fresh Express low", price: "", hint: "Skip if still good" },
-            { id: "w1b-milk", category: "Dairy", name: "Milk top-up midweek if needed", price: "", hint: "" },
-            { id: "w1b-cheese", category: "Dairy", name: "Shredded cheese if Sargento bag empty", price: "", hint: "Skip if stocked" },
+            { id: "w1b-cheese", category: "Dairy", name: "Cheese for quesadillas if low", price: "", hint: "" },
+            { id: "w1b-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "" },
             { id: "w1b-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "Skip if stocked" },
-            { id: "w1b-chili-cans", category: "Pantry", name: "Chili beans/tomatoes only if pantry empty", price: "", hint: "Skip if stocked" },
-            { id: "w1b-tortillas", category: "Pantry", name: "Tortillas if almost done (quesadillas)", price: "", hint: "Skip if enough" },
+            { id: "w1b-tortillas", category: "Pantry", name: "Tortillas if low", price: "", hint: "" },
+            { id: "w1b-buns", category: "Pantry", name: "Burger buns (optional)", price: "", hint: "" },
           ],
         },
       },
@@ -379,8 +375,9 @@
         A: {
           id: "A",
           label: "Option A",
-          blurb: "Sheet-pan chicken · quesadillas · chili · Alfredo",
+          blurb: "Tacos · Alfredo · salmon · sausage · no chili",
           budget: "~$100–130",
+          houseNote: "No chili this week (Week 1 A already had weekend chili). Potato bar without chili.",
           days: [
             {
               id: "mon",
@@ -388,170 +385,14 @@
               short: "Mon",
               icon: "🥘",
               mealEmoji: "🍗",
-              dinner: "Sheet-pan oven chicken + potatoes + veg",
-              adultLunch: "adult lunch → chicken wrap/sandwich (opt)",
-              recipe: {
-                title: "Sheet-pan oven chicken",
-                have: "oil, salt, garlic powder, paprika",
-                steps: [
-                  "425°F chicken breasts + potatoes + broccoli/green beans.",
-                  "Toss with oil, salt, garlic powder, paprika; roast until chicken is 165°F.",
-                ],
-                enjoy: "Don’t crowd the pan so veg and potatoes brown.",
-                buy: "chicken breasts 2–3 lb; potatoes; broccoli or green beans",
-              },
-            },
-            {
-              id: "tue",
-              day: "Tuesday",
-              short: "Tue",
-              icon: "⭐",
-              mealEmoji: "🫓",
-              dinner: "Quesadilla night (chicken or cheese)",
-              adultLunch: "adult lunch → extra quesadilla (opt)",
-              recipe: {
-                title: "Quesadilla night",
-                have: "tortillas, cheese, leftover or fresh chicken, salsa, Bush’s beans",
-                steps: [
-                  "Tortillas + cheese + leftover or fresh chicken; skillet both sides.",
-                  "Salsa + Bush’s beans on the side.",
-                ],
-                enjoy: "Crispy cheese edges.",
-                buy: "tortillas / taco cheese if low; chicken if none leftover",
-              },
-            },
-            {
-              id: "wed",
-              day: "Wednesday",
-              short: "Wed",
-              icon: "☁️",
-              mealEmoji: "🌶️",
-              dinner: "Big chili pot",
-              adultLunch: "adult lunch → chili thermos (opt)",
-              recipe: {
-                title: "Big chili pot",
-                have: "tomatoes, beans, broth, chili powder/cumin",
-                steps: [
-                  "Beef + onion + tomatoes + beans + broth + chili powder/cumin.",
-                  "Simmer; cheese + crushed Doritos on top.",
-                ],
-                enjoy: "One pot feeds Wed dinner + adult Thu rebuild.",
-                buy: "ground beef 1–1.5 lb; onion",
-              },
-            },
-            {
-              id: "thu",
-              day: "Thursday",
-              short: "Thu",
-              icon: "💛",
-              mealEmoji: "🌮",
-              dinner: "Chili rebuild (bowls / nachos / potatoes)",
+              dinner: "Sheet-pan chicken + potatoes + broccoli",
               adultLunch: "adult lunch → —",
               recipe: {
-                title: "Chili rebuild",
-                have: "leftover chili, chips/rice/potatoes, cheese",
-                steps: ["Same chili — bowls, nachos, or over rice/potatoes."],
-                enjoy: "New shape, same comfort.",
-                buy: "none",
-              },
-            },
-            {
-              id: "fri",
-              day: "Friday",
-              short: "Fri",
-              icon: "🛒",
-              mealEmoji: "🍗",
-              dinner: "Rotisserie + rice + salad (busy night)",
-              adultLunch: "adult lunch → chicken sandwich Sat (opt)",
-              recipe: {
-                title: "Rotisserie busy night",
-                have: "rice, Fresh Express salad + dressing",
-                steps: [
-                  "Store rotisserie; microwave rice; salad + dressing.",
-                ],
-                enjoy: "Keep Friday easy — warm the chicken, don’t overthink sides.",
-                buy: "rotisserie Fri",
-              },
-            },
-            {
-              id: "sat",
-              day: "Saturday",
-              short: "Sat",
-              icon: "🍝",
-              mealEmoji: "🍝",
-              dinner: "Chicken Alfredo (cook double)",
-              adultLunch: "adult lunch → thermos Alfredo Sun (opt)",
-              recipe: {
-                title: "Chicken Alfredo",
-                have: "Bertolli Garlic Alfredo, pasta, chicken, Parmesan",
-                steps: [
-                  "Pasta + Bertolli Garlic Alfredo + chicken; Parmesan.",
-                  "Cook double for adult leftover lunches.",
-                ],
-                enjoy: "Finish pasta in the sauce; pepper on the table.",
-                buy: "Alfredo + pasta if low; chicken if needed",
-              },
-            },
-            {
-              id: "sun",
-              day: "Sunday",
-              short: "Sun",
-              icon: "☀️",
-              mealEmoji: "🥔",
-              dinner: "Baked potato bar",
-              adultLunch: "Sun lunch → Alfredo or chili leftover (adults); pack Tucker Mon kit",
-              recipe: {
-                title: "Baked potato bar",
-                have: "potatoes, butter, cheese, leftover chili, sour cream if on hand",
-                steps: [
-                  "Baked potatoes + butter, cheese, leftover chili, sour cream if on hand.",
-                  "Sun night: pack Tucker’s fixed Mon lunchbox kit (not dinner leftovers).",
-                ],
-                enjoy: "Everyone builds their own.",
-                buy: "potatoes if not bought for Mon",
-              },
-            },
-          ],
-          groceries: [
-            ...tuckerGroceries("w2"),
-            { id: "w2a-chicken", category: "Protein", name: "Chicken breasts 2–3 lb", price: "", hint: "" },
-            { id: "w2a-rotisserie", category: "Protein", name: "Rotisserie (Fri busy night)", price: "", hint: "" },
-            { id: "w2a-beef", category: "Protein", name: "Ground beef 1–1.5 lb (chili)", price: "", hint: "" },
-            { id: "w2a-potatoes", category: "Produce", name: "Potatoes (Mon + Sun bar)", price: "", hint: "" },
-            { id: "w2a-onion", category: "Produce", name: "Onion", price: "", hint: "" },
-            { id: "w2a-broccoli", category: "Produce", name: "Broccoli or green beans", price: "", hint: "" },
-            { id: "w2a-salad", category: "Produce", name: "Salad refresh if needed", price: "", hint: "Skip if Fresh Express still good" },
-            { id: "w2a-fruit", category: "Produce", name: "Fruit for adults/snacks", price: "", hint: "" },
-            { id: "w2a-cheese", category: "Dairy", name: "Taco cheese if low", price: "", hint: "Skip if Sargento bag has enough" },
-            { id: "w2a-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "" },
-            { id: "w2a-tortillas", category: "Pantry", name: "Tortillas if low (quesadillas)", price: "", hint: "Skip if enough" },
-            { id: "w2a-alfredo", category: "Pantry", name: "Alfredo + pasta if low", price: "", hint: "Bertolli + pasta often already stocked — skip" },
-            { id: "w2a-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "Skip if stocked" },
-            { id: "w2a-chili-cans", category: "Pantry", name: "Chili beans/tomatoes only if pantry empty", price: "", hint: "Beans/salsa/rice — skip if stocked" },
-          ],
-        },
-        B: {
-          id: "B",
-          label: "Option B",
-          blurb: "Sausage · tacos · burgers · breakfast-for-dinner",
-          budget: "~$100–130",
-          days: [
-            {
-              id: "mon",
-              day: "Monday",
-              short: "Mon",
-              icon: "🌿",
-              mealEmoji: "🌭",
-              dinner: "Sausage sheet-pan + potatoes + peppers",
-              adultLunch: "adult lunch → wrap from leftovers (opt)",
-              recipe: {
-                title: "Sausage sheet-pan",
+                title: "Sheet-pan chicken",
                 have: "oil, salt, garlic powder, paprika",
-                steps: [
-                  "425°F sausage + potatoes + peppers; oil, salt, garlic powder, paprika.",
-                ],
-                enjoy: "Spread out for browning.",
-                buy: "sausage + peppers; potatoes",
+                steps: ["425°F chicken breasts + potatoes + broccoli."],
+                enjoy: "Don’t crowd the pan.",
+                buy: "chicken breasts; potatoes; broccoli",
               },
             },
             {
@@ -561,16 +402,13 @@
               icon: "🌮",
               mealEmoji: "🌮",
               dinner: "Taco night",
-              adultLunch: "adult lunch → leftover taco meat quesadilla (opt)",
+              adultLunch: "adult lunch → meat → Wed rebuild (opt)",
               recipe: {
                 title: "Taco night",
                 have: "tortillas, taco packet, cheese, salsa, beans",
-                steps: [
-                  "Brown beef or shred chicken + taco packet; warm tortillas.",
-                  "Cheese, salsa, beans.",
-                ],
-                enjoy: "Toast tortillas; warm the beans with cheese.",
-                buy: "ground beef for tacos (share pack with Sat burgers if splitting)",
+                steps: ["Taco night; save meat for Wed rebuild."],
+                enjoy: "Warm tortillas.",
+                buy: "taco beef/chicken if needed",
               },
             },
             {
@@ -579,13 +417,13 @@
               short: "Wed",
               icon: "⭐",
               mealEmoji: "🧀",
-              dinner: "Taco rebuild (nachos / bowls)",
+              dinner: "Taco rebuild",
               adultLunch: "adult lunch → —",
               recipe: {
                 title: "Taco rebuild",
-                have: "leftover taco meat, chips/tortillas/rice, cheese, salsa",
-                steps: ["Nachos / bowls / quesadillas from leftover taco meat."],
-                enjoy: "New shape, same taco night energy.",
+                have: "leftover taco meat, chips/rice/tortillas, cheese",
+                steps: ["Rebuild from taco meat."],
+                enjoy: "New shape.",
                 buy: "none",
               },
             },
@@ -593,54 +431,203 @@
               id: "thu",
               day: "Thursday",
               short: "Thu",
-              icon: "🍗",
-              mealEmoji: "🍚",
-              dinner: "Oven chicken + rice + salad",
-              adultLunch: "adult lunch → chicken sandwich Fri/Sat (opt)",
+              icon: "💛",
+              mealEmoji: "🍝",
+              dinner: "Chicken Alfredo (double batch)",
+              adultLunch: "adult lunch → —",
               recipe: {
-                title: "Oven chicken + rice",
-                have: "chicken breasts, rice, salad",
-                steps: ["Oven breasts + rice + salad."],
-                enjoy: "Rest chicken before slicing.",
-                buy: "chicken breasts",
+                title: "Chicken Alfredo",
+                have: "Alfredo, pasta, chicken, Parmesan",
+                steps: [
+                  "Pasta + Alfredo + chicken; double batch.",
+                  "Extra covers Ted on Fri fish night.",
+                ],
+                enjoy: "Finish in the sauce.",
+                buy: "Alfredo/pasta if low; chicken",
               },
             },
             {
               id: "fri",
               day: "Friday",
               short: "Fri",
-              icon: "🥣",
-              mealEmoji: "🧀",
-              dinner: "Soup + grilled cheese (occasional)",
+              icon: "🐟",
+              mealEmoji: "🐟",
+              dinner: "Salmon (Samantha) + rice + salad",
               adultLunch: "adult lunch → —",
+              tedNote: "Ted: leftover Alfredo (not fish)",
               recipe: {
-                title: "Soup + grilled cheese",
-                have: "Campbell’s Chunky, bread/cheese for grilled cheese or toast",
+                title: "Salmon night (Samantha)",
+                have: "rice, salad; leftover Alfredo for Ted",
                 steps: [
-                  "Heat Chunky; grilled cheese for kids/adults who want it — or soup + toast.",
-                  "Keep it once-a-week occasional.",
+                  "Salmon for Samantha; rice + salad.",
+                  "Ted = Alfredo leftover — no fish.",
                 ],
-                enjoy: "Light Friday — don’t overbuild it.",
-                buy: "none if Chunky + bread/cheese on hand",
+                enjoy: "Two plates, one night.",
+                buy: "salmon Fri",
               },
             },
             {
               id: "sat",
               day: "Saturday",
               short: "Sat",
-              icon: "🍔",
-              mealEmoji: "🍔",
-              dinner: "Burger night + simple sides",
-              adultLunch: "adult lunch → leftover burger bowls Sun (opt)",
+              icon: "🌭",
+              mealEmoji: "🌭",
+              dinner: "Sausage sheet-pan + potatoes + peppers",
+              adultLunch: "adult lunch → —",
               recipe: {
-                title: "Burger night",
-                have: "ground beef, seasonings; pickles/chips optional",
+                title: "Sausage sheet-pan",
+                have: "oil, salt, garlic powder, paprika",
+                steps: ["Sausage + potatoes + peppers — daytime-friendly sheet pan."],
+                enjoy: "No chili this week — sheet pan is the weekend cook.",
+                buy: "sausage Sat; peppers",
+              },
+            },
+            {
+              id: "sun",
+              day: "Sunday",
+              short: "Sun",
+              icon: "☀️",
+              mealEmoji: "🥔",
+              dinner: "Baked potato bar (cheese, butter, leftover chicken/sausage)",
+              adultLunch: "pack Tucker Mon kit Sun night",
+              recipe: {
+                title: "Baked potato bar",
+                have: "potatoes, butter, cheese, leftover chicken/sausage",
                 steps: [
-                  "Seasoned burger patties; buns if you have them, or over salad/rice.",
-                  "Pickles/chips optional.",
+                  "Baked potatoes + toppings (no chili).",
+                  "Pack Tucker’s fixed Mon lunchbox kit (not dinner leftovers).",
                 ],
-                enjoy: "Simple sides — chips or salad is enough.",
-                buy: "ground beef enough for tacos + burgers (or split packs); burger buns optional",
+                enjoy: "Everyone builds their own — no chili toppings this week.",
+                buy: "potatoes if not bought Mon",
+              },
+            },
+          ],
+          groceries: [
+            ...tuckerGroceries("w2"),
+            { id: "w2a-chicken", category: "Protein", name: "Chicken breasts", price: "", hint: "" },
+            { id: "w2a-beef", category: "Protein", name: "Taco beef/chicken if needed", price: "", hint: "" },
+            { id: "w2a-salmon", category: "Protein", name: "Salmon (Fri — Samantha)", price: "", hint: "Ted = Alfredo leftover" },
+            { id: "w2a-sausage", category: "Protein", name: "Sausage (Sat sheet-pan)", price: "", hint: "" },
+            { id: "w2a-potatoes", category: "Produce", name: "Potatoes (Mon + Sun bar)", price: "", hint: "" },
+            { id: "w2a-broccoli", category: "Produce", name: "Broccoli", price: "", hint: "" },
+            { id: "w2a-peppers", category: "Produce", name: "Peppers (Sat)", price: "", hint: "" },
+            { id: "w2a-salad", category: "Produce", name: "Salad if needed", price: "", hint: "" },
+            { id: "w2a-fruit", category: "Produce", name: "Fruit for adults/snacks", price: "", hint: "" },
+            { id: "w2a-cheese", category: "Dairy", name: "Cheese if low", price: "", hint: "" },
+            { id: "w2a-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "" },
+            { id: "w2a-tortillas", category: "Pantry", name: "Tortillas if low", price: "", hint: "" },
+            { id: "w2a-alfredo", category: "Pantry", name: "Alfredo + pasta if low", price: "", hint: "Skip if stocked" },
+            { id: "w2a-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "Skip chili ingredients this week" },
+          ],
+        },
+        B: {
+          id: "B",
+          label: "Option B",
+          blurb: "Chicken · quesadillas · tilapia · weekend chili",
+          budget: "~$100–130",
+          houseNote: "Weekend chili Sat only this week (not Week 1 B). One daytime pot — leftover Sun lunch optional.",
+          days: [
+            {
+              id: "mon",
+              day: "Monday",
+              short: "Mon",
+              icon: "🍗",
+              mealEmoji: "🍚",
+              dinner: "Oven chicken + rice + salad",
+              adultLunch: "adult lunch → —",
+              recipe: {
+                title: "Oven chicken + rice",
+                have: "chicken breasts, rice, salad",
+                steps: ["Oven breasts + rice + salad."],
+                enjoy: "Simple chicken start.",
+                buy: "chicken breasts",
+              },
+            },
+            {
+              id: "tue",
+              day: "Tuesday",
+              short: "Tue",
+              icon: "⭐",
+              mealEmoji: "🫓",
+              dinner: "Quesadilla night",
+              adultLunch: "adult lunch → —",
+              recipe: {
+                title: "Quesadilla night",
+                have: "tortillas, cheese, chicken",
+                steps: ["Quesadillas with chicken/cheese."],
+                enjoy: "Save leftover for Ted on Wed if needed.",
+                buy: "tortillas/cheese if low",
+              },
+            },
+            {
+              id: "wed",
+              day: "Wednesday",
+              short: "Wed",
+              icon: "🐟",
+              mealEmoji: "🐟",
+              dinner: "Tilapia (Samantha) + rice + veg",
+              adultLunch: "adult lunch → —",
+              tedNote: "Ted: leftover chicken/quesadilla (not fish)",
+              recipe: {
+                title: "Tilapia night (Samantha)",
+                have: "rice, veg; leftover chicken/quesadilla for Ted",
+                steps: [
+                  "Tilapia for Samantha; rice + veg.",
+                  "Ted leftover chicken/quesadilla — no fish.",
+                ],
+                enjoy: "Sam’s fish; Ted’s leftover sub.",
+                buy: "tilapia",
+              },
+            },
+            {
+              id: "thu",
+              day: "Thursday",
+              short: "Thu",
+              icon: "💛",
+              mealEmoji: "🍝",
+              dinner: "Chicken Alfredo or chicken + pasta bake",
+              adultLunch: "adult lunch → —",
+              recipe: {
+                title: "Chicken pasta night",
+                have: "pasta, Alfredo or bake ingredients, chicken",
+                steps: ["Alfredo or simple chicken pasta bake — keep chicken heavy."],
+                enjoy: "Comfort pasta midweek.",
+                buy: "Alfredo if doing pasta; chicken",
+              },
+            },
+            {
+              id: "fri",
+              day: "Friday",
+              short: "Fri",
+              icon: "🛒",
+              mealEmoji: "🍗",
+              dinner: "Rotisserie + salad (busy)",
+              adultLunch: "adult lunch → —",
+              recipe: {
+                title: "Rotisserie busy night",
+                have: "salad, dressing",
+                steps: ["Rotisserie + salad."],
+                enjoy: "Keep Friday easy.",
+                buy: "rotisserie",
+              },
+            },
+            {
+              id: "sat",
+              day: "Saturday",
+              short: "Sat",
+              icon: "🏈",
+              mealEmoji: "🌶️",
+              dinner: "Chili pot (daytime / football / company)",
+              adultLunch: "Sun lunch → chili leftover optional (not a second cook)",
+              recipe: {
+                title: "Weekend chili (daytime pot)",
+                have: "beans, tomatoes, broth, chili spices",
+                steps: [
+                  "Chili daytime pot — one cook for the weekend.",
+                  "Leftover Sun lunch for who wants it — not a second cook.",
+                ],
+                enjoy: "Football / company — this week’s only chili.",
+                buy: "chili beef + beans/tomatoes",
               },
             },
             {
@@ -650,36 +637,36 @@
               icon: "☀️",
               mealEmoji: "🥞",
               dinner: "Breakfast-for-dinner",
-              adultLunch: "Sun lunch → burger leftover / soup (adults); pack Tucker Mon kit",
+              adultLunch: "Sun lunch → chili leftover (optional); pack Tucker Mon kit",
               recipe: {
                 title: "Breakfast-for-dinner",
-                have: "eggs, Dave’s Killer bagels, fruit",
+                have: "eggs, bagels, fruit",
                 steps: [
-                  "Eggs, Dave’s Killer bagels, sausage; fruit.",
-                  "Sun night: pack Tucker’s fixed Mon lunchbox kit (not dinner leftovers).",
+                  "Eggs, bagels, sausage.",
+                  "Pack Tucker’s fixed Mon lunchbox kit (not dinner leftovers).",
                 ],
                 enjoy: "Hot plates together.",
-                buy: "breakfast sausage if needed",
+                buy: "breakfast sausage",
               },
             },
           ],
           groceries: [
             ...tuckerGroceries("w2"),
-            { id: "w2b-sausage", category: "Protein", name: "Dinner sausage (Mon sheet-pan)", price: "", hint: "" },
-            { id: "w2b-beef", category: "Protein", name: "Ground beef for tacos + burgers (or split packs)", price: "", hint: "" },
-            { id: "w2b-chicken", category: "Protein", name: "Chicken breasts (Thu oven)", price: "", hint: "" },
-            { id: "w2b-breakfast-sausage", category: "Protein", name: "Breakfast sausage (Sun)", price: "", hint: "" },
-            { id: "w2b-eggs", category: "Protein", name: "Eggs (if carton low)", price: "", hint: "" },
-            { id: "w2b-potatoes", category: "Produce", name: "Potatoes (sheet-pan)", price: "", hint: "" },
-            { id: "w2b-peppers", category: "Produce", name: "Bell peppers", price: "", hint: "" },
-            { id: "w2b-onion", category: "Produce", name: "Onion (if low)", price: "", hint: "" },
-            { id: "w2b-salad", category: "Produce", name: "Salad if Fresh Express low", price: "", hint: "Skip if still good" },
+            { id: "w2b-chicken", category: "Protein", name: "Chicken (Mon/Thu pasta)", price: "", hint: "" },
+            { id: "w2b-tilapia", category: "Protein", name: "Tilapia (Wed — Samantha)", price: "", hint: "Ted = leftover chicken/quesadilla" },
+            { id: "w2b-rotisserie", category: "Protein", name: "Rotisserie (Fri)", price: "", hint: "" },
+            { id: "w2b-beef", category: "Protein", name: "Chili beef (Sat weekend pot)", price: "", hint: "Weekend chili only — not midweek" },
+            { id: "w2b-sausage", category: "Protein", name: "Breakfast sausage (Sun)", price: "", hint: "" },
+            { id: "w2b-eggs", category: "Protein", name: "Eggs (if low)", price: "", hint: "" },
+            { id: "w2b-salad", category: "Produce", name: "Salad", price: "", hint: "" },
+            { id: "w2b-veg", category: "Produce", name: "Veg for fish night / sides", price: "", hint: "" },
+            { id: "w2b-onion", category: "Produce", name: "Onion (chili)", price: "", hint: "" },
             { id: "w2b-fruit", category: "Produce", name: "Fruit for adults/snacks", price: "", hint: "" },
-            { id: "w2b-cheese", category: "Dairy", name: "Cheese for tacos / grilled cheese if low", price: "", hint: "" },
+            { id: "w2b-cheese", category: "Dairy", name: "Cheese if low", price: "", hint: "" },
             { id: "w2b-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "" },
-            { id: "w2b-buns", category: "Pantry", name: "Burger buns (optional)", price: "", hint: "Or serve burgers over salad/rice" },
-            { id: "w2b-tortillas", category: "Pantry", name: "Tortillas if low", price: "", hint: "Skip if enough" },
-            { id: "w2b-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "Skip if stocked" },
+            { id: "w2b-alfredo", category: "Pantry", name: "Alfredo if doing Thu pasta", price: "", hint: "" },
+            { id: "w2b-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "" },
+            { id: "w2b-chili-cans", category: "Pantry", name: "Chili beans/tomatoes if pantry empty", price: "", hint: "Sat daytime chili only" },
           ],
         },
       },
@@ -699,6 +686,7 @@
   const els = {
     weekLabel: document.getElementById("week-label"),
     budgetBand: document.getElementById("budget-band"),
+    houseNote: document.getElementById("house-note"),
     week1: document.getElementById("week-1"),
     week2: document.getElementById("week-2"),
     planA: document.getElementById("plan-a"),
@@ -750,9 +738,7 @@
   function persist() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (_) {
-      /* ignore */
-    }
+    } catch (_) {}
     writeShareToUrl(false);
   }
 
@@ -867,8 +853,7 @@
   }
 
   function writeShareToUrl(push) {
-    const encoded = encodeState();
-    const next = `#s=${encoded}`;
+    const next = `#s=${encodeState()}`;
     if (push) history.pushState(null, "", next);
     else if (window.location.hash !== next) history.replaceState(null, "", next);
   }
@@ -893,6 +878,10 @@
     els.planABlurb.textContent = week.plans.A.blurb;
     els.planBBlurb.textContent = week.plans.B.blurb;
     els.budgetBand.textContent = `Budget band ${plan.budget}`;
+    if (els.houseNote) {
+      els.houseNote.textContent = plan.houseNote || "";
+      els.houseNote.hidden = !plan.houseNote;
+    }
   }
 
   function renderCalendar() {
@@ -901,12 +890,15 @@
     plan.days.forEach((day) => {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "day-card";
+      btn.className = "day-card" + (day.tedNote ? " day-card-fish" : "");
       btn.setAttribute("aria-label", `${day.day}: ${day.dinner}. Tap for recipe.`);
       const adultLine =
         day.adultLunch && day.adultLunch !== "—" && !/adult lunch → —/.test(day.adultLunch)
           ? `<p class="day-lunch">${escapeHtml(day.adultLunch)}</p>`
           : `<p class="day-lunch day-lunch-muted">adult lunch → —</p>`;
+      const tedLine = day.tedNote
+        ? `<p class="day-ted">${escapeHtml(day.tedNote)}</p>`
+        : "";
       btn.innerHTML = `
         <div class="day-head">
           <span>${day.short}</span>
@@ -915,6 +907,7 @@
         <div class="day-body">
           <span class="meal-emoji" aria-hidden="true">${day.mealEmoji}</span>
           <p class="day-dinner">${escapeHtml(day.dinner)}</p>
+          ${tedLine}
           ${adultLine}
           <p class="tap-hint">Tap for short recipe →</p>
         </div>
@@ -992,10 +985,14 @@
   function openRecipe(day) {
     const r = day.recipe;
     els.modalTitle.textContent = `${day.day} — ${r.title}`;
-    els.modalLunch.textContent =
-      day.adultLunch && day.adultLunch !== "—" && !/adult lunch → —/.test(day.adultLunch)
+    els.modalLunch.textContent = day.tedNote
+      ? day.tedNote
+      : day.adultLunch && day.adultLunch !== "—" && !/adult lunch → —/.test(day.adultLunch)
         ? day.adultLunch
         : "Tucker: fixed school lunchbox (not dinner leftovers)";
+    const tedBlock = day.tedNote
+      ? `<div class="recipe-block recipe-ted"><h4>Ted (no fish)</h4><p>${escapeHtml(day.tedNote)}</p></div>`
+      : "";
     els.modalBody.innerHTML = `
       <div class="recipe-block">
         <h4>Have (pantry first)</h4>
@@ -1005,6 +1002,7 @@
         <h4>Do</h4>
         <ul>${r.steps.map((s) => `<li>${escapeHtml(s)}</li>`).join("")}</ul>
       </div>
+      ${tedBlock}
       <div class="recipe-block">
         <h4>Make it enjoyable</h4>
         <p>${escapeHtml(r.enjoy)}</p>
@@ -1015,7 +1013,7 @@
       </div>
       <div class="recipe-block">
         <h4>Tucker school lunch</h4>
-        <p>Fixed kit Mon–Fri: yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice. Adults only for dinner leftovers.</p>
+        <p>Fixed kit Mon–Fri: yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice. Not dinner leftovers.</p>
       </div>
     `;
     els.modal.classList.add("open");
@@ -1034,19 +1032,20 @@
     const lines = [
       `Burns Family grocery — ${state.weekTitle} (${week.label} · ${plan.label})`,
       `Budget band ${plan.budget}`,
+      plan.houseNote || "",
       "Tucker lunchbox = yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice",
       "Restock midweek as packs deplete. Tucker does NOT eat dinner leftovers for school lunch.",
+      "Chili = weekend daytime only when on the plan (not midweek, not twice, not every week).",
       "",
-    ];
+    ].filter(Boolean);
     CATEGORIES.forEach((cat) => {
       const items = allGroceryItems().filter((i) => i.category === cat);
       if (!items.length) return;
       lines.push(cat.toUpperCase());
       items.forEach((item) => {
         const mark = itemChecked(item.id) ? "[x]" : "[ ]";
-        const price = item.price ? ` ${item.price}` : "";
         const hint = item.hint ? ` (${item.hint})` : "";
-        lines.push(`${mark} ${item.name}${price}${hint}`);
+        lines.push(`${mark} ${item.name}${hint}`);
       });
       lines.push("");
     });
@@ -1095,16 +1094,8 @@
 
   function setWeek(weekId) {
     const next = weekId === "2" ? "2" : "1";
-    const prevDefault = WEEKS[state.week].title;
     state.week = next;
-    if (!state.weekTitle || state.weekTitle === prevDefault) {
-      state.weekTitle = WEEKS[next].title;
-    } else if (state.weekTitle === WEEKS["1"].title || state.weekTitle === WEEKS["2"].title) {
-      state.weekTitle = WEEKS[next].title;
-    } else {
-      // User customized title — still switch label to the selected week's default for clarity
-      state.weekTitle = WEEKS[next].title;
-    }
+    state.weekTitle = WEEKS[next].title;
     persist();
     renderAll();
   }
