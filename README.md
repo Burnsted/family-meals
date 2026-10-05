@@ -12,7 +12,10 @@ Live site (GitHub Pages): **https://burnsted.github.io/family-meals/**
 - Checks persist in `localStorage` on each phone
 - **Copy share link** — encodes plan choice + checked items (+ custom items) in the URL hash so you can text it back and forth
 - **Copy grocery list as text** for iMessage/SMS
-- Budget band, Tucker lunchbox tip, editable week title
+- Budget band (~$100–130), editable week title
+- **Tucker lunchbox** = yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice (fixed Mon–Fri kit — **not** dinner leftovers)
+- Dedicated grocery section for 5 school days + midweek restock note
+- Adult leftover lunches from dinner stay optional for Ted/Samantha only
 - Add custom grocery items
 
 No login, no database, no paid services. Vanilla HTML / CSS / JS.

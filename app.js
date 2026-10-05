@@ -2,14 +2,60 @@
   "use strict";
 
   const STORAGE_KEY = "family-meals-state-v1";
-  const CATEGORIES = ["Protein", "Produce", "Dairy", "Pantry"];
+  const CATEGORIES = ["Tucker lunchbox", "Protein", "Produce", "Dairy", "Pantry"];
+
+  /** Same Mon–Fri kit for Option A and Option B — not dinner leftovers */
+  const TUCKER_GROCERIES = [
+    {
+      id: "t-yogurt",
+      category: "Tucker lunchbox",
+      name: "Yogurt cups ×5+ (Chobani multipack)",
+      price: "",
+      hint: "Count packs Sun night; restock midweek if depleting",
+    },
+    {
+      id: "t-cheese",
+      category: "Tucker lunchbox",
+      name: "Cheese sticks ×5+ (Polly-O / Cheese Heads)",
+      price: "",
+      hint: "Already stocked — buy if not enough for 5 days",
+    },
+    {
+      id: "t-pretzels",
+      category: "Tucker lunchbox",
+      name: "Pretzels and/or Pringles (if low)",
+      price: "",
+      hint: "Snyder’s / Pringles already in pantry — portion for 5 days",
+    },
+    {
+      id: "t-fruit-snack",
+      category: "Tucker lunchbox",
+      name: "Fruit snacks ×5+",
+      price: "",
+      hint: "Restock midweek as packs deplete",
+    },
+    {
+      id: "t-beef-stick",
+      category: "Tucker lunchbox",
+      name: "Natural beef sticks (red/white pack) ×5+",
+      price: "",
+      hint: "Likely need — check pantry; buy ahead for the week",
+    },
+    {
+      id: "t-juice",
+      category: "Tucker lunchbox",
+      name: "Apple juice boxes if Apple & Eve running low",
+      price: "",
+      hint: "Apple & Eve boxes already on hand — top up for 5 days",
+    },
+  ];
 
   const PLANS = {
     A: {
       id: "A",
       label: "Option A",
-      blurb: "Cook once · lunch tomorrow",
-      budget: "~$90–130",
+      blurb: "Rotisserie · tacos · Alfredo · chili",
+      budget: "~$100–130",
       days: [
         {
           id: "mon",
@@ -17,18 +63,18 @@
           short: "Mon",
           icon: "👨‍🍳",
           mealEmoji: "🍗",
-          dinner: "Rotisserie chicken + rice/potatoes + salad",
-          lunch: "lunch → chicken wrap / sandwich",
+          dinner: "Rotisserie + rice/potatoes + salad",
+          adultLunch: "adult lunch → chicken wrap/sandwich (opt)",
           recipe: {
-            title: "Rotisserie plate (15 min)",
-            have: "rotisserie, Fresh Express salad or veg, rice/potatoes, butter",
+            title: "Rotisserie plate",
+            have: "rotisserie, Fresh Express salad or veg, rice/potatoes, dressing, butter",
             steps: [
-              "Warm chicken 10 min at 350°F.",
-              "Microwave rice or roast leftover potatoes with oil + salt + garlic powder.",
-              "Toss salad with Kraft dressing you already have.",
+              "Warm rotisserie (about 10 min at 350°F).",
+              "Rice or potatoes on the side.",
+              "Salad + dressing; lemon optional.",
             ],
-            enjoy: "Warm the meat (not cold fridge chicken), squeeze Sicilia lemon on salad, butter on potatoes.",
-            buy: "none if rotisserie is home",
+            enjoy: "Warm the meat; butter on potatoes; lemon on salad if you like.",
+            buy: "rotisserie if not already home",
           },
         },
         {
@@ -37,18 +83,17 @@
           short: "Tue",
           icon: "🌮",
           mealEmoji: "🌮",
-          dinner: "Taco night (beef or leftover chicken)",
-          lunch: "lunch → taco meat wrap / quesadilla",
+          dinner: "Taco night",
+          adultLunch: "adult lunch → leftover taco meat quesadilla (opt)",
           recipe: {
-            title: "Taco night (25 min)",
+            title: "Taco night",
             have: "tortillas, McCormick taco seasoning, Sargento taco cheese, salsa, Bush’s taco beans",
             steps: [
-              "Brown 1 lb ground beef (or shred leftover rotisserie) → drain.",
-              "Stir in taco packet + ⅔ cup water (or Swanson broth). Simmer 5 min.",
-              "Warm tortillas and Bush’s beans. Top with cheese, salsa, optional lettuce/tomato.",
+              "Brown beef or shred leftover chicken + taco packet + water/broth.",
+              "Warm tortillas; cheese, salsa, Bush’s beans on the side.",
             ],
-            enjoy: "Toast tortillas in a dry pan 20 sec/side; put beans in a bowl with cheese on top so they melt.",
-            buy: "ground beef (if not using leftover chicken), onion, lettuce/tomato optional",
+            enjoy: "Toast tortillas in a dry pan; melt cheese over warm beans.",
+            buy: "ground beef if not using leftover chicken; onion optional",
           },
         },
         {
@@ -57,17 +102,16 @@
           short: "Wed",
           icon: "⭐",
           mealEmoji: "🧀",
-          dinner: "Leftover taco rebuild (nachos / bowls / quesadillas)",
-          lunch: "lunch → Alfredo thermos (if ready) or bagel + string cheese",
+          dinner: "Taco rebuild (nachos / bowls / quesadillas)",
+          adultLunch: "adult lunch → optional leftover plate",
           recipe: {
-            title: "Leftover taco rebuild (15 min)",
-            have: "leftover taco meat, tortillas/chips, cheese, salsa, rice or Rice-A-Roni",
+            title: "Taco rebuild",
+            have: "leftover taco meat, tortillas/chips, cheese, salsa, rice",
             steps: [
-              "Nachos: chips → meat → cheese → 400°F 5 min → salsa.",
-              "Taco bowls: rice + meat + cheese + salsa + beans.",
-              "Quesadillas: tortilla + meat + cheese, skillet both sides.",
+              "Nachos, taco bowls, or quesadillas from leftover taco meat.",
+              "Same flavors, new shape — not sad scraps.",
             ],
-            enjoy: "Don’t just microwave a plate — rebuild into nachos or bowls so it feels new.",
+            enjoy: "Rebuild into nachos or bowls so dinner feels new.",
             buy: "none",
           },
         },
@@ -77,18 +121,17 @@
           short: "Thu",
           icon: "💛",
           mealEmoji: "🍝",
-          dinner: "Chicken Alfredo + side salad",
-          lunch: "lunch → thermos pasta",
+          dinner: "Chicken Alfredo (cook double)",
+          adultLunch: "adult lunch → thermos Alfredo (opt)",
           recipe: {
-            title: "Chicken Alfredo (30 min)",
-            have: "Bertolli Garlic Alfredo, Barilla/Mueller’s pasta, chicken or leftover rotisserie, Parmesan, butter/garlic",
+            title: "Chicken Alfredo",
+            have: "Bertolli Garlic Alfredo, pasta, chicken or leftover rotisserie, Parmesan",
             steps: [
-              "Boil pasta. Meanwhile sauté diced chicken in butter + garlic powder + salt/pepper (or shred rotisserie).",
-              "Warm Alfredo in pan (don’t boil hard). Toss pasta + chicken + sauce.",
-              "Finish with Parmesan + black pepper. Side: Fresh Express salad.",
-              "Cook double for Fri thermos lunches.",
+              "Boil pasta; cook or shred chicken.",
+              "Warm Alfredo; toss pasta + chicken + sauce.",
+              "Parmesan + pepper. Cook double for adult leftover lunches.",
             ],
-            enjoy: "Undercook pasta 1 minute, finish in the sauce; extra black pepper and Parmesan on the table.",
+            enjoy: "Finish pasta in the sauce; extra black pepper on the table.",
             buy: "chicken breast if rotisserie is gone",
           },
         },
@@ -98,18 +141,17 @@
           short: "Fri",
           icon: "🌿",
           mealEmoji: "🥘",
-          dinner: "Oven chicken breasts + potatoes + veg",
-          lunch: "weekend → chicken sandwiches; pack Mon lunch Sun night",
+          dinner: "Sheet-pan oven chicken + potatoes + veg",
+          adultLunch: "adult lunch → chicken sandwich Sat (opt)",
           recipe: {
-            title: "Oven chicken + potatoes (40 min, mostly hands-off)",
-            have: "chicken breasts, potatoes, oil/butter, garlic powder, paprika, salad/veg",
+            title: "Sheet-pan oven chicken",
+            have: "chicken breasts, potatoes, oil, salt, garlic powder, paprika, salad/veg",
             steps: [
               "Heat oven 425°F.",
-              "Cube potatoes, toss oil + salt + garlic powder + paprika → sheet pan.",
-              "Season chicken same spices + pepper → same pan or second pan.",
-              "Roast 22–28 min until chicken hits 165°F.",
+              "Chicken breasts + potatoes with oil, salt, garlic powder, paprika.",
+              "Roast until chicken hits 165°F.",
             ],
-            enjoy: "Don’t crowd the pan (crispy potatoes); rest chicken 5 min before slicing; lemon squeeze optional.",
+            enjoy: "Don’t crowd the pan; rest chicken before slicing.",
             buy: "chicken breasts, potatoes",
           },
         },
@@ -119,18 +161,17 @@
           short: "Sat",
           icon: "🍲",
           mealEmoji: "🌶️",
-          dinner: "Big pot chili",
-          lunch: "Sat lunch → leftover chicken sandwiches; Sun → chili",
+          dinner: "Big chili pot",
+          adultLunch: "Sat lunch → chicken leftovers; Sun → chili (adults)",
           recipe: {
-            title: "One-pot chili (45 min)",
-            have: "ground beef or leftover chicken, Muir Glen tomatoes, beans, McCormick stew packet or chili spices, Swanson broth",
+            title: "Big chili pot",
+            have: "beef or leftover chicken, onion, tomatoes, beans, broth, chili powder/cumin",
             steps: [
-              "Brown 1 lb beef with onion.",
-              "Add 1 can tomatoes, 1–2 cans beans (drained), 1 cup broth, stew packet or 1 tbsp chili powder + 1 tsp cumin.",
-              "Simmer 25–30 min. Taste salt.",
+              "Brown beef + onion; add tomatoes, beans, broth, chili powder/cumin.",
+              "Simmer; top with cheese + crushed Doritos.",
             ],
-            enjoy: "Top bowls with taco cheese + crushed Doritos or Ritz.",
-            buy: "ground beef if used up Tue; onion",
+            enjoy: "One pot feeds Sat dinner + adult Sun lunch.",
+            buy: "ground beef if used up earlier; onion",
           },
         },
         {
@@ -139,48 +180,43 @@
           short: "Sun",
           icon: "☀️",
           mealEmoji: "🥞",
-          dinner: "Breakfast-for-dinner (eggs, bagels, sausage/bacon, fruit)",
-          lunch: "lunch → chili leftovers; pack Mon lunch from Fri chicken",
+          dinner: "Breakfast-for-dinner",
+          adultLunch: "Sun lunch → chili over rice (adults); pack Tucker Mon kit Sun night",
           recipe: {
-            title: "Breakfast-for-dinner (20 min)",
-            have: "eggs, butter, bagels/Dave’s, fruit, maple syrup or Lyle’s; pancake mix optional",
+            title: "Breakfast-for-dinner",
+            have: "eggs, bagels, butter, fruit, maple optional",
             steps: [
-              "Cook sausage or bacon.",
-              "Scramble or fry eggs in butter. Toast bagels.",
-              "Fruit bowl. Optional: 1–2 pancakes if kids want diner night.",
-              "Pack Mon school lunch from Fri chicken leftovers.",
+              "Eggs, bagels, sausage; fruit; maple optional.",
+              "Sun night: pack Tucker’s fixed Mon lunchbox kit (not dinner leftovers).",
             ],
-            enjoy: "Everything hits the table hot together; syrup + butter on the side; let Tucker pick scrambled vs fried.",
-            buy: "sausage or bacon",
+            enjoy: "Everything hot together; let Tucker pick scrambled vs fried eggs at dinner.",
+            buy: "sausage",
           },
         },
       ],
       groceries: [
-        { id: "a-rotisserie", category: "Protein", name: "1 rotisserie (if not already home)", price: "~$8", hint: "Grabbed / check fridge" },
-        { id: "a-chicken", category: "Protein", name: "2–3 lb chicken breasts", price: "~$10–14", hint: "" },
-        { id: "a-beef", category: "Protein", name: "1–1.5 lb ground beef (tacos + chili)", price: "~$8–12", hint: "Some ground meat may already be home" },
-        { id: "a-eggs", category: "Protein", name: "Eggs (if carton low)", price: "~$4", hint: "Egg carton already in fridge — check count" },
-        { id: "a-sausage", category: "Protein", name: "Breakfast sausage or bacon (Sun)", price: "~$5–7", hint: "" },
-        { id: "a-potatoes", category: "Produce", name: "Potatoes (5 lb)", price: "~$4", hint: "" },
-        { id: "a-salad", category: "Produce", name: "Salad kit refresh if Fresh Express low", price: "~$4", hint: "Fresh Express kits already stocked — skip if still good" },
-        { id: "a-fruit", category: "Produce", name: "Bananas + apples (school fruit)", price: "~$6", hint: "" },
-        { id: "a-grapes", category: "Produce", name: "Grapes or more berries", price: "~$5", hint: "Strawberries may still be good" },
-        { id: "a-onion", category: "Produce", name: "Yellow onion + garlic (if low)", price: "~$3", hint: "" },
-        { id: "a-taco-veg", category: "Produce", name: "Optional: shredded lettuce/tomato for tacos", price: "~$3", hint: "" },
-        { id: "a-milk", category: "Dairy", name: "fairlife or Publix milk if running out midweek", price: "~$4–6", hint: "fairlife + Publix milk already on hand" },
-        { id: "a-cheese", category: "Dairy", name: "Shredded cheese only if Sargento bag empty", price: "~$4", hint: "Sargento taco cheese already stocked — skip" },
-        { id: "a-yogurt", category: "Dairy", name: "Yogurt cups for lunchboxes (Chobani)", price: "~$5", hint: "Chobani 4-pack already stocked — top up if low" },
-        { id: "a-tortillas", category: "Pantry", name: "Tortillas if package almost done", price: "~$3", hint: "Old El Paso tortillas already in fridge — skip if enough" },
-        { id: "a-rice", category: "Pantry", name: "Rice (if no leftover)", price: "~$3", hint: "Rice-A-Roni / Rico rice already stocked" },
-        { id: "a-chili-cans", category: "Pantry", name: "Chili beans / diced tomatoes if not using pantry cans", price: "~$3", hint: "Muir Glen tomatoes + Bush’s beans already stocked — skip" },
-        { id: "a-bread", category: "Pantry", name: "Bread or more bagels for sandwiches", price: "~$4", hint: "Dave’s / bagels already stocked — skip if enough" },
+        ...TUCKER_GROCERIES,
+        { id: "a-rotisserie", category: "Protein", name: "1 rotisserie (if not already home)", price: "", hint: "Check fridge / store grab" },
+        { id: "a-chicken", category: "Protein", name: "2–3 lb chicken breasts", price: "", hint: "" },
+        { id: "a-beef", category: "Protein", name: "1–1.5 lb ground beef (tacos + chili)", price: "", hint: "Some ground meat may already be home" },
+        { id: "a-eggs", category: "Protein", name: "Eggs (if carton low)", price: "", hint: "Egg carton in fridge — check count" },
+        { id: "a-sausage", category: "Protein", name: "Breakfast sausage (Sun)", price: "", hint: "" },
+        { id: "a-potatoes", category: "Produce", name: "Potatoes", price: "", hint: "" },
+        { id: "a-fruit", category: "Produce", name: "Fruit for adults/snacks", price: "", hint: "" },
+        { id: "a-onion", category: "Produce", name: "Yellow onion (if low)", price: "", hint: "" },
+        { id: "a-salad", category: "Produce", name: "Salad refresh if Fresh Express low", price: "", hint: "Fresh Express already stocked — skip if still good" },
+        { id: "a-milk", category: "Dairy", name: "Milk top-up midweek if needed", price: "", hint: "fairlife / Publix already on hand" },
+        { id: "a-shredded", category: "Dairy", name: "Shredded cheese only if Sargento bag empty", price: "", hint: "Taco cheese already stocked — skip" },
+        { id: "a-tortillas", category: "Pantry", name: "Tortillas only if almost done", price: "", hint: "Old El Paso already in fridge — skip if enough" },
+        { id: "a-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "Rice-A-Roni / Rico already stocked" },
+        { id: "a-chili-cans", category: "Pantry", name: "Chili beans/tomatoes only if not using pantry cans", price: "", hint: "Muir Glen + Bush’s already stocked — skip" },
       ],
     },
     B: {
       id: "B",
       label: "Option B",
-      blurb: "Alternate menu · same week",
-      budget: "~$90–120",
+      blurb: "Sausage sheet-pan · quesadillas · potato bar",
+      budget: "~$100–130",
       days: [
         {
           id: "mon",
@@ -188,17 +224,16 @@
           short: "Mon",
           icon: "🌿",
           mealEmoji: "🌭",
-          dinner: "Sheet-pan sausage + potatoes + peppers",
-          lunch: "lunch → wrap or thermos leftovers",
+          dinner: "Sausage sheet-pan + potatoes + peppers",
+          adultLunch: "adult lunch → wrap from leftovers (opt)",
           recipe: {
-            title: "Sausage sheet-pan (~25 min)",
-            have: "oil, salt, garlic powder, paprika; potatoes if buying",
+            title: "Sausage sheet-pan",
+            have: "oil, salt, garlic powder, paprika",
             steps: [
-              "Heat oven 425°F.",
-              "Sheet-pan sausage + cubed potatoes + peppers with oil, salt, garlic powder, paprika.",
-              "Roast about 25 min until sausage cooked and potatoes tender.",
+              "425°F sausage + cubed potatoes + peppers.",
+              "Toss with oil, salt, garlic powder, paprika; roast ~25 min.",
             ],
-            enjoy: "Don’t crowd the pan so peppers and potatoes get color.",
+            enjoy: "Don’t crowd the pan so peppers and potatoes brown.",
             buy: "sausage, potatoes, peppers",
           },
         },
@@ -209,16 +244,15 @@
           icon: "⭐",
           mealEmoji: "🫓",
           dinner: "Quesadilla night",
-          lunch: "lunch → extra quesadilla + fruit + yogurt",
+          adultLunch: "adult lunch → extra quesadilla (opt)",
           recipe: {
-            title: "Chicken quesadillas",
-            have: "tortillas, cheese, leftover chicken/breast, salsa, Bush’s beans",
+            title: "Quesadilla night",
+            have: "tortillas, cheese, chicken, salsa, Bush’s beans",
             steps: [
-              "Fill tortilla with cheese + shredded chicken.",
-              "Skillet both sides until golden and melty.",
-              "Serve with salsa + Bush’s beans on the side. Make an extra for tomorrow’s lunch.",
+              "Tortilla + cheese + shredded chicken; skillet both sides.",
+              "Salsa + beans on the side. Make an extra for adult lunch if you want.",
             ],
-            enjoy: "Extra cheese edges that crisp in the pan = diner vibes.",
+            enjoy: "Crispy cheese edges = diner vibes.",
             buy: "chicken if none leftover",
           },
         },
@@ -229,16 +263,15 @@
           icon: "☁️",
           mealEmoji: "🍲",
           dinner: "Big chili pot",
-          lunch: "lunch → chili thermos + crackers",
+          adultLunch: "adult lunch → chili thermos (opt)",
           recipe: {
-            title: "Chili (same as Option A Sat)",
-            have: "tomatoes, beans, broth, chili powder / stew packet",
+            title: "Big chili pot",
+            have: "beef or chicken, onion, tomatoes, beans, broth, chili seasoning",
             steps: [
-              "Brown beef (or use chicken) with onion.",
-              "Add tomatoes, beans, broth, chili seasoning.",
-              "Simmer 25–30 min. Taste salt.",
+              "Same chili as Option A: brown meat + onion, add tomatoes/beans/broth/spices.",
+              "Simmer; cheese on top.",
             ],
-            enjoy: "Cheese + crushed chips on top.",
+            enjoy: "Big pot → dinner tonight + adult lunches tomorrow.",
             buy: "ground beef or sausage if needed; onion",
           },
         },
@@ -248,17 +281,16 @@
           short: "Thu",
           icon: "💛",
           mealEmoji: "🌮",
-          dinner: "Chili rebuild bowls / nachos / over rice",
-          lunch: "lunch → bagel + string cheese OR chili again",
+          dinner: "Chili rebuild bowls / nachos",
+          adultLunch: "adult lunch → optional chili again",
           recipe: {
-            title: "Leftover chili rebuild",
+            title: "Chili rebuild",
             have: "leftover chili, chips or rice, cheese",
             steps: [
-              "Nachos: chips → chili → cheese → broil/bake briefly.",
-              "Or rice bowls with chili + cheese.",
-              "Same chili, new shape — not sad scraps.",
+              "Nachos or rice bowls from leftover chili.",
+              "Same chili, new shape.",
             ],
-            enjoy: "Lime squeeze if you have it.",
+            enjoy: "Lime + cheese if you have them.",
             buy: "none",
           },
         },
@@ -268,17 +300,15 @@
           short: "Fri",
           icon: "🍗",
           mealEmoji: "🍚",
-          dinner: "Oven chicken breast + rice + salad",
-          lunch: "lunch → chicken sandwich + fruit + Goldfish",
+          dinner: "Oven chicken + rice + salad",
+          adultLunch: "adult lunch → sandwich Sat (opt)",
           recipe: {
             title: "Oven chicken + rice",
-            have: "chicken breasts, rice, Fresh Express salad, lemon + Parmesan optional",
+            have: "chicken breasts, rice, Fresh Express salad",
             steps: [
-              "Roast chicken breasts at 425°F until 165°F.",
-              "Microwave/stovetop rice.",
-              "Serve with Fresh Express salad; lemon + Parmesan if you want fancy.",
+              "Roast chicken breasts; cook rice; salad on the side.",
             ],
-            enjoy: "Rest chicken before slicing for sandwiches tomorrow.",
+            enjoy: "Rest chicken before slicing for adult sandwiches.",
             buy: "chicken breasts",
           },
         },
@@ -288,17 +318,15 @@
           short: "Sat",
           icon: "🥞",
           mealEmoji: "🍳",
-          dinner: "Breakfast-for-dinner (eggs, bagels, sausage)",
-          lunch: "Sat lunch → chicken leftovers",
+          dinner: "Breakfast-for-dinner",
+          adultLunch: "—",
           recipe: {
             title: "Breakfast-for-dinner",
-            have: "eggs, bagels, butter, fruit, maple/Lyle’s",
+            have: "eggs, bagels, butter, fruit, maple optional",
             steps: [
-              "Cook sausage. Eggs scrambled or fried in butter.",
-              "Toast bagels. Fruit on the side.",
-              "Optional pancakes from the fridge mix.",
+              "Eggs, bagels, sausage; fruit; maple optional.",
             ],
-            enjoy: "Hot plates together; syrup on the side.",
+            enjoy: "Hot plates together.",
             buy: "sausage if not bought earlier",
           },
         },
@@ -308,38 +336,36 @@
           short: "Sun",
           icon: "☀️",
           mealEmoji: "🥔",
-          dinner: "Build-your-own baked potato bar",
-          lunch: "lunch → soup + grilled cheese OR leftover chili; pack Mon lunch",
+          dinner: "Baked potato bar (chili/cheese/butter)",
+          adultLunch: "Sun lunch → Campbell’s Chunky or chili (adults); pack Tucker Mon kit",
           recipe: {
             title: "Baked potato bar",
-            have: "potatoes, chili leftover, cheese, butter; Campbell’s Chunky optional for lunch",
+            have: "potatoes, chili leftover, cheese, butter; Campbell’s Chunky optional for adult lunch",
             steps: [
-              "Microwave or oven-bake potatoes until fluffy.",
-              "Set out toppings: chili leftover, cheese, butter.",
-              "Pack Mon lunch from Fri chicken leftovers.",
+              "Bake or microwave potatoes; toppings from chili/cheese/butter.",
+              "Sun night: pack Tucker’s fixed Mon lunchbox kit (not dinner leftovers).",
             ],
-            enjoy: "Let everyone build their own — Tucker picks toppings.",
+            enjoy: "Everyone builds their own potato.",
             buy: "potatoes if not already bought",
           },
         },
       ],
       groceries: [
-        { id: "b-sausage", category: "Protein", name: "Dinner sausage (sheet-pan) + breakfast sausage if wanted", price: "~$8–12", hint: "" },
-        { id: "b-chicken", category: "Protein", name: "2–3 lb chicken breasts", price: "~$10–14", hint: "" },
-        { id: "b-beef", category: "Protein", name: "Ground beef for chili (or use chicken)", price: "~$8–12", hint: "Some ground meat may already be home" },
-        { id: "b-eggs", category: "Protein", name: "Eggs (if carton low)", price: "~$4", hint: "Egg carton already in fridge — check count" },
-        { id: "b-potatoes", category: "Produce", name: "Potatoes (sheet-pan + potato bar)", price: "~$4", hint: "" },
-        { id: "b-peppers", category: "Produce", name: "Bell peppers (sheet-pan)", price: "~$3–4", hint: "" },
-        { id: "b-onion", category: "Produce", name: "Yellow onion (chili)", price: "~$2", hint: "" },
-        { id: "b-fruit", category: "Produce", name: "Bananas + apples (school fruit)", price: "~$6", hint: "" },
-        { id: "b-salad", category: "Produce", name: "Salad kit if Fresh Express low", price: "~$4", hint: "Fresh Express kits already stocked — skip if still good" },
-        { id: "b-yogurt", category: "Dairy", name: "Yogurt cups for lunchboxes", price: "~$5", hint: "Chobani already stocked — top up if low" },
-        { id: "b-cheese", category: "Dairy", name: "Shredded cheese if Sargento bag empty", price: "~$4", hint: "Sargento taco cheese already stocked — skip" },
-        { id: "b-milk", category: "Dairy", name: "Milk top-up midweek if needed", price: "~$4–6", hint: "fairlife + Publix milk already on hand" },
-        { id: "b-rice", category: "Pantry", name: "Rice if pantry thin", price: "~$3", hint: "Rice-A-Roni / Rico already stocked — skip" },
-        { id: "b-chili-cans", category: "Pantry", name: "Chili beans / tomatoes only if pantry empty", price: "~$3", hint: "Muir Glen + Bush’s already stocked — skip" },
-        { id: "b-tortillas", category: "Pantry", name: "Tortillas if almost done (quesadillas)", price: "~$3", hint: "Old El Paso already in fridge — skip if enough" },
-        { id: "b-bread", category: "Pantry", name: "Bagels/bread if low", price: "~$4", hint: "Dave’s / bagels already stocked" },
+        ...TUCKER_GROCERIES,
+        { id: "b-sausage", category: "Protein", name: "Dinner sausage (sheet-pan) + breakfast sausage if wanted", price: "", hint: "" },
+        { id: "b-chicken", category: "Protein", name: "2–3 lb chicken breasts", price: "", hint: "" },
+        { id: "b-beef", category: "Protein", name: "Ground beef for chili (or use chicken)", price: "", hint: "Some ground meat may already be home" },
+        { id: "b-eggs", category: "Protein", name: "Eggs (if carton low)", price: "", hint: "Egg carton in fridge — check count" },
+        { id: "b-potatoes", category: "Produce", name: "Potatoes (sheet-pan + potato bar)", price: "", hint: "" },
+        { id: "b-peppers", category: "Produce", name: "Bell peppers (sheet-pan)", price: "", hint: "" },
+        { id: "b-onion", category: "Produce", name: "Yellow onion (chili)", price: "", hint: "" },
+        { id: "b-fruit", category: "Produce", name: "Fruit for adults/snacks", price: "", hint: "" },
+        { id: "b-salad", category: "Produce", name: "Salad kit if Fresh Express low", price: "", hint: "Fresh Express already stocked — skip if still good" },
+        { id: "b-milk", category: "Dairy", name: "Milk top-up midweek if needed", price: "", hint: "fairlife / Publix already on hand" },
+        { id: "b-cheese", category: "Dairy", name: "Shredded cheese if Sargento bag empty", price: "", hint: "Already stocked — skip" },
+        { id: "b-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "Already stocked — skip" },
+        { id: "b-chili-cans", category: "Pantry", name: "Chili beans/tomatoes only if pantry empty", price: "", hint: "Muir Glen + Bush’s already stocked — skip" },
+        { id: "b-tortillas", category: "Pantry", name: "Tortillas if almost done (quesadillas)", price: "", hint: "Old El Paso already in fridge — skip if enough" },
       ],
     },
   };
@@ -539,6 +565,10 @@
       btn.type = "button";
       btn.className = "day-card";
       btn.setAttribute("aria-label", `${day.day}: ${day.dinner}. Tap for recipe.`);
+      const adultLine =
+        day.adultLunch && day.adultLunch !== "—"
+          ? `<p class="day-lunch">${escapeHtml(day.adultLunch)}</p>`
+          : `<p class="day-lunch day-lunch-muted">adult lunch → —</p>`;
       btn.innerHTML = `
         <div class="day-head">
           <span>${day.short}</span>
@@ -547,7 +577,7 @@
         <div class="day-body">
           <span class="meal-emoji" aria-hidden="true">${day.mealEmoji}</span>
           <p class="day-dinner">${escapeHtml(day.dinner)}</p>
-          <p class="day-lunch">${escapeHtml(day.lunch)}</p>
+          ${adultLine}
           <p class="tap-hint">Tap for short recipe →</p>
         </div>
       `;
@@ -579,9 +609,16 @@
     })).filter((group) => group.items.length);
 
     els.groceryList.innerHTML = "";
+
+    const tuckerNote = document.createElement("p");
+    tuckerNote.className = "tucker-note";
+    tuckerNote.textContent =
+      "Tucker lunchbox: same kit every school day (Mon–Fri). Count packs Sun night; restock midweek as yogurt, sticks, juice, and snacks deplete. Not dinner leftovers.";
+    els.groceryList.appendChild(tuckerNote);
+
     byCat.forEach((group) => {
       const h = document.createElement("h3");
-      h.className = "category";
+      h.className = "category" + (group.cat === "Tucker lunchbox" ? " category-tucker" : "");
       h.textContent = group.cat;
       els.groceryList.appendChild(h);
 
@@ -618,7 +655,10 @@
   function openRecipe(day) {
     const r = day.recipe;
     els.modalTitle.textContent = `${day.day} — ${r.title}`;
-    els.modalLunch.textContent = day.lunch;
+    els.modalLunch.textContent =
+      day.adultLunch && day.adultLunch !== "—"
+        ? day.adultLunch
+        : "Tucker: fixed school lunchbox (not dinner leftovers)";
     els.modalBody.innerHTML = `
       <div class="recipe-block">
         <h4>Have (pantry first)</h4>
@@ -636,6 +676,10 @@
         <h4>Buy if missing</h4>
         <p>${escapeHtml(r.buy)}</p>
       </div>
+      <div class="recipe-block">
+        <h4>Tucker school lunch</h4>
+        <p>Fixed kit Mon–Fri: yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice. Adults only for dinner leftovers.</p>
+      </div>
     `;
     els.modal.classList.add("open");
     els.modal.setAttribute("aria-hidden", "false");
@@ -652,6 +696,8 @@
     const lines = [
       `Burns Family grocery — ${state.weekTitle} (${plan.label})`,
       `Budget band ${plan.budget}`,
+      "Tucker lunchbox = yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice",
+      "Restock midweek as packs deplete. Tucker does NOT eat dinner leftovers for school lunch.",
       "",
     ];
     CATEGORIES.forEach((cat) => {
@@ -666,7 +712,6 @@
       });
       lines.push("");
     });
-    lines.push("Tucker lunchbox = last night’s dinner + fruit + snack");
     return lines.join("\n").trim();
   }
 
