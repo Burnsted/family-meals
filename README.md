@@ -6,11 +6,11 @@ Live site (GitHub Pages): **https://burnsted.github.io/family-meals/**
 
 ## What’s included
 
-- Visual week calendar (Option **A** / Option **B**)
+- **Week 1** (Oct 5–11) and **Week 2** (Oct 12–18), each with Option **A** / Option **B**
 - Tap a day for a short pantry-first recipe
-- Grocery list with checkboxes by category (Protein, Produce, Dairy, Pantry)
+- Grocery list with checkboxes by category (Tucker lunchbox, Protein, Produce, Dairy, Pantry)
 - Checks persist in `localStorage` on each phone
-- **Copy share link** — encodes plan choice + checked items (+ custom items) in the URL hash so you can text it back and forth
+- **Copy share link** — encodes week + plan + checked items (+ custom items) in the URL hash
 - **Copy grocery list as text** for iMessage/SMS
 - Budget band (~$100–130), editable week title
 - **Tucker lunchbox** = yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice (fixed Mon–Fri kit — **not** dinner leftovers)
