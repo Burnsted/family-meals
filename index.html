@@ -4,21 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Burns Family meal week planner and grocery list for Ted & Samantha." />
-  <meta name="theme-color" content="#1f8a8a" />
+  <meta name="theme-color" content="#0f6e6e" />
   <title>Burns Family Meals</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="app">
     <header class="site-header">
-      <div class="brand-row">
-        <span class="brand-deco" aria-hidden="true">🌿</span>
-        <h1 class="brand">Burns Family Meals</h1>
-        <span class="brand-deco" aria-hidden="true">🌮</span>
-      </div>
+      <p class="brand-kicker">Kitchen HQ</p>
+      <h1 class="brand">Burns Family Meals</h1>
       <div class="week-label-wrap">
         <label class="visually-hidden" for="week-label">Week label</label>
         <input
@@ -30,103 +27,109 @@
           aria-label="Editable week title"
         />
       </div>
-      <p class="tagline">Adults: cook once / leftover lunches · Tucker: fixed school kit</p>
-      <div class="budget-pill" id="budget-band">Budget band ~$100–130</div>
-      <p class="house-note" id="house-note" hidden></p>
+      <p class="tagline">Cook once for dinners · leftover lunches for adults · Tucker’s fixed school kit</p>
+      <div class="budget-row">
+        <div class="budget-pill" id="budget-band">Budget band ~$100–130</div>
+        <div class="estimate-pill" id="estimate-band" title="Sum of optional $ estimates still unchecked">Est. left $0</div>
+      </div>
+      <p class="plan-note" id="house-note" hidden></p>
     </header>
 
-    <div class="toggle-block">
-      <p class="toggle-label" id="week-toggle-label">Week</p>
-      <div class="plan-toggle" role="group" aria-labelledby="week-toggle-label">
-        <button type="button" class="plan-btn week-btn" id="week-1" aria-pressed="true">
-          Week 1
-          <small>Oct 5–11</small>
-        </button>
-        <button type="button" class="plan-btn week-btn" id="week-2" aria-pressed="false">
-          Week 2
-          <small>Oct 12–18</small>
-        </button>
-      </div>
-    </div>
+    <aside class="rules-banner" aria-label="House rules">
+      <h2>House rules</h2>
+      <ul>
+        <li><strong>Tucker lunch (Mon–Fri):</strong> yogurt, cheese stick, pretzels/Pringles, fruit snack, beef stick, apple juice — never dinner leftovers. Restock midweek.</li>
+        <li><strong>Adults:</strong> leftover-lunch from dinner is fine.</li>
+        <li><strong>Chili:</strong> weekend daytime only — Week 1A Sat + Week 2B Sat. Not twice/week, not every week, not midweek.</li>
+        <li><strong>Fish nights:</strong> Samantha’s plate; Ted uses the leftover substitute noted on that day.</li>
+      </ul>
+    </aside>
 
-    <div class="toggle-block">
-      <p class="toggle-label" id="plan-toggle-label">Menu option</p>
-      <div class="plan-toggle plan-toggle-options" role="group" aria-labelledby="plan-toggle-label">
-        <button type="button" class="plan-btn" id="plan-a" aria-pressed="true">
-          Option A
-          <small id="plan-a-blurb">Rotisserie · tacos · Alfredo · chili</small>
+    <section class="templates" aria-labelledby="templates-title">
+      <div class="section-title">
+        <h2 id="templates-title">Load a week template</h2>
+        <span>One tap</span>
+      </div>
+      <div class="template-grid" role="group" aria-label="Week templates">
+        <button type="button" class="template-btn" data-week="1" data-plan="A" aria-pressed="true">
+          <span class="template-id">Week 1 · A</span>
+          <small id="tpl-1a">Tacos · Alfredo · salmon · weekend chili</small>
         </button>
-        <button type="button" class="plan-btn" id="plan-b" aria-pressed="false">
-          Option B
-          <small id="plan-b-blurb">Sausage sheet-pan · quesadillas · potato bar</small>
+        <button type="button" class="template-btn" data-week="1" data-plan="B" aria-pressed="false">
+          <span class="template-id">Week 1 · B</span>
+          <small id="tpl-1b">Sheet-pan · quesadillas · tilapia · burgers</small>
+        </button>
+        <button type="button" class="template-btn" data-week="2" data-plan="A" aria-pressed="false">
+          <span class="template-id">Week 2 · A</span>
+          <small id="tpl-2a">Tacos · Alfredo · salmon · sausage · no chili</small>
+        </button>
+        <button type="button" class="template-btn" data-week="2" data-plan="B" aria-pressed="false">
+          <span class="template-id">Week 2 · B</span>
+          <small id="tpl-2b">Chicken · quesadillas · tilapia · weekend chili</small>
         </button>
       </div>
-    </div>
+    </section>
 
     <section class="howto" aria-labelledby="howto-title">
-      <h2 id="howto-title">How to share (Ted &amp; Samantha)</h2>
+      <h2 id="howto-title">Share with Ted &amp; Samantha</h2>
       <ol>
-        <li>Pick <strong>Week 1 or Week 2</strong>, then <strong>Option A or B</strong>, and check off groceries.</li>
-        <li>Tap <strong>Copy share link</strong> and text/email it — the other person opens the same week + plan + checks.</li>
-        <li>Or tap <strong>Copy grocery list as text</strong> for a quick iMessage/SMS checklist.</li>
+        <li>Tap a <strong>Week template</strong>, check groceries (add $ estimates if you want).</li>
+        <li>Tap <strong>Copy share link</strong> — the other phone loads the same week, checks, prices, and custom items.</li>
+        <li>Or <strong>Copy grocery list as text</strong> for iMessage/SMS.</li>
       </ol>
       <p class="sync-note">
-        v1 sync = share-link (no login). Each phone also saves to localStorage.
-        For live simultaneous editing later, paste the grocery text into a shared note.
+        v1 sync = share link (no login). Each phone also saves to localStorage.
+        Shop mode makes aisle taps bigger and drops checked items to the bottom.
       </p>
     </section>
 
     <div class="actions">
-      <button type="button" class="btn btn-primary" id="copy-share">🔗 Copy share link</button>
-      <button type="button" class="btn btn-secondary" id="copy-grocery">📋 Copy grocery list as text</button>
+      <button type="button" class="btn btn-primary" id="copy-share">Copy share link</button>
+      <button type="button" class="btn btn-secondary" id="copy-grocery">Copy grocery list as text</button>
+      <button type="button" class="btn btn-ghost" id="shop-mode" aria-pressed="false">Shop mode: Off</button>
       <button type="button" class="btn btn-ghost" id="reset-checks">Clear checkmarks</button>
     </div>
-
-    <aside class="lunchbox" aria-label="Tucker lunchbox tip">
-      <span class="icon" aria-hidden="true">🎒</span>
-      <p>
-        Tucker lunchbox = yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice
-        <small>Same kit every school day · restock midweek · not dinner leftovers</small>
-      </p>
-      <span class="icon" aria-hidden="true">⭐</span>
-    </aside>
 
     <section aria-labelledby="week-title">
       <div class="section-title">
         <h2 id="week-title">This week’s dinners</h2>
-        <span>Tap a day for recipe</span>
+        <span>7-day calendar · tap for recipe</span>
       </div>
       <div class="week-grid" id="week-grid"></div>
     </section>
 
     <section class="grocery-panel" aria-labelledby="grocery-title">
       <div class="section-title">
-        <h2 id="grocery-title">Grocery list</h2>
+        <h2 id="grocery-title">Grocery checklist</h2>
         <span id="checked-count">0 checked</span>
       </div>
       <div class="grocery-meta">
-        <span class="chip">By category</span>
-        <span class="chip">Checks save on this phone</span>
-        <span class="chip">Skip hints from stock log</span>
+        <span class="chip">By aisle</span>
+        <span class="chip">Checks + $ save on phone</span>
+        <span class="chip">Share link encodes state</span>
       </div>
       <div id="grocery-list"></div>
 
       <div class="custom-add">
         <label class="visually-hidden" for="custom-category">Category</label>
         <select id="custom-category" aria-label="Custom item category">
-          <option>Tucker lunchbox</option>
-          <option>Protein</option>
           <option>Produce</option>
           <option>Dairy</option>
+          <option>Meat</option>
           <option selected>Pantry</option>
+          <option>Frozen</option>
+          <option>Tucker lunchbox</option>
+          <option>Other</option>
         </select>
         <label class="visually-hidden" for="custom-name">Custom grocery item</label>
         <input id="custom-name" type="text" maxlength="80" placeholder="Add custom grocery item…" />
+        <label class="visually-hidden" for="custom-price">Optional price</label>
+        <input id="custom-price" type="number" min="0" step="0.01" inputmode="decimal" placeholder="$" aria-label="Optional price estimate" />
         <button type="button" class="btn btn-secondary" id="add-custom">Add item</button>
       </div>
     </section>
 
-    <p class="footer-note">Made for the Burns kitchen · pantry-first · no account needed</p>
+    <p class="footer-note">Burns-owned planner · pantry-first · no account · no paid APIs</p>
   </div>
 
   <div
