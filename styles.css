@@ -480,6 +480,37 @@ body::before {
   font-weight: 650;
 }
 
+.house-note {
+  margin: 0.75rem auto 0;
+  max-width: 36rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--white);
+  border: 2px solid rgba(31, 138, 138, 0.35);
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--teal-deep);
+}
+
+.day-ted {
+  margin: 0.4rem 0 0;
+  padding: 0.4rem 0.55rem;
+  background: var(--coral-soft);
+  border-radius: 10px;
+  color: var(--coral-deep);
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.day-card-fish {
+  box-shadow: 0 10px 28px rgba(232, 106, 60, 0.16);
+}
+
+.recipe-ted {
+  border-left-color: var(--coral) !important;
+  background: var(--coral-soft) !important;
+}
+
 .tucker-note {
   margin: 0 0 0.75rem;
   padding: 0.7rem 0.85rem;

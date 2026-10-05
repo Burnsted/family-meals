@@ -14,7 +14,8 @@ Live site (GitHub Pages): **https://burnsted.github.io/family-meals/**
 - **Copy grocery list as text** for iMessage/SMS
 - Budget band (~$100–130), editable week title
 - **Tucker lunchbox** = yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice (fixed Mon–Fri kit — **not** dinner leftovers)
-- Dedicated grocery section for 5 school days + midweek restock note
+- **Chili** = weekend daytime cook only (football/company): Week 1 A Sat + Week 2 B Sat. Not midweek, not twice, not every week. Week 1 B and Week 2 A have no chili.
+- **Fish nights** (salmon/tilapia for Samantha): labeled **Ted: leftover substitute**
 - Adult leftover lunches from dinner stay optional for Ted/Samantha only
 - Add custom grocery items
 
