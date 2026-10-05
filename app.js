@@ -1,8 +1,19 @@
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "family-meals-state-v1";
-  const CATEGORIES = ["Tucker lunchbox", "Protein", "Produce", "Dairy", "Pantry"];
+  const STORAGE_KEY = "family-meals-state-v2";
+  const LEGACY_STORAGE_KEY = "family-meals-state-v1";
+  /** Aisle order for grocery checklist */
+  const CATEGORIES = [
+    "Produce",
+    "Dairy",
+    "Meat",
+    "Pantry",
+    "Frozen",
+    "Tucker lunchbox",
+    "Other",
+  ];
+  const LEGACY_CATEGORY = { Protein: "Meat" };
 
   function tuckerGroceries(prefix) {
     return [
@@ -201,12 +212,12 @@
           ],
           groceries: [
             ...tuckerGroceries("w1"),
-            { id: "w1a-rotisserie", category: "Protein", name: "Rotisserie", price: "", hint: "" },
-            { id: "w1a-chicken", category: "Protein", name: "Chicken breasts ~2 lb (Alfredo)", price: "", hint: "" },
-            { id: "w1a-beef", category: "Protein", name: "Ground beef ~1–1.5 lb (chili +/or tacos)", price: "", hint: "" },
-            { id: "w1a-salmon", category: "Protein", name: "Salmon fillets (Fri — Samantha)", price: "", hint: "Ted skips fish — leftover sub that night" },
-            { id: "w1a-sausage", category: "Protein", name: "Breakfast sausage (Sun)", price: "", hint: "" },
-            { id: "w1a-eggs", category: "Protein", name: "Eggs (if low)", price: "", hint: "" },
+            { id: "w1a-rotisserie", category: "Meat", name: "Rotisserie", price: "", hint: "" },
+            { id: "w1a-chicken", category: "Meat", name: "Chicken breasts ~2 lb (Alfredo)", price: "", hint: "" },
+            { id: "w1a-beef", category: "Meat", name: "Ground beef ~1–1.5 lb (chili +/or tacos)", price: "", hint: "" },
+            { id: "w1a-salmon", category: "Meat", name: "Salmon fillets (Fri — Samantha)", price: "", hint: "Ted skips fish — leftover sub that night" },
+            { id: "w1a-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "" },
+            { id: "w1a-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "" },
             { id: "w1a-potatoes", category: "Produce", name: "Potatoes / rice sides", price: "", hint: "" },
             { id: "w1a-onion", category: "Produce", name: "Onion", price: "", hint: "" },
             { id: "w1a-salad", category: "Produce", name: "Salad / veg", price: "", hint: "" },
@@ -347,12 +358,12 @@
           ],
           groceries: [
             ...tuckerGroceries("w1"),
-            { id: "w1b-chicken", category: "Protein", name: "Chicken breasts (enough Mon + Wed)", price: "", hint: "" },
-            { id: "w1b-tilapia", category: "Protein", name: "Tilapia (Thu — Samantha)", price: "", hint: "Ted skips fish — leftover chicken/quesadilla" },
-            { id: "w1b-rotisserie", category: "Protein", name: "Rotisserie if no leftover chicken (Fri)", price: "", hint: "" },
-            { id: "w1b-beef", category: "Protein", name: "Burger beef (Sat)", price: "", hint: "Skip chili ingredients this week" },
-            { id: "w1b-sausage", category: "Protein", name: "Breakfast sausage (Sun)", price: "", hint: "" },
-            { id: "w1b-eggs", category: "Protein", name: "Eggs (if low)", price: "", hint: "" },
+            { id: "w1b-chicken", category: "Meat", name: "Chicken breasts (enough Mon + Wed)", price: "", hint: "" },
+            { id: "w1b-tilapia", category: "Meat", name: "Tilapia (Thu — Samantha)", price: "", hint: "Ted skips fish — leftover chicken/quesadilla" },
+            { id: "w1b-rotisserie", category: "Meat", name: "Rotisserie if no leftover chicken (Fri)", price: "", hint: "" },
+            { id: "w1b-beef", category: "Meat", name: "Burger beef (Sat)", price: "", hint: "Skip chili ingredients this week" },
+            { id: "w1b-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "" },
+            { id: "w1b-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "" },
             { id: "w1b-potatoes", category: "Produce", name: "Potatoes", price: "", hint: "" },
             { id: "w1b-peppers", category: "Produce", name: "Peppers", price: "", hint: "" },
             { id: "w1b-salad", category: "Produce", name: "Salad refresh", price: "", hint: "" },
@@ -504,10 +515,10 @@
           ],
           groceries: [
             ...tuckerGroceries("w2"),
-            { id: "w2a-chicken", category: "Protein", name: "Chicken breasts", price: "", hint: "" },
-            { id: "w2a-beef", category: "Protein", name: "Taco beef/chicken if needed", price: "", hint: "" },
-            { id: "w2a-salmon", category: "Protein", name: "Salmon (Fri — Samantha)", price: "", hint: "Ted = Alfredo leftover" },
-            { id: "w2a-sausage", category: "Protein", name: "Sausage (Sat sheet-pan)", price: "", hint: "" },
+            { id: "w2a-chicken", category: "Meat", name: "Chicken breasts", price: "", hint: "" },
+            { id: "w2a-beef", category: "Meat", name: "Taco beef/chicken if needed", price: "", hint: "" },
+            { id: "w2a-salmon", category: "Meat", name: "Salmon (Fri — Samantha)", price: "", hint: "Ted = Alfredo leftover" },
+            { id: "w2a-sausage", category: "Meat", name: "Sausage (Sat sheet-pan)", price: "", hint: "" },
             { id: "w2a-potatoes", category: "Produce", name: "Potatoes (Mon + Sun bar)", price: "", hint: "" },
             { id: "w2a-broccoli", category: "Produce", name: "Broccoli", price: "", hint: "" },
             { id: "w2a-peppers", category: "Produce", name: "Peppers (Sat)", price: "", hint: "" },
@@ -652,12 +663,12 @@
           ],
           groceries: [
             ...tuckerGroceries("w2"),
-            { id: "w2b-chicken", category: "Protein", name: "Chicken (Mon/Thu pasta)", price: "", hint: "" },
-            { id: "w2b-tilapia", category: "Protein", name: "Tilapia (Wed — Samantha)", price: "", hint: "Ted = leftover chicken/quesadilla" },
-            { id: "w2b-rotisserie", category: "Protein", name: "Rotisserie (Fri)", price: "", hint: "" },
-            { id: "w2b-beef", category: "Protein", name: "Chili beef (Sat weekend pot)", price: "", hint: "Weekend chili only — not midweek" },
-            { id: "w2b-sausage", category: "Protein", name: "Breakfast sausage (Sun)", price: "", hint: "" },
-            { id: "w2b-eggs", category: "Protein", name: "Eggs (if low)", price: "", hint: "" },
+            { id: "w2b-chicken", category: "Meat", name: "Chicken (Mon/Thu pasta)", price: "", hint: "" },
+            { id: "w2b-tilapia", category: "Meat", name: "Tilapia (Wed — Samantha)", price: "", hint: "Ted = leftover chicken/quesadilla" },
+            { id: "w2b-rotisserie", category: "Meat", name: "Rotisserie (Fri)", price: "", hint: "" },
+            { id: "w2b-beef", category: "Meat", name: "Chili beef (Sat weekend pot)", price: "", hint: "Weekend chili only — not midweek" },
+            { id: "w2b-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "" },
+            { id: "w2b-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "" },
             { id: "w2b-salad", category: "Produce", name: "Salad", price: "", hint: "" },
             { id: "w2b-veg", category: "Produce", name: "Veg for fish night / sides", price: "", hint: "" },
             { id: "w2b-onion", category: "Produce", name: "Onion (chili)", price: "", hint: "" },
@@ -678,7 +689,9 @@
     plan: "A",
     weekTitle: WEEKS["1"].title,
     checked: {},
+    prices: {},
     custom: [],
+    shopMode: false,
   });
 
   let state = defaultState();
@@ -686,21 +699,23 @@
   const els = {
     weekLabel: document.getElementById("week-label"),
     budgetBand: document.getElementById("budget-band"),
+    estimateBand: document.getElementById("estimate-band"),
     houseNote: document.getElementById("house-note"),
-    week1: document.getElementById("week-1"),
-    week2: document.getElementById("week-2"),
-    planA: document.getElementById("plan-a"),
-    planB: document.getElementById("plan-b"),
-    planABlurb: document.getElementById("plan-a-blurb"),
-    planBBlurb: document.getElementById("plan-b-blurb"),
+    templateBtns: Array.from(document.querySelectorAll(".template-btn")),
+    tpl1a: document.getElementById("tpl-1a"),
+    tpl1b: document.getElementById("tpl-1b"),
+    tpl2a: document.getElementById("tpl-2a"),
+    tpl2b: document.getElementById("tpl-2b"),
     weekGrid: document.getElementById("week-grid"),
     groceryList: document.getElementById("grocery-list"),
     checkedCount: document.getElementById("checked-count"),
     customName: document.getElementById("custom-name"),
     customCategory: document.getElementById("custom-category"),
+    customPrice: document.getElementById("custom-price"),
     addCustom: document.getElementById("add-custom"),
     copyShare: document.getElementById("copy-share"),
     copyGrocery: document.getElementById("copy-grocery"),
+    shopMode: document.getElementById("shop-mode"),
     resetChecks: document.getElementById("reset-checks"),
     toast: document.getElementById("toast"),
     modal: document.getElementById("recipe-modal"),
@@ -719,6 +734,12 @@
     return week.plans[state.plan] || week.plans.A;
   }
 
+  function normalizeCategory(cat) {
+    if (!cat || typeof cat !== "string") return "Other";
+    if (LEGACY_CATEGORY[cat]) return LEGACY_CATEGORY[cat];
+    return CATEGORIES.includes(cat) ? cat : "Other";
+  }
+
   function itemChecked(id) {
     return Boolean(state.checked[id]);
   }
@@ -726,6 +747,33 @@
   function setChecked(id, value) {
     if (value) state.checked[id] = true;
     else delete state.checked[id];
+  }
+
+  function itemPrice(id, fallback) {
+    if (Object.prototype.hasOwnProperty.call(state.prices, id)) {
+      const n = Number(state.prices[id]);
+      return Number.isFinite(n) && n >= 0 ? n : null;
+    }
+    if (fallback !== undefined && fallback !== "" && fallback !== null) {
+      const n = Number(fallback);
+      return Number.isFinite(n) && n >= 0 ? n : null;
+    }
+    return null;
+  }
+
+  function setPrice(id, raw) {
+    const trimmed = String(raw ?? "").trim();
+    if (!trimmed) {
+      delete state.prices[id];
+      return;
+    }
+    const n = Number(trimmed);
+    if (!Number.isFinite(n) || n < 0) return;
+    state.prices[id] = Math.round(n * 100) / 100;
+  }
+
+  function formatMoney(n) {
+    return `$${n.toFixed(2).replace(/\.00$/, "")}`;
   }
 
   function showToast(message) {
@@ -744,7 +792,8 @@
 
   function loadFromStorage() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      let raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) raw = localStorage.getItem(LEGACY_STORAGE_KEY);
       if (!raw) return null;
       return normalizeState(JSON.parse(raw));
     } catch (_) {
@@ -757,6 +806,7 @@
     if (!parsed || typeof parsed !== "object") return base;
     base.week = parsed.week === "2" || parsed.week === 2 ? "2" : "1";
     base.plan = parsed.plan === "B" ? "B" : "A";
+    base.shopMode = Boolean(parsed.shopMode);
     if (typeof parsed.weekTitle === "string" && parsed.weekTitle.trim()) {
       base.weekTitle = parsed.weekTitle.trim().slice(0, 80);
     } else {
@@ -773,16 +823,33 @@
         });
       }
     }
+    if (parsed.prices && typeof parsed.prices === "object" && !Array.isArray(parsed.prices)) {
+      Object.keys(parsed.prices).forEach((id) => {
+        const n = Number(parsed.prices[id]);
+        if (Number.isFinite(n) && n >= 0) base.prices[id] = Math.round(n * 100) / 100;
+      });
+    }
     if (Array.isArray(parsed.custom)) {
       base.custom = parsed.custom
         .filter((c) => c && typeof c.name === "string" && c.name.trim())
-        .map((c, i) => ({
-          id: typeof c.id === "string" ? c.id : `custom-${i}-${Date.now()}`,
-          name: c.name.trim().slice(0, 80),
-          category: CATEGORIES.includes(c.category) ? c.category : "Pantry",
-        }));
+        .map((c, i) => {
+          const id = typeof c.id === "string" ? c.id : `custom-${i}-${Date.now()}`;
+          const price = itemPriceFromAny(c.price);
+          if (price !== null) base.prices[id] = price;
+          return {
+            id,
+            name: c.name.trim().slice(0, 80),
+            category: normalizeCategory(c.category),
+          };
+        });
     }
     return base;
+  }
+
+  function itemPriceFromAny(v) {
+    if (v === undefined || v === null || v === "") return null;
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 ? Math.round(n * 100) / 100 : null;
   }
 
   function encodeState() {
@@ -790,12 +857,19 @@
       wk: state.week,
       p: state.plan,
       w: state.weekTitle,
+      sm: state.shopMode ? 1 : 0,
       c: Object.keys(state.checked).filter((k) => state.checked[k]),
+      $: Object.keys(state.prices).reduce((acc, id) => {
+        const n = Number(state.prices[id]);
+        if (Number.isFinite(n) && n >= 0) acc[id] = n;
+        return acc;
+      }, {}),
       x: state.custom.map((item) => ({
         i: item.id,
         n: item.name,
         k: item.category,
         d: itemChecked(item.id) ? 1 : 0,
+        $: itemPrice(item.id),
       })),
     };
     const json = JSON.stringify(payload);
@@ -812,6 +886,7 @@
       const next = defaultState();
       next.week = payload.wk === "2" || payload.wk === 2 ? "2" : "1";
       next.plan = payload.p === "B" ? "B" : "A";
+      next.shopMode = Boolean(payload.sm);
       if (typeof payload.w === "string" && payload.w.trim()) {
         next.weekTitle = payload.w.trim().slice(0, 80);
       } else {
@@ -823,6 +898,12 @@
           if (typeof id === "string") checked[id] = true;
         });
       }
+      if (payload.$ && typeof payload.$ === "object") {
+        Object.keys(payload.$).forEach((id) => {
+          const n = Number(payload.$[id]);
+          if (Number.isFinite(n) && n >= 0) next.prices[id] = Math.round(n * 100) / 100;
+        });
+      }
       next.custom = [];
       if (Array.isArray(payload.x)) {
         payload.x.forEach((item, i) => {
@@ -831,9 +912,11 @@
           next.custom.push({
             id,
             name: String(item.n).trim().slice(0, 80),
-            category: CATEGORIES.includes(item.k) ? item.k : "Pantry",
+            category: normalizeCategory(item.k),
           });
           if (item.d) checked[id] = true;
+          const price = itemPriceFromAny(item.$);
+          if (price !== null) next.prices[id] = price;
         });
       }
       next.checked = checked;
@@ -865,22 +948,28 @@
     return url.toString();
   }
 
-  function renderToggles() {
+  function renderTemplates() {
     const week = currentWeek();
-    const plan = currentPlan();
-    const isWeek1 = state.week === "1";
-    const isA = state.plan === "A";
+    if (els.tpl1a) els.tpl1a.textContent = WEEKS["1"].plans.A.blurb;
+    if (els.tpl1b) els.tpl1b.textContent = WEEKS["1"].plans.B.blurb;
+    if (els.tpl2a) els.tpl2a.textContent = WEEKS["2"].plans.A.blurb;
+    if (els.tpl2b) els.tpl2b.textContent = WEEKS["2"].plans.B.blurb;
 
-    els.week1.setAttribute("aria-pressed", String(isWeek1));
-    els.week2.setAttribute("aria-pressed", String(!isWeek1));
-    els.planA.setAttribute("aria-pressed", String(isA));
-    els.planB.setAttribute("aria-pressed", String(!isA));
-    els.planABlurb.textContent = week.plans.A.blurb;
-    els.planBBlurb.textContent = week.plans.B.blurb;
+    els.templateBtns.forEach((btn) => {
+      const on = btn.dataset.week === state.week && btn.dataset.plan === state.plan;
+      btn.setAttribute("aria-pressed", String(on));
+    });
+
+    const plan = currentPlan();
     els.budgetBand.textContent = `Budget band ${plan.budget}`;
     if (els.houseNote) {
       els.houseNote.textContent = plan.houseNote || "";
       els.houseNote.hidden = !plan.houseNote;
+    }
+    document.body.classList.toggle("shop-mode", state.shopMode);
+    if (els.shopMode) {
+      els.shopMode.setAttribute("aria-pressed", String(state.shopMode));
+      els.shopMode.textContent = state.shopMode ? "Shop mode: On" : "Shop mode: Off";
     }
   }
 
@@ -909,7 +998,7 @@
           <p class="day-dinner">${escapeHtml(day.dinner)}</p>
           ${tedLine}
           ${adultLine}
-          <p class="tap-hint">Tap for short recipe →</p>
+          <p class="tap-hint">Day note · tap for recipe</p>
         </div>
       `;
       btn.addEventListener("click", () => openRecipe(day));
@@ -919,10 +1008,14 @@
 
   function allGroceryItems() {
     const plan = currentPlan();
-    const seeded = plan.groceries.map((g) => ({ ...g, custom: false }));
+    const seeded = plan.groceries.map((g) => ({
+      ...g,
+      category: normalizeCategory(g.category),
+      custom: false,
+    }));
     const custom = state.custom.map((c) => ({
       id: c.id,
-      category: c.category,
+      category: normalizeCategory(c.category),
       name: c.name,
       price: "",
       hint: "custom item",
@@ -931,21 +1024,64 @@
     return [...seeded, ...custom];
   }
 
+  function estimateTotals(items) {
+    let left = 0;
+    let all = 0;
+    let pricedLeft = 0;
+    let pricedAll = 0;
+    items.forEach((item) => {
+      const price = itemPrice(item.id, item.price);
+      if (price === null) return;
+      all += price;
+      pricedAll += 1;
+      if (!itemChecked(item.id)) {
+        left += price;
+        pricedLeft += 1;
+      }
+    });
+    return { left, all, pricedLeft, pricedAll };
+  }
+
+  function renderEstimate(items) {
+    const { left, all, pricedLeft, pricedAll } = estimateTotals(items);
+    if (!els.estimateBand) return;
+    if (pricedAll === 0) {
+      els.estimateBand.textContent = "Est. — add $";
+      els.estimateBand.title = "Optional: type a $ estimate on any grocery line";
+      return;
+    }
+    els.estimateBand.textContent = `Est. left ${formatMoney(left)}`;
+    els.estimateBand.title = `${pricedLeft} unchecked priced · trip total if all priced ${formatMoney(all)} (${pricedAll} lines)`;
+  }
+
   function renderGrocery() {
     const items = allGroceryItems();
     let checked = 0;
-    const byCat = CATEGORIES.map((cat) => ({
-      cat,
-      items: items.filter((i) => i.category === cat),
-    })).filter((group) => group.items.length);
+    const byCat = CATEGORIES.map((cat) => {
+      let groupItems = items.filter((i) => i.category === cat);
+      if (state.shopMode) {
+        groupItems = [...groupItems].sort((a, b) => Number(itemChecked(a.id)) - Number(itemChecked(b.id)));
+      }
+      return { cat, items: groupItems };
+    }).filter((group) => group.items.length);
 
     els.groceryList.innerHTML = "";
 
     const tuckerNote = document.createElement("p");
     tuckerNote.className = "tucker-note";
     tuckerNote.textContent =
-      "Tucker lunchbox: same kit every school day (Mon–Fri). Count packs Sun night; restock midweek as yogurt, sticks, juice, and snacks deplete. Not dinner leftovers.";
+      "Tucker lunchbox: same kit every school day (Mon–Fri). Count packs Sun night; restock midweek. Not dinner leftovers.";
     els.groceryList.appendChild(tuckerNote);
+
+    const totalBar = document.createElement("div");
+    totalBar.className = "estimate-bar";
+    const totals = estimateTotals(items);
+    totalBar.innerHTML =
+      totals.pricedAll === 0
+        ? `<strong>Running $ estimate:</strong> optional — tap a line’s $ box while you shop.`
+        : `<strong>Running $ estimate:</strong> ${formatMoney(totals.left)} still to buy` +
+          ` <span>· ${formatMoney(totals.all)} if all priced lines counted</span>`;
+    els.groceryList.appendChild(totalBar);
 
     byCat.forEach((group) => {
       const h = document.createElement("h3");
@@ -958,28 +1094,54 @@
       group.items.forEach((item) => {
         const isOn = itemChecked(item.id);
         if (isOn) checked += 1;
+        const price = itemPrice(item.id, item.price);
         const li = document.createElement("li");
         li.className = `item${isOn ? " checked" : ""}`;
         const inputId = `g-${item.id}`;
+        const priceId = `p-${item.id}`;
         li.innerHTML = `
           <input type="checkbox" id="${escapeAttr(inputId)}" ${isOn ? "checked" : ""} />
-          <label for="${escapeAttr(inputId)}">
-            ${escapeHtml(item.name)}
-            ${item.price ? `<span class="price">${escapeHtml(item.price)}</span>` : ""}
-            ${item.hint ? `<span class="hint">${escapeHtml(item.hint)}</span>` : ""}
-          </label>
+          <div class="item-main">
+            <label for="${escapeAttr(inputId)}">
+              ${escapeHtml(item.name)}
+              ${item.hint ? `<span class="hint">${escapeHtml(item.hint)}</span>` : ""}
+            </label>
+            <label class="price-field" for="${escapeAttr(priceId)}">
+              <span>$</span>
+              <input
+                type="number"
+                id="${escapeAttr(priceId)}"
+                class="price-input"
+                min="0"
+                step="0.01"
+                inputmode="decimal"
+                placeholder=""
+                value="${price === null ? "" : String(price)}"
+                aria-label="Optional price for ${escapeAttr(item.name)}"
+              />
+            </label>
+          </div>
         `;
-        li.querySelector("input").addEventListener("change", (e) => {
+        li.querySelector('input[type="checkbox"]').addEventListener("change", (e) => {
           setChecked(item.id, e.target.checked);
           persist();
           renderGrocery();
+          renderEstimate(allGroceryItems());
         });
+        const priceInput = li.querySelector(".price-input");
+        priceInput.addEventListener("change", (e) => {
+          setPrice(item.id, e.target.value);
+          persist();
+          renderGrocery();
+        });
+        priceInput.addEventListener("click", (e) => e.stopPropagation());
         ul.appendChild(li);
       });
       els.groceryList.appendChild(ul);
     });
 
     els.checkedCount.textContent = `${checked} checked · ${items.length} items`;
+    renderEstimate(items);
   }
 
   function openRecipe(day) {
@@ -1029,23 +1191,33 @@
   function groceryText() {
     const week = currentWeek();
     const plan = currentPlan();
+    const items = allGroceryItems();
+    const totals = estimateTotals(items);
     const lines = [
       `Burns Family grocery — ${state.weekTitle} (${week.label} · ${plan.label})`,
       `Budget band ${plan.budget}`,
+      totals.pricedAll
+        ? `Running $ estimate: ${formatMoney(totals.left)} left · ${formatMoney(totals.all)} all priced`
+        : "",
       plan.houseNote || "",
       "Tucker lunchbox = yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice",
       "Restock midweek as packs deplete. Tucker does NOT eat dinner leftovers for school lunch.",
       "Chili = weekend daytime only when on the plan (not midweek, not twice, not every week).",
       "",
-    ].filter(Boolean);
+    ].filter((line, i, arr) => line !== "" || (i > 0 && arr[i - 1] !== ""));
     CATEGORIES.forEach((cat) => {
-      const items = allGroceryItems().filter((i) => i.category === cat);
-      if (!items.length) return;
+      let catItems = items.filter((i) => i.category === cat);
+      if (state.shopMode) {
+        catItems = [...catItems].sort((a, b) => Number(itemChecked(a.id)) - Number(itemChecked(b.id)));
+      }
+      if (!catItems.length) return;
       lines.push(cat.toUpperCase());
-      items.forEach((item) => {
+      catItems.forEach((item) => {
         const mark = itemChecked(item.id) ? "[x]" : "[ ]";
+        const price = itemPrice(item.id, item.price);
+        const priceBit = price === null ? "" : ` ${formatMoney(price)}`;
         const hint = item.hint ? ` (${item.hint})` : "";
-        lines.push(`${mark} ${item.name}${hint}`);
+        lines.push(`${mark} ${item.name}${priceBit}${hint}`);
       });
       lines.push("");
     });
@@ -1087,23 +1259,23 @@
 
   function renderAll() {
     els.weekLabel.value = state.weekTitle;
-    renderToggles();
+    renderTemplates();
     renderCalendar();
     renderGrocery();
   }
 
-  function setWeek(weekId) {
-    const next = weekId === "2" ? "2" : "1";
-    state.week = next;
-    state.weekTitle = WEEKS[next].title;
+  function loadTemplate(weekId, planId, announce) {
+    const nextWeek = weekId === "2" ? "2" : "1";
+    const nextPlan = planId === "B" ? "B" : "A";
+    const changed = state.week !== nextWeek || state.plan !== nextPlan;
+    state.week = nextWeek;
+    state.plan = nextPlan;
+    state.weekTitle = WEEKS[nextWeek].title;
     persist();
     renderAll();
-  }
-
-  function setPlan(planId) {
-    state.plan = planId === "B" ? "B" : "A";
-    persist();
-    renderAll();
+    if (announce && changed) {
+      showToast(`Loaded ${WEEKS[nextWeek].label} Option ${nextPlan}`);
+    }
   }
 
   function boot() {
@@ -1120,10 +1292,11 @@
       state = defaultState();
     }
 
-    els.week1.addEventListener("click", () => setWeek("1"));
-    els.week2.addEventListener("click", () => setWeek("2"));
-    els.planA.addEventListener("click", () => setPlan("A"));
-    els.planB.addEventListener("click", () => setPlan("B"));
+    els.templateBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        loadTemplate(btn.dataset.week, btn.dataset.plan, true);
+      });
+    });
 
     els.weekLabel.addEventListener("change", () => {
       state.weekTitle = els.weekLabel.value.trim() || currentWeek().title;
@@ -1143,11 +1316,16 @@
         els.customName.focus();
         return;
       }
+      const id = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
       state.custom.push({
-        id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        id,
         name: name.slice(0, 80),
-        category: els.customCategory.value,
+        category: normalizeCategory(els.customCategory.value),
       });
+      if (els.customPrice && els.customPrice.value.trim()) {
+        setPrice(id, els.customPrice.value);
+        els.customPrice.value = "";
+      }
       els.customName.value = "";
       persist();
       renderGrocery();
@@ -1166,6 +1344,12 @@
     });
     els.copyGrocery.addEventListener("click", () => {
       copyText(groceryText(), "Grocery list copied for iMessage/SMS");
+    });
+    els.shopMode.addEventListener("click", () => {
+      state.shopMode = !state.shopMode;
+      persist();
+      renderAll();
+      showToast(state.shopMode ? "Shop mode on — big taps, checked sink to bottom" : "Shop mode off");
     });
     els.resetChecks.addEventListener("click", () => {
       state.checked = {};
