@@ -137,13 +137,31 @@ body::before {
   border: 2px solid rgba(31, 138, 138, 0.25);
 }
 
-/* Plan toggle */
+/* Week / plan toggles */
+.toggle-block {
+  margin: 1rem 0 0.35rem;
+  animation: rise-in 0.65s ease both;
+}
+
+.toggle-label {
+  margin: 0 0 0.4rem;
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
 .plan-toggle {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.65rem;
-  margin: 1.25rem 0 1rem;
-  animation: rise-in 0.65s ease both;
+  margin: 0 0 0.65rem;
+}
+
+.week-btn[aria-pressed="true"] {
+  background: linear-gradient(160deg, var(--coral), var(--coral-deep));
+  border-color: var(--gold);
 }
 
 .plan-btn {
@@ -460,6 +478,37 @@ body::before {
 .day-lunch-muted {
   color: var(--ink-soft);
   font-weight: 650;
+}
+
+.house-note {
+  margin: 0.75rem auto 0;
+  max-width: 36rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--white);
+  border: 2px solid rgba(31, 138, 138, 0.35);
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--teal-deep);
+}
+
+.day-ted {
+  margin: 0.4rem 0 0;
+  padding: 0.4rem 0.55rem;
+  background: var(--coral-soft);
+  border-radius: 10px;
+  color: var(--coral-deep);
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.day-card-fish {
+  box-shadow: 0 10px 28px rgba(232, 106, 60, 0.16);
+}
+
+.recipe-ted {
+  border-left-color: var(--coral) !important;
+  background: var(--coral-soft) !important;
 }
 
 .tucker-note {

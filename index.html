@@ -32,24 +32,42 @@
       </div>
       <p class="tagline">Adults: cook once / leftover lunches · Tucker: fixed school kit</p>
       <div class="budget-pill" id="budget-band">Budget band ~$100–130</div>
+      <p class="house-note" id="house-note" hidden></p>
     </header>
 
-    <div class="plan-toggle" role="group" aria-label="Meal week option">
-      <button type="button" class="plan-btn" id="plan-a" aria-pressed="true">
-        Option A
-        <small>Rotisserie · tacos · Alfredo · chili</small>
-      </button>
-      <button type="button" class="plan-btn" id="plan-b" aria-pressed="false">
-        Option B
-        <small>Sausage sheet-pan · quesadillas · potato bar</small>
-      </button>
+    <div class="toggle-block">
+      <p class="toggle-label" id="week-toggle-label">Week</p>
+      <div class="plan-toggle" role="group" aria-labelledby="week-toggle-label">
+        <button type="button" class="plan-btn week-btn" id="week-1" aria-pressed="true">
+          Week 1
+          <small>Oct 5–11</small>
+        </button>
+        <button type="button" class="plan-btn week-btn" id="week-2" aria-pressed="false">
+          Week 2
+          <small>Oct 12–18</small>
+        </button>
+      </div>
+    </div>
+
+    <div class="toggle-block">
+      <p class="toggle-label" id="plan-toggle-label">Menu option</p>
+      <div class="plan-toggle plan-toggle-options" role="group" aria-labelledby="plan-toggle-label">
+        <button type="button" class="plan-btn" id="plan-a" aria-pressed="true">
+          Option A
+          <small id="plan-a-blurb">Rotisserie · tacos · Alfredo · chili</small>
+        </button>
+        <button type="button" class="plan-btn" id="plan-b" aria-pressed="false">
+          Option B
+          <small id="plan-b-blurb">Sausage sheet-pan · quesadillas · potato bar</small>
+        </button>
+      </div>
     </div>
 
     <section class="howto" aria-labelledby="howto-title">
       <h2 id="howto-title">How to share (Ted &amp; Samantha)</h2>
       <ol>
-        <li>Pick <strong>Option A</strong> or <strong>Option B</strong>, check off groceries as you go.</li>
-        <li>Tap <strong>Copy share link</strong> and text/email it — the other person opens the same plan + checks.</li>
+        <li>Pick <strong>Week 1 or Week 2</strong>, then <strong>Option A or B</strong>, and check off groceries.</li>
+        <li>Tap <strong>Copy share link</strong> and text/email it — the other person opens the same week + plan + checks.</li>
         <li>Or tap <strong>Copy grocery list as text</strong> for a quick iMessage/SMS checklist.</li>
       </ol>
       <p class="sync-note">
