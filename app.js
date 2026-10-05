@@ -1115,7 +1115,7 @@
                 min="0"
                 step="0.01"
                 inputmode="decimal"
-                placeholder="0"
+                placeholder=""
                 value="${price === null ? "" : String(price)}"
                 aria-label="Optional price for ${escapeAttr(item.name)}"
               />
