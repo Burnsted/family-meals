@@ -203,8 +203,9 @@
   line-height: 1.12;
   color: var(--wb-teal-deep);
   max-width: 100%;
-  word-break: break-word;
-  hyphens: auto;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
 }
 .wb-col.is-alt .wb-meal { color: var(--wb-orange-deep); }
 
