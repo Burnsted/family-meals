@@ -659,15 +659,24 @@
       if (!d) return "";
       const letter = FA ? FA.dayLetter(d.name) : d.name.charAt(0);
       const short = FA ? FA.shortMealName(d.title, 4) : d.title;
-      const art = FA ? FA.art(d.title) : "";
+      const dish = d.dishId ? dishById(d.dishId) : null;
+      const artKey =
+        (dish && dish.name) ||
+        d.dishId ||
+        (d.kind === "light" ? (/egg/i.test(d.title || "") ? "eggs" : "light") : d.title);
+      const art = FA ? FA.art(artKey) : "";
       return `<div class="lock-sheet-day"><span class="lsd-letter">${letter}</span><span aria-hidden="true">${art}</span><span class="lsd-name">${esc(short)}</span></div>`;
     }).join("");
     const bg = document.createElement("div");
     bg.id = "lock-sheet-bg";
     bg.className = "lock-sheet-bg";
+    const datesLabel =
+      (window.WeekBoard && window.WeekBoard.weekOfLabel
+        ? window.WeekBoard.weekOfLabel(pkg.datesLabel || "")
+        : pkg.datesLabel) || "This week";
     bg.innerHTML = `<div class="lock-sheet" role="dialog" aria-modal="true" aria-labelledby="lock-sheet-title">
       <h2 id="lock-sheet-title">${esc(C.sheetTitle || "Lock in this week")}</h2>
-      <p class="lock-dates">${esc(pkg.datesLabel)}</p>
+      <p class="lock-dates">${esc(datesLabel)}</p>
       ${rows}
       <p class="lock-grocery-count">${esc((C.groceryLine || ((n) => n + " grocery items"))(pkg.grocery.length))}</p>
       <p class="muted">${esc(C.localOnly || "Saved on this phone only")}</p>
@@ -1218,20 +1227,25 @@
         if (dish.freeze) body += `<p class="muted">${esc(dish.freeze)}</p>`;
       }
     }
-    if (dish && !locked) {
+    if (open && dish && !locked) {
       body += `<div class="rates" data-rate="${esc(dish.id)}">
         <button type="button" class="${rate === -1 ? "on" : ""}" data-r="-1" aria-label="Thumbs down">👎</button>
         <button type="button" class="${rate === 1 ? "on" : ""}" data-r="1" aria-label="Thumbs up">👍</button>
         <button type="button" class="${rate === 2 ? "on" : ""}" data-r="2" aria-label="Favorite">⭐</button>
       </div>`;
     }
-    if (!locked) {
+    if (open && !locked) {
       const log = state.log[day.i] || "";
       body += `<p class="field-label">Log it</p><div class="log-row" data-log="${day.i}">
         ${["Made", "Skipped", "Ate out"].map((x) => `<button type="button" class="choice${log === x ? " on" : ""}" data-val="${esc(x)}">${esc(x)}</button>`).join("")}
       </div>`;
     }
-    const art = FA ? FA.art(day.title || day.emoji || "default", "lg") : (day.emoji ? `<span class="food-emoji">${day.emoji}</span>` : "");
+    const artKey =
+      (dish && dish.name) ||
+      day.dishId ||
+      (day.kind === "light" && /egg/i.test(day.title || "") ? "eggs" : day.title);
+    const art = FA ? FA.art(artKey || "default", "lg") : (day.emoji ? `<span class="food-emoji">${day.emoji}</span>` : "");
+    const quietTitle = FA && FA.shortMealName ? FA.shortMealName(day.title, 4) : day.title;
     const quiet = day.kind === "leftover" || day.kind === "reuse" || day.kind === "light";
     const IA = window.ItemAlts;
     let meatRow = "";
@@ -1253,7 +1267,7 @@
       </div>
       <div class="day-art-row">
         <span aria-hidden="true">${art}</span>
-        <p class="dish-title">${esc(day.title)}</p>
+        <p class="dish-title">${esc(quietTitle)}</p>
       </div>
       ${meatRow}
       ${body}
