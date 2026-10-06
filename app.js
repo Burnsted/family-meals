@@ -5836,12 +5836,10 @@ function sidesBlockHTML(dayId, day) {
       const thumbs = photos
         .map((src, i) => `<span class="ph-thumb"><img alt="" src="${src}" /><button type="button" class="ph-x" data-rmph="${escapeAttr(sec.id)}" data-i="${i}" aria-label="Remove photo">${FM_X_ICO}</button></span>`)
         .join("");
-      const addLab = photos.length ? "Add more photos" : "Add photos";
       return `<div class="ph-sec${photos.length ? " done" : ""}" data-sec="${escapeAttr(sec.id)}">
         ${custom ? `<button type="button" class="ph-sec-del" data-delsec="${escapeAttr(sec.id)}" aria-label="Delete section">${FM_X_ICO}</button>` : ""}
         <div class="ph-sec-lab">${sec.emoji ? `<span class="big">${sec.emoji}</span>` : ""}${escapeHtml(sec.label)}</div>
-        ${thumbs ? `<div class="ph-thumbs">${thumbs}</div>` : ""}
-        <button type="button" class="ph-add" data-addph="${escapeAttr(sec.id)}">${FM_CAM_ICO}<span>${addLab}</span></button>
+        <div class="ph-thumbs">${thumbs}<button type="button" class="ph-add" data-addph="${escapeAttr(sec.id)}" aria-label="Add photos">${FM_PLUS_ICO}</button></div>
         <input type="file" accept="image/*" multiple data-phfile="${escapeAttr(sec.id)}" hidden />
       </div>`;
     }).join("");
