@@ -1081,6 +1081,72 @@ body.shop-mode .price-input {
   font-size: 1.05rem;
 }
 
+.shop-mode-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 0.35rem;
+  width: 100%;
+}
+.shop-mode-wrap #shop-mode {
+  flex: 1 1 auto;
+}
+.tip-i {
+  appearance: none;
+  border: 2px solid rgba(15, 110, 110, 0.28);
+  background: var(--white, #fffaf4);
+  color: var(--teal-deep, #0a5555);
+  border-radius: 12px;
+  width: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.tip-i .ico {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+}
+.tip-pop {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 40;
+  background: var(--ink, #173042);
+  color: #fff;
+  border-radius: 12px;
+  padding: 0.7rem 0.85rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.35;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
+  text-align: left;
+}
+.tip-pop[hidden] {
+  display: none !important;
+}
+.tip-i:hover + .tip-pop,
+.tip-i:focus-visible + .tip-pop,
+.shop-mode-wrap:focus-within .tip-pop.is-open,
+.tip-pop.is-open {
+  display: block !important;
+}
+html[data-theme="dark"] .tip-i {
+  background: var(--card, #1e293b);
+  border-color: rgba(45, 212, 191, 0.35);
+  color: var(--ink, #f1f5f9);
+}
+html[data-theme="dark"] .tip-pop {
+  background: #0b1220;
+  border: 1px solid rgba(45, 212, 191, 0.35);
+}
+
 /* Swap picker */
 .swap-current {
   margin: 0 0 0.75rem;

@@ -93,8 +93,14 @@
       <button type="button" class="btn btn-secondary icon-btn" id="copy-grocery" aria-label="Share list">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       </button>
-      <button type="button" class="btn btn-ghost" id="shop-mode" aria-pressed="false">Shop mode: Off</button>
-      <button type="button" class="btn btn-ghost" id="reset-checks">Clear checkmarks</button>
+      <span class="shop-mode-wrap">
+        <button type="button" class="btn btn-ghost" id="shop-mode" aria-pressed="false">Shop mode: Off</button>
+        <button type="button" class="tip-i" id="shop-mode-tip" aria-label="What shop mode does" aria-expanded="false" aria-controls="shop-mode-tip-pop">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        </button>
+        <span class="tip-pop" id="shop-mode-tip-pop" role="tooltip" hidden>Shop mode: larger grocery checkboxes, checked items move to the bottom, and the screen stays on while you shop.</span>
+      </span>
+      <button type="button" class="btn btn-ghost" id="reset-checks" hidden>Uncheck all grocery items</button>
     </div>
     <div class="copy-photo" id="copy-photo" hidden></div>
 
