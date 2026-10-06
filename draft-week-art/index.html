@@ -14,9 +14,11 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="week-strip.css" />
   <link rel="stylesheet" href="lock-week.css" />
+  <link rel="stylesheet" href="home-hero.css" />
 </head>
 <body>
-  <div class="app">
+  <div id="home-gate" class="home-gate" hidden></div>
+  <div class="app" id="main-app">
     <div class="rcpt-top">
       <button type="button" class="back-link" id="back-btn" aria-label="Back" hidden>
         <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
@@ -273,6 +275,7 @@
     <div class="lock-sheet" role="dialog" aria-modal="true" aria-labelledby="lock-sheet-title" id="lock-sheet-inner"></div>
   </div>
   <script src="food-art.js"></script>
+  <script src="home-hero.js"></script>
   <script src="lock-week.js"></script>
   <script src="app.js"></script>
   <script>

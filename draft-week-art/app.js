@@ -6303,6 +6303,53 @@ function sidesBlockHTML(dayId, day) {
     boot();
   }
 
+
+  const HOME_GATE_KEY = "fm-home-entered-v1";
+  function burnsIsReturning() {
+    try {
+      if (localStorage.getItem(HOME_GATE_KEY) === "1") return true;
+    } catch (_) {}
+    try {
+      if (welcomeDone && welcomeDone()) return true;
+    } catch (_) {}
+    return !!(state && state.week && state.plan);
+  }
+  function enterBurnsApp(mode) {
+    try { localStorage.setItem(HOME_GATE_KEY, "1"); } catch (_) {}
+    document.body.classList.remove("show-home-gate");
+    const gate = document.getElementById("home-gate");
+    if (gate) gate.hidden = true;
+    const app = document.getElementById("main-app") || document.querySelector(".app");
+    if (app) app.style.display = "";
+    if (mode === "photos") {
+      const stock = document.getElementById("stock-panel");
+      if (stock) stock.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else if (mode === "questions") {
+      try { if (typeof startWelcome === "function") startWelcome(true); } catch (_) {}
+    } else if (mode === "week") {
+      const wk = document.getElementById("week-section") || document.getElementById("week-title");
+      if (wk) wk.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+  function showBurnsHomeGate() {
+    const HH = window.HomeHero;
+    const gate = document.getElementById("home-gate");
+    if (!HH || !gate) return false;
+    gate.hidden = false;
+    gate.innerHTML = HH.html({ mood: "burns", returning: burnsIsReturning(), primaryId: "home-primary-cta" });
+    document.body.classList.add("show-home-gate");
+    const app = document.getElementById("main-app") || document.querySelector(".app");
+    if (app) app.style.display = "none";
+    const primary = document.getElementById("home-primary-cta");
+    if (primary) primary.onclick = () => enterBurnsApp(burnsIsReturning() ? "week" : "build");
+    // build = enter planner (month + week visible); week = scroll to week strip
+    const photos = document.getElementById("home-setup-photos");
+    if (photos) photos.onclick = () => enterBurnsApp("photos");
+    const qs = document.getElementById("home-setup-questions");
+    if (qs) qs.onclick = () => enterBurnsApp("questions");
+    return true;
+  }
+
   /* ===== draft-week-art: week strip, lock-in (local), random meal, grocery total ===== */
   function weekOnlyGroceryItems() {
     return allGroceryItems();
@@ -6560,10 +6607,16 @@ function sidesBlockHTML(dayId, day) {
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    try { wireBurnsDraftControls(); renderWeekStrip(); syncLockUI(); } catch (e) { console.warn(e); }
+    try {
+      showBurnsHomeGate();
+      wireBurnsDraftControls();
+      renderWeekStrip();
+      syncLockUI();
+    } catch (e) { console.warn(e); }
   });
   // Also wire immediately in case DOM already ready
   try { wireBurnsDraftControls(); } catch (_) {}
+  try { if (document.readyState !== "loading") showBurnsHomeGate(); } catch (_) {}
 
 
 })();

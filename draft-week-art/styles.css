@@ -2660,3 +2660,14 @@ html[data-theme="dark"] {
   --strip-line: rgba(45, 212, 191, 0.35);
   --strip-cook: rgba(45, 212, 191, 0.12);
 }
+
+.home-gate {
+  position: relative;
+  z-index: 20;
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  padding: 1rem 1rem 2.5rem;
+}
+body.show-home-gate .app { display: none; }
+body.show-home-gate .home-gate { display: block; }
+.home-gate[hidden] { display: none !important; }

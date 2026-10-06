@@ -55,6 +55,7 @@
       lockedWeek: null,
       focusDay: null,
       customGrocery: [],
+      showHome: true,
     };
   }
 
@@ -563,6 +564,59 @@
   }
 
   /* ---------- Screens ---------- */
+
+
+  function isReturningUser() {
+    return !!(state.doneSetup || (state.week && state.week.days && state.week.days.length));
+  }
+
+  function renderHome() {
+    const app = document.getElementById("app");
+    app.classList.remove("has-week", "week-is-locked");
+    const HH = window.HomeHero;
+    if (!HH) {
+      state.showHome = false;
+      state.setupStep = "first";
+      save();
+      render();
+      return;
+    }
+    app.innerHTML = HH.html({ mood: "kathy", returning: isReturningUser(), primaryId: "home-primary-cta" });
+    wireTop();
+    const primary = document.getElementById("home-primary-cta");
+    if (primary) primary.onclick = () => {
+      state.showHome = false;
+      if (isReturningUser()) {
+        state.doneSetup = true;
+        state.setupStep = "week";
+        if (!state.week) buildDefaultWeek();
+      } else {
+        state.setupStep = "first";
+        state.doneSetup = false;
+      }
+      save();
+      render();
+      window.scrollTo(0, 0);
+    };
+    const photos = document.getElementById("home-setup-photos");
+    if (photos) photos.onclick = () => {
+      state.showHome = false;
+      state.doneSetup = false;
+      state.setupStep = "fresh";
+      save();
+      render();
+      window.scrollTo(0, 0);
+    };
+    const qs = document.getElementById("home-setup-questions");
+    if (qs) qs.onclick = () => {
+      state.showHome = false;
+      state.doneSetup = false;
+      state.setupStep = "first";
+      save();
+      render();
+      window.scrollTo(0, 0);
+    };
+  }
 
   function renderFirst() {
     const q = "Cooking for how many people? How much prep time when you cook? How many nights do you cook each week?";
@@ -1309,6 +1363,17 @@
   }
 
   function render() {
+    if (state.showHome !== false && !state.doneSetup && state.setupStep !== "week") {
+      // First-run home hero (mock week). Returning users with a week skip straight unless showHome forced.
+      if (!isReturningUser()) {
+        renderHome();
+        return;
+      }
+    }
+    if (state.showHome === true && isReturningUser()) {
+      renderHome();
+      return;
+    }
     if (state.doneSetup || state.setupStep === "week") {
       renderWeek();
       return;
@@ -1331,8 +1396,9 @@
     (map[state.setupStep] || renderFirst)();
   }
 
-  // boot
+  // boot — home hero is the entry (Steve bar)
   tryLoadShare();
+  state.showHome = true;
   if ((K.DISHES || []).length < 16) {
     console.error("[kathy] need at least 16 dishes, have", (K.DISHES || []).length);
   } else {
