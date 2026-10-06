@@ -1812,7 +1812,7 @@
         fromSwap: true,
         sourceKey: key,
         days: [],
-        hint: g.hint || "est.",
+        hint: g.hint || "",
       }));
     }
     const parsed = parseDinnerKey(key);
@@ -2320,7 +2320,7 @@
       category: normalizeCategory(category || "Other"),
       name: name || (meta && meta.n) || pk,
       price: "",
-      hint: "est.",
+      hint: "",
     };
   }
   function makeExtra(key, opts) {
@@ -2345,7 +2345,7 @@
         have: opts.have || "pantry basics",
         steps: opts.steps || ["Shop the grocery lines for this night.", "Cook simply. low time, family of 4."],
         enjoy: opts.enjoy || "Easy night.",
-        buy: opts.buy || "see grocery lines (est.)",
+        buy: opts.buy || "see grocery lines",
       },
       groceries: opts.groceries || [],
     };
@@ -2824,6 +2824,18 @@ function sidesBlockHTML(dayId, day) {
   function formatMoney2(n) {
     return `$${(Number(n) || 0).toFixed(2)}`;
   }
+  /** Steve copy bar: zero slashes, zero en/em dashes in user-facing text. */
+  function uiCopy(s) {
+    if (window.WeekBoard && typeof window.WeekBoard.cleanCopy === "function") {
+      return window.WeekBoard.cleanCopy(s);
+    }
+    return String(s == null ? "" : s)
+      .replace(/[—–]/g, " ")
+      .replace(/\s*\/\s*/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   function storeTotals(items) {
     const t = { a: 0, p: 0, b: 0, aLeft: 0, pLeft: 0, bLeft: 0, na: 0, np: 0, cu: 0, own: 0 };
     items.forEach((item) => {
@@ -2848,22 +2860,13 @@ function sidesBlockHTML(dayId, day) {
     return t;
   }
   function storePriceRow(item) {
-    const sp = storePriceFor(item);
-    if (!sp) return item.custom && itemPrice(item.id) === null ? `<div class="pr"><span>Store est. ? · add your $</span></div>` : "";
-    const aw = sp.a != null && (sp.p == null || sp.a <= sp.p);
-    const pw = sp.p != null && !aw;
-    const aLab = sp.locA === false && sp.a != null ? "est. (not this store yet)" : srcLabel(sp.sA);
-    const pLab = sp.locP === false && sp.p != null ? "est. (not this store yet)" : srcLabel(sp.sP);
-    const aTxt = sp.a != null ? `Aldi ${sp.locA === false ? "est. (not this store yet) " : "est. "}${formatMoney2(sp.a)}` : sp.al != null ? `Aldi n/a (look-alike est. ${formatMoney2(sp.al)})` : "Aldi n/a";
-    const pTxt = sp.p != null ? `Publix ${sp.locP === false ? "est. (not this store yet) " : "est. "}${formatMoney2(sp.p)}` : "Publix n/a";
-    return `<div class="pr">${sp.q ? `<span class="qty-l">${escapeHtml(sp.q)}</span>` : ""}<span class="${aw ? "win" : ""}${isStale(sp.sA) ? " stale" : ""}">${escapeHtml(aTxt)}</span><span class="${pw ? "win" : ""}${isStale(sp.sP) ? " stale" : ""}">${escapeHtml(pTxt)}</span>${aw || pw ? `<span class="win">${aw ? "Aldi" : "Publix"} cheaper</span>` : ""}<span class="src-l">${escapeHtml(aLab === pLab ? aLab : `Aldi ${aLab} · Publix ${pLab}`)}</span></div>`;
+    // Steve grocery bar: no Est. / estimate chrome. Own $ only via price field.
+    void item;
+    return "";
   }
   function storePriceText(item) {
-    const sp = storePriceFor(item);
-    if (!sp) return "";
-    const a = sp.a != null ? `Aldi ${sp.locA === false ? "est. (not this store yet) " : "est. "}${formatMoney2(sp.a)}` : sp.al != null ? `Aldi look-alike est. ${formatMoney2(sp.al)}` : "Aldi n/a";
-    const p = sp.p != null ? `Publix ${sp.locP === false ? "est. (not this store yet) " : "est. "}${formatMoney2(sp.p)}` : "Publix n/a";
-    return `${a} / ${p}`;
+    void item;
+    return "";
   }
 
   function normalizeBudget(b) {
@@ -2883,7 +2886,7 @@ function sidesBlockHTML(dayId, day) {
     const b = state.budget;
     if (!b.on) return "Budget: off";
     if (b.amt == null) return `Budget band ${plan.budget}`;
-    return `Budget ${formatMoney(b.amt)} / ${b.days} days`;
+    return `Budget ${formatMoney(b.amt)} for ${b.days} days`;
   }
 
   function scaledBudgetAmount() {
@@ -2958,7 +2961,7 @@ function sidesBlockHTML(dayId, day) {
       <label class="fld" for="bDays">How many days it covers</label><input class="inp" id="bDays" type="number" inputmode="numeric" min="1" max="366" value="${b.days}">
       <div class="dchips">${[3, 5, 7, 14].map((n) => `<button type="button" data-dd="${n}" class="${b.days === n ? "on" : ""}">${n} days</button>`).join("")}</div>
       <div class="sh-row2"><button type="button" class="sh-btn" id="bClr">Back to default band</button><button type="button" class="sh-btn p" id="bSave">Save</button></div>
-      <p class="muted2">Compared with this week’s est. total. Saved on this phone and in the share link.</p>`, "Budget");
+      <p class="muted2">Compared with this week’s grocery total from priced items. Saved on this phone and in the share link.</p>`, "Budget");
     const sw = inn.querySelector("#bSw");
     const flip = () => {
       state.budget.on = !state.budget.on;
@@ -2977,7 +2980,7 @@ function sidesBlockHTML(dayId, day) {
       const a = parseFloat(String(inn.querySelector("#bAmt").value).replace(/[$,\s]/g, ""));
       state.budget = normalizeBudget({ on: true, amt: Number.isFinite(a) && a > 0 ? a : null, days: inn.querySelector("#bDays").value });
       persist(); closeSheet(); renderAll();
-      showToast(state.budget.amt == null ? "Budget band back to default" : `Budget ${formatMoney(state.budget.amt)} / ${state.budget.days} days saved`);
+      showToast(state.budget.amt == null ? "Budget band back to default" : `Budget ${formatMoney(state.budget.amt)} for ${state.budget.days} days saved`);
     });
     inn.querySelector("#bClr").addEventListener("click", () => {
       state.budget = { on: true, amt: null, days: 7 };
@@ -3041,7 +3044,7 @@ function sidesBlockHTML(dayId, day) {
           const lunch = day.adultLunch && day.adultLunch !== "—" && !/adult lunch open/.test(day.adultLunch) ? day.adultLunch : "";
           return `<div class="cz${o ? " ch" : ""}${moveFrom === td.id ? " mv" : ""}">
             <div class="cz-h"><span>${escapeHtml(td.day)}</span><span>${o ? "changed" : ""}</span></div>
-            <div class="cz-d">${day.mealEmoji} ${isFav(day.dinner) ? "❤️ " : ""}${escapeHtml(day.dinner)}</div>
+            <div class="cz-d">${day.mealEmoji} ${""}${escapeHtml(uiCopy(day.dinner))}</div>
             ${lunch ? `<div class="cz-l">${escapeHtml(lunch)}</div>` : ""}
             <div class="cz-o">
               <button type="button" data-a="keep" data-d="${td.id}" class="${!o ? "on" : ""}">Keep</button>
@@ -3050,7 +3053,7 @@ function sidesBlockHTML(dayId, day) {
               <button type="button" data-a="eatout" data-d="${td.id}" class="${t === "eatout" ? "on" : ""}">Eat out</button>
               <button type="button" data-a="move" data-d="${td.id}" class="mvb${moveFrom === td.id ? " on" : ""}">${moveFrom === null ? "⇅ Move" : moveFrom === td.id ? "Cancel" : "⇅ Swap w/ " + escapeHtml(plan.days.find((x) => x.id === moveFrom).short)}</button>
             </div>
-            ${swapOpen === td.id ? `<div class="cz-list">${options.map((d) => `<button type="button" data-pick="${escapeAttr(d.key)}" data-d="${td.id}">${isFav(d.day.dinner) ? "❤️ " : ""}${escapeHtml(d.day.dinner)}<small>${escapeHtml(d.label)}</small></button>`).join("")}</div>` : ""}
+            ${swapOpen === td.id ? `<div class="cz-list">${options.map((d) => `<button type="button" data-pick="${escapeAttr(d.key)}" data-d="${td.id}">${""}${escapeHtml(uiCopy(d.day.dinner))}<small>${escapeHtml(d.label)}</small></button>`).join("")}</div>` : ""}
           </div>`;
         }).join("")}
         <div class="sh-row2"><button type="button" class="sh-btn" id="czR">Reset this week</button><button type="button" class="sh-btn p" id="czS">Save</button></div>`;
@@ -3145,7 +3148,7 @@ function sidesBlockHTML(dayId, day) {
   function calorieBadges(day) {
     const c = caloriesForDay(day);
     if (!c.main && !c.meal) return "";
-    return `<span class="cal-badges"><span class="cal-main" title="USDA FoodData Central typical-serving rough estimate">🔥 ~${c.main} cal per serving</span><span class="cal-meal" title="Main + sides estimate">This meal: ~${c.meal} cal per serving</span></span>`;
+    return `<span class="cal-badges"><span class="cal-main" title="USDA FoodData Central typical serving">🔥 ~${c.main} cal per serving</span><span class="cal-meal" title="Main plus sides">This meal: ~${c.meal} cal per serving</span></span>`;
   }
 
   function prepCookFor(day) {
@@ -3370,12 +3373,12 @@ function sidesBlockHTML(dayId, day) {
     const budget = bud.on && bud.amt != null ? Math.round((bud.amt * 7) / (bud.days || 14) * 100) / 100 : null;
     const tmKeys = Object.keys(times).sort((a,b)=>times[b]-times[a]);
     const highlights = [];
-    if (topRated.length) highlights.push(`Top: ${topRated.slice(0,2).map((r)=>(r.r===2?"❤️":"👍")+" "+(r.n||"")).join(" · ")}`);
+    if (topRated.length) highlights.push(`Top: ${topRated.slice(0,2).map((r)=>(r.r===2?"★":"👍")+" "+(r.n||"")).join(" · ")}`);
     if (uniqSug[0]) highlights.push(uniqSug[0]);
     if (made >= 5) highlights.push("Solid logging this week.");
     body.innerHTML = `
       <div class="wr-stats wst-row">
-        <div><b>$${est.toFixed(0)}</b>${budget!=null?` / $${budget.toFixed(0)}`:""}<small>est.${budget!=null?" vs budget":""}</small></div>
+        <div><b>$${est.toFixed(0)}</b>${budget!=null?` of $${budget.toFixed(0)}`:""}<small>${budget!=null?"vs budget":"priced"}</small></div>
         <div><b>${made}/${skipped}/${ateOut}</b><small>made / skip / out</small></div>
         <div><b>${planned}</b><small>planned</small></div>
       </div>
@@ -4062,24 +4065,24 @@ function sidesBlockHTML(dayId, day) {
         (day.overrideType === "pickmeal" ? " day-card-pickmeal" : "");
       const adultLine =
         day.adultLunch && day.adultLunch !== "—" && !/adult lunch open/.test(day.adultLunch)
-          ? `<p class="day-lunch">${escapeHtml(day.adultLunch)}</p>`
+          ? `<p class="day-lunch">${escapeHtml(uiCopy(day.adultLunch))}</p>`
           : `<p class="day-lunch day-lunch-muted">adult lunch open</p>`;
       const tedLine = day.tedNote
-        ? `<p class="day-ted">${escapeHtml(day.tedNote)}</p>`
+        ? `<p class="day-ted">${escapeHtml(uiCopy(day.tedNote))}</p>`
         : "";
       const swapBadge = day.swapped
         ? `<p class="day-swap-badge">${
             day.overrideType === "leftovers"
-              ? "Swapped → Leftovers"
+              ? "Swapped to Leftovers"
               : day.overrideType === "eatout"
-                ? "Swapped → Eat out"
+                ? "Swapped to Eat out"
                 : day.overrideType === "removed"
                 ? "🗑 Removed from this week"
                 : day.overrideType === "pickmeal"
                 ? "Pick a meal"
                 : day.overrideType === "grabgo"
                 ? `🛍 Grab & go`
-                : `Swapped → ${escapeHtml(day.swapLabel || "dinner")}`
+                : `Swapped to ${escapeHtml(uiCopy(day.swapLabel || "dinner"))}`
           }</p>`
         : "";
       const holClass = day.holiday || day.overrideType === "holiday";
@@ -4096,7 +4099,7 @@ function sidesBlockHTML(dayId, day) {
         <button type="button" class="day-body day-body-btn${holClass ? " is-holiday" : ""}" aria-label="${escapeAttr(day.day)}: ${escapeAttr(day.dinner)}. Tap for recipe.">
           <span class="emo-row"><span class="meal-emoji" aria-hidden="true">${day.mealEmoji}</span>${prepCookBadge(day)}</span>
           ${typeof calorieBadges === "function" ? calorieBadges(Object.assign({}, day, { _sideDayId: templateDay.id })) : ""}
-          <p class="day-dinner">${isFav(day.dinner) ? '<span class="fav-badge">⭐</span> ' : ""}${escapeHtml(day.dinner)}</p>
+          <p class="day-dinner">${isFav(day.dinner) ? '<span class="fav-badge">⭐</span> ' : ""}${escapeHtml(uiCopy(day.dinner))}</p>
           <div class="day-meat-row" data-day-meat="${escapeAttr(templateDay.id)}"></div>
           ${day.tag ? `<p class="day-tag">${escapeHtml(day.tag)}</p>` : ""}
           ${swapBadge}
@@ -4130,7 +4133,7 @@ function sidesBlockHTML(dayId, day) {
                 document.querySelectorAll(".item-alt-pop").forEach((p) => p.remove());
                 if (closing) return;
                 const pop = document.createElement("div");
-                pop.innerHTML = IA.bubbleHTML("Swap meat for…", info.alts, cur, false);
+                pop.innerHTML = IA.bubbleHTML("Swap meat for", info.alts, cur, false);
                 const bubble = pop.firstElementChild;
                 meatHost.appendChild(bubble);
                 bubble.querySelectorAll("[data-alt]").forEach((btn) => {
@@ -4227,15 +4230,15 @@ function sidesBlockHTML(dayId, day) {
       const on = ov && (ov.type === "grabgo" || ov.type === "pick") && ov.key === key;
       return `<button type="button" class="swap-option${on ? " is-on" : ""}" data-swap-type="grabgo" data-swap-key="${escapeAttr(key)}">
         <span class="swap-option-title">${escapeHtml(g.tag)} · ${escapeHtml(g.dinner.replace(/^Grab & go:\s*/, ""))}</span>
-        <span class="swap-option-sub">Adds grocery lines · est. prices</span>
+        <span class="swap-option-sub">Adds grocery lines</span>
       </button>`;
     }).join("");
     els.swapBody.innerHTML = `
-      <p class="swap-current">Now: <strong>${escapeHtml(current.dinner)}</strong></p>
+      <p class="swap-current">Now: <strong>${escapeHtml(uiCopy(current.dinner))}</strong></p>
       <div class="swap-options" role="list">
         <button type="button" class="swap-option" data-swap-type="reset" ${!ov ? "disabled" : ""}>
           <span class="swap-option-title">Restore template</span>
-          <span class="swap-option-sub">${escapeHtml(templateDay.dinner)}</span>
+          <span class="swap-option-sub">${escapeHtml(uiCopy(templateDay.dinner))}</span>
         </button>
         <button type="button" class="swap-option${ov && ov.type === "leftovers" ? " is-on" : ""}" data-swap-type="leftovers">
           <span class="swap-option-title">Leftovers</span>
@@ -4254,7 +4257,7 @@ function sidesBlockHTML(dayId, day) {
           .map((d) => {
             const on = ov && ov.type === "pick" && ov.key === d.key;
             return `<button type="button" class="swap-option${on ? " is-on" : ""}" data-swap-type="pick" data-swap-key="${escapeAttr(d.key)}">
-              <span class="swap-option-title">${isFav(d.day.dinner) ? "❤️ " : ""}${escapeHtml(d.day.dinner)}</span>
+              <span class="swap-option-title">${""}${escapeHtml(uiCopy(d.day.dinner))}</span>
               <span class="swap-option-sub">${escapeHtml(d.label)}${d.day.tedNote ? " · Ted leftover sub" : ""}</span>
             </button>`;
           })
@@ -4265,7 +4268,7 @@ function sidesBlockHTML(dayId, day) {
         <div class="swap-options" id="swap-more-list" role="list"></div>
         <button type="button" class="swap-more-btn" id="swap-more-btn">More</button>
       </div>
-      <p class="swap-footnote">Grocery lines for this night update automatically. Share link + this phone save the swap. Estimates only (est.).</p>
+      <p class="swap-footnote">Grocery lines for this night update automatically. Share link and this phone save the swap.</p>
     `;
     const moreList = els.swapBody.querySelector("#swap-more-list");
     const moreBtn = els.swapBody.querySelector("#swap-more-btn");
@@ -4286,12 +4289,12 @@ function sidesBlockHTML(dayId, day) {
       const on = ov && ov.type === "pick" && ov.key === key;
       const sub = [
         ex.kindLabel || "More ideas",
-        "est. prices",
+        "prices",
         ex.weekendOnly ? "weekend only" : "",
         ex.tedNote ? "Ted leftover sub" : "",
       ].filter(Boolean).join(" · ");
       return `<button type="button" class="swap-option${on ? " is-on" : ""}" data-swap-type="pick" data-swap-key="${escapeAttr(key)}">
-        <span class="swap-option-title">${isFav(ex.dinner) ? "❤️ " : ""}${escapeHtml(ex.dinner)}</span>
+        <span class="swap-option-title">${""}${escapeHtml(uiCopy(ex.dinner))}</span>
         <span class="swap-option-sub">${escapeHtml(sub)}</span>
       </button>`;
     }
@@ -4611,7 +4614,7 @@ function sidesBlockHTML(dayId, day) {
     const opts = allCategories().map(
       (c) => `<option value="${escapeAttr(c)}" ${c === cur ? "selected" : ""}>${escapeHtml(c)}</option>`
     );
-    opts.push(`<option value="${NEW_CAT_VAL}" ${cur === NEW_CAT_VAL ? "selected" : ""}>+ New category…</option>`);
+    opts.push(`<option value="${NEW_CAT_VAL}" ${cur === NEW_CAT_VAL ? "selected" : ""}>+ New category</option>`);
     sel.innerHTML = opts.join("");
     updateNewCatFieldVisibility();
   }
@@ -4654,19 +4657,20 @@ function sidesBlockHTML(dayId, day) {
     const items = allGroceryItems().filter((i) => !itemHaveIt(i.id) && !itemChecked(i.id));
     const cats = allCategories();
     const week = currentWeek();
-    const lines = [`Shopping list · week of ${week.title || state.weekTitle || ""}`];
+    const lines = [`Shopping list · week of ${uiCopy(week.title || state.weekTitle || "")}`];
     let total = 0;
+    let priced = 0;
     cats.forEach((cat) => {
       const group = items.filter((i) => i.category === cat);
       if (!group.length) return;
       lines.push("", cat.toUpperCase());
       group.forEach((it) => {
         const p = itemPrice(it.id, it.price);
-        if (p != null) total += p;
-        lines.push(`- ${it.name}${p != null ? ` · est. ${formatMoney2(p)}` : ""}`);
+        if (p != null) { total += p; priced += 1; }
+        lines.push(`- ${uiCopy(it.name)}${p != null ? ` · ${formatMoney2(p)}` : ""}`);
       });
     });
-    lines.push("", `Est. total: ${formatMoney2(total)}`);
+    if (priced) lines.push("", formatMoney2(total));
     return lines.join("\n");
   }
   async function shareListText(text, title) {
@@ -4758,20 +4762,22 @@ function sidesBlockHTML(dayId, day) {
       "Tucker lunchbox. same kit Mon to Fri. Tap Have it if stocked.";
     els.groceryList.appendChild(tuckerNote);
 
-    const tots = storeTotals(items.filter((i) => !itemHaveIt(i.id)));
     const totalBar = document.createElement("div");
     totalBar.className = "store-totals";
     const loc = state.location || "Vero Beach";
-    // Prefer cheapest of Aldi/Publix for the single $ total display
-    const useStore = tots.a <= tots.p ? "aldi" : "publix";
-    state.store = useStore;
-    const estVal = useStore === "publix" ? tots.p : tots.a;
-    const estLab = useStore === "publix" ? "Publix" : "Aldi";
-    const pricedCount = (items || []).filter((i) => !itemHaveIt(i.id) && itemPrice(i.id, i.price) != null).length;
+    let pricedCount = 0;
+    let pricedSum = 0;
+    (items || []).forEach((i) => {
+      if (itemHaveIt(i.id)) return;
+      const p = itemPrice(i.id, i.price);
+      if (p == null || !isFinite(p)) return;
+      pricedCount += 1;
+      pricedSum += p;
+    });
     if (pricedCount) {
       totalBar.innerHTML = `
-      <div class="tot" role="group" aria-label="Store total">
-        <div class="best">$${estVal.toFixed(2)} at ${escapeHtml(estLab)}</div>
+      <div class="tot" role="group" aria-label="Priced total">
+        <div class="best">$${pricedSum.toFixed(2)}</div>
       </div>
       <p class="pchk">${escapeHtml(state.storeName || "Aldi")} · ${escapeHtml(loc)}</p>`;
     } else {
@@ -4895,7 +4901,7 @@ function sidesBlockHTML(dayId, day) {
         if (!openId) return;
         chip.setAttribute("aria-expanded", "true");
         const pop = document.createElement("div");
-        pop.innerHTML = IA.bubbleHTML("Swap for…", alts, item.name, false);
+        pop.innerHTML = IA.bubbleHTML("Swap for", alts, item.name, false);
         const bubble = pop.firstElementChild;
         li.querySelector(".item-copy")?.appendChild(bubble);
         bubble.querySelectorAll("[data-alt]").forEach((btn) => {
@@ -4957,7 +4963,9 @@ function sidesBlockHTML(dayId, day) {
       fold.className = "aisle-fold" + (cat === "Tucker lunchbox" ? " category-tucker" : "");
       fold.dataset.aisle = cat;
       const searching = Boolean(q);
-      fold.open = searching ? true : isAisleOpen(cat);
+      // Menu extras (customs) stay open when present so reload does not hide them
+      const preferOpen = secName === "Menu extras" && groupItems.length > 0;
+      fold.open = searching || preferOpen ? true : isAisleOpen(cat);
       const sum = document.createElement("summary");
       const customCat = isCustomCategory(cat);
       const aisleLab = secName === "Menu for this week" ? cat : secName;
@@ -5011,8 +5019,8 @@ function sidesBlockHTML(dayId, day) {
           <div class="item-main">
             <div class="item-copy">
               <label for="${escapeAttr(inputId)}">
-                ${escapeHtml(item.name)}
-                ${item.hint ? `<span class="hint">${escapeHtml(item.hint)}</span>` : ""}
+                ${escapeHtml(uiCopy(item.name))}
+                ${item.hint ? `<span class="hint">${escapeHtml(uiCopy(item.hint))}</span>` : ""}
               </label>
               <div class="item-meta-row">
                 <button type="button" class="meta-chip qty-chip" data-edit="qty" aria-label="Quantity for ${escapeAttr(item.name)}">
@@ -5052,7 +5060,7 @@ function sidesBlockHTML(dayId, day) {
                 inputmode="decimal"
                 placeholder="your"
                 value="${price === null ? "" : String(price)}"
-                aria-label="Your own price for ${escapeAttr(item.name)} (overrides store estimates)"
+                aria-label="Your price for ${escapeAttr(uiCopy(item.name))}"
               />
             </label>
           </div>
@@ -5122,7 +5130,7 @@ function sidesBlockHTML(dayId, day) {
           setNote(item.id, li.querySelector(".note-input").value);
           persist();
           renderGrocery();
-          showToast("Saved qty / note");
+          showToast("Saved qty and note");
         });
         ul.appendChild(li);
         try { bindAltChevron(li, item); } catch (_) {}
@@ -5136,7 +5144,7 @@ function sidesBlockHTML(dayId, day) {
       const empty = document.createElement("p");
       empty.className = "grocery-empty";
       empty.textContent = state.hideChecked
-        ? "All visible items are checked (or Have-it hidden). Toggle Show checked / Hidden to review."
+        ? "All visible items are checked (or Have-it hidden). Toggle Show checked or Hidden to review."
         : q
           ? "No items match your search."
           : "No grocery lines for this view.";
@@ -5166,11 +5174,11 @@ function sidesBlockHTML(dayId, day) {
         ? day.adultLunch
         : "Tucker: fixed school lunchbox (not dinner leftovers)";
     const tedBlock = day.tedNote
-      ? `<div class="recipe-block recipe-ted"><h4>Ted (no fish)</h4><p>${escapeHtml(day.tedNote)}</p></div>`
+      ? `<div class="recipe-block recipe-ted"><h4>Ted (no fish)</h4><p>${escapeHtml(uiCopy(day.tedNote))}</p></div>`
       : "";
     const cal = caloriesForDay(day);
     els.modalBody.innerHTML = `
-      ${cal.main ? `<p class="muted2">🔥 ~${cal.main} cal per serving · This meal: ~${cal.meal} cal per serving <small>(USDA typical-serving rough est.)</small></p>` : ""}
+      ${cal.main ? `<p class="muted2">🔥 ~${cal.main} cal per serving · This meal: ~${cal.meal} cal per serving <small>(USDA typical serving)</small></p>` : ""}
       <div class="recipe-block">
         <h4>Have (pantry first)</h4>
         <p>${escapeHtml(r.have)}</p>
@@ -5210,17 +5218,16 @@ function sidesBlockHTML(dayId, day) {
     const totals = estimateTotals(items);
     const dinnerLines = plan.days.map((d) => {
       const day = effectiveDay(d);
-      return `${day.short}: ${day.dinner}${day.tedNote ? ` (${day.tedNote})` : ""}`;
+      return `${day.short}: ${uiCopy(day.dinner)}${day.tedNote ? ` (${uiCopy(day.tedNote)})` : ""}`;
     });
     const lines = [
       `Burns Family grocery. ${state.weekTitle} (${week.label} · ${plan.label})`,
       `${state.storeName || "Aldi"} · ${state.location || "Vero Beach"}`,
       budgetLine(plan),
       (() => {
-        const t = storeTotals(items);
-        const use = t.a <= t.p ? "Aldi" : "Publix"; const v = use === "Publix" ? t.p : t.a; return `Est. total (${use}) ${formatMoney2(v)}`;
+        if (!totals.pricedAll) return "";
+        return formatMoney2(totals.all);
       })(),
-      totals.pricedAll ? `Your own $ entered: ${formatMoney(totals.all)} on ${totals.pricedAll} line(s)` : "",
       "Dinners: " + dinnerLines.join(" · "),
       "Tucker lunchbox = yogurt + cheese + pretzels or Pringles + fruit snack + beef stick + juice",
       "Chili = weekend daytime only when on the plan.",
@@ -5401,7 +5408,7 @@ function sidesBlockHTML(dayId, day) {
         </section>
         <section class="set-block">
           <h4>Weekly grocery budget</h4>
-          <p class="muted2">Used for the list est. total compare. Edit anytime here.</p>
+          <p class="muted2">Used for the list total compare. Edit anytime here.</p>
           <label class="fld">Amount (USD)</label>
           <input class="inp" id="set-bud-amt" type="number" min="0" step="1" value="${escapeAttr(state.budget && state.budget.on ? (state.budget.amt ?? "") : "")}" placeholder="e.g. 120" />
           <label class="fld">Over days</label>
@@ -6224,7 +6231,7 @@ function sidesBlockHTML(dayId, day) {
     const map = loadFmPhotos();
     const secs = allFmStorageSections();
     const newHtml = fmStockShowNew
-      ? `<div class="ph-new-row"><input id="fmPhNewName" placeholder="Name the new section…" maxlength="40" autocomplete="off" /><button type="button" class="btn btn-secondary" id="fmPhNewAdd">Add</button><button type="button" class="btn btn-ghost" id="fmPhNewCancel">Cancel</button></div>`
+      ? `<div class="ph-new-row"><input id="fmPhNewName" placeholder="Name the new section" maxlength="40" autocomplete="off" /><button type="button" class="btn btn-secondary" id="fmPhNewAdd">Add</button><button type="button" class="btn btn-ghost" id="fmPhNewCancel">Cancel</button></div>`
       : "";
     const tiles = secs.map((sec) => {
       const photos = map[sec.id] || [];
@@ -6968,6 +6975,60 @@ function sidesBlockHTML(dayId, day) {
     showToast((C.randomToast || ((n) => "Picked: " + n))(pick.name));
   }
 
+  function openOctoberBrochure() {
+    const OB = window.OctoberBrochure;
+    const WB = window.WeekBoard;
+    if (!OB || !WB) {
+      showToast("October brochure unavailable");
+      return;
+    }
+    const month = activeMonth();
+    const slots = OB.remainingOctoberWeeks(2026, 5);
+    const boards = slots
+      .map((slot, i) => {
+        const weekId = String(Math.min(i + 1, 4));
+        const week = WEEKS[weekId];
+        if (!week) return null;
+        const planId =
+          (month.picks && month.picks[weekId]) ||
+          (weekId === String(state.week) ? state.plan : "A") ||
+          "A";
+        const plan = (week.plans && (week.plans[planId] || week.plans.A)) || null;
+        if (!plan) return null;
+        const useLive = weekId === String(state.week);
+        const days = (plan.days || []).map((td, di) => {
+          const day = useLive ? effectiveDay(td) : td;
+          return {
+            index: td.id,
+            short: td.short || day.short,
+            name: day.day || td.day,
+            title: day.dinner,
+            dinner: day.dinner,
+            recipe: day.recipe,
+            tedNote: day.tedNote,
+            tag: day.tag,
+            kind: day.overrideType === "leftovers" ? "leftover" : "cook",
+            artKey: day.dinner,
+            active: false,
+            today: false,
+          };
+        });
+        return {
+          weekId,
+          planId,
+          datesLabel: slot.label || week.title,
+          days,
+        };
+      })
+      .filter(Boolean);
+    OB.open({
+      mood: "burns",
+      title: "October dinners brochure",
+      WeekBoard: WB,
+      boards,
+    });
+  }
+
   function wireBurnsDraftControls() {
     const C = window.WEEK_LOCK_COPY || {};
     const lockBtn = document.getElementById("lock-week-btn");
@@ -7008,6 +7069,8 @@ function sidesBlockHTML(dayId, day) {
       renderGrocery();
       document.getElementById("grocery-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
+    const brochureBtn = document.getElementById("october-brochure-btn");
+    if (brochureBtn) brochureBtn.onclick = () => openOctoberBrochure();
     if (footShare) footShare.onclick = () => shareGroceryList();
     if (footUncheck) footUncheck.onclick = () => {
       state.checked = {};

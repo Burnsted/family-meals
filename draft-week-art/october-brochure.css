@@ -1,0 +1,80 @@
+/* October dinners brochure overlay (Burns scaffold). Does not replace week board. */
+.october-brochure {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  background:
+    linear-gradient(180deg, rgba(243, 235, 224, 0.97), rgba(232, 220, 203, 0.96)),
+    #f3ebe0;
+  color: #2a2118;
+}
+body.brochure-open {
+  overflow: hidden;
+}
+.brochure-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem 0.85rem 2.5rem;
+}
+.brochure-head {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0 0 1.25rem;
+}
+.brochure-back {
+  appearance: none;
+  justify-self: start;
+  min-height: 44px;
+  padding: 0.35rem 0.15rem;
+  border: 0;
+  background: transparent;
+  color: #0a5555;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.brochure-kicker {
+  margin: 0;
+  font-family: "Nunito", sans-serif;
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #0f6e6e;
+}
+.brochure-title {
+  margin: 0.15rem 0 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 800;
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  line-height: 1.05;
+  color: #c45c18;
+}
+.brochure-sub {
+  margin: 0.35rem 0 0;
+  font-family: "Nunito", sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #3d342a;
+  max-width: 36rem;
+}
+.brochure-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+.brochure-week .week-board {
+  margin: 0;
+}
+.brochure-empty {
+  margin: 1rem 0;
+  font-weight: 700;
+}
+
+@media (min-width: 900px) {
+  .brochure-shell { padding: 1.5rem 1.25rem 3rem; }
+}

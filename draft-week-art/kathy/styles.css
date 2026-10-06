@@ -1,4 +1,5 @@
 /* Kathy's Table — quiet Florida waterfront (Steve art bar draft) */
+html, body { overflow-x: hidden; }
 :root {
   --bg: #f6efe4;
   --bg-water: #d9ebe8;

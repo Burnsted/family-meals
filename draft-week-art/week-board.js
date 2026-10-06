@@ -71,7 +71,7 @@
     if (d.tedNote) {
       const t = cleanCopy(d.tedNote).replace(/^Ted:\s*/i, "Ted: ");
       if (/leftover/i.test(t)) return "Ted: leftovers";
-      return t.length > 36 ? t.slice(0, 34) + "…" : t;
+      return t.length > 36 ? t.slice(0, 34) + "..." : t;
     }
     if (d.tag && /grab/i.test(d.tag)) return "Grab and go";
     if (d.kind === "leftover" || d.kind === "reuse") return "Leftovers";
