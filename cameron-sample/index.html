@@ -253,6 +253,8 @@
   .rate{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px;font-size:12px;font-weight:800;color:var(--wsoft)}
   .rate button{min-width:46px;min-height:40px;border-radius:12px;border:2px solid rgba(15,110,110,.25);background:var(--wbg);font-size:16px;cursor:pointer}
   .rate button[aria-pressed="true"]{background:var(--tealS);border-color:var(--teal)}
+  .rate .rate-del{min-width:44px;min-height:44px;padding:4px;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--wsoft);margin-left:2px}
+  .rate .rate-del .ico{display:block}
   .favb{display:inline-block;font-size:12px;font-weight:800;background:#ffe4e6;color:#9f1239;border-radius:999px;padding:2px 8px;vertical-align:middle}
   .rpanel ul{list-style:none;margin:0;padding:0}.rpanel li{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed rgba(23,48,66,.12);font-weight:800}
   .rpanel li span{flex:1}.rpanel li small{color:var(--wsoft);font-weight:650}
@@ -261,8 +263,8 @@
   .nextwk{background:var(--white);border-radius:14px;padding:10px 14px;font-weight:700;font-size:14px;color:var(--wsoft);box-shadow:0 8px 22px rgba(23,48,66,.1);margin-bottom:12px}
   /* v4 */
   .dha{display:flex;align-items:center;gap:6px}
-  .dact{min-height:32px;min-width:40px;padding:3px 10px;border-radius:999px;border:1.5px solid rgba(255,255,255,.55);background:rgba(255,255,255,.14);color:#fff;font:inherit;font-size:11px;font-weight:800;letter-spacing:.04em;cursor:pointer}
-  .dact.del{font-size:14px;padding:3px 8px;letter-spacing:0}
+  .swap-link{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:44px;min-width:44px;padding:0 4px;border:0;border-radius:0;background:transparent;box-shadow:none;color:#fff;font:inherit;font-size:13px;font-weight:800;letter-spacing:0;text-decoration:underline;text-underline-offset:3px;cursor:pointer;opacity:.95}
+  .swap-link .ico{display:block;opacity:.95}
   .log{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(23,48,66,.14)}
   .lr{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:4px 0;font-size:12px;font-weight:800;color:var(--wsoft)}
   .lr button{min-height:36px;min-width:40px;padding:4px 10px;border-radius:999px;border:2px solid rgba(15,110,110,.22);background:var(--wbg);font:inherit;font-size:12px;font-weight:800;color:var(--wink);cursor:pointer}
@@ -332,7 +334,6 @@
   .rcpt-btn.ico-btn,.cpb.ico-btn{width:auto;flex:1 1 auto}
   .gear.ico-btn{width:44px;height:44px;border-radius:14px;border:2px solid rgba(15,110,110,.35);background:var(--white);box-shadow:0 3px 0 rgba(15,110,110,.12)}
   .cal-btn.ico-btn{min-width:44px;min-height:44px;border-radius:14px;border:2px solid rgba(15,110,110,.35);background:var(--white)}
-  .dact.ico-btn{min-height:32px;min-width:36px;padding:4px 8px;border-radius:999px;border:1.5px solid rgba(255,255,255,.55);background:rgba(255,255,255,.14);color:#fff}
   .memo-sm{font-size:20px;line-height:1}
   .sheet .sw.sm{display:inline-flex;align-items:center;width:52px;height:30px}
   .freezer-tip{margin:6px 0 8px;font-size:13px;font-weight:700;color:var(--wsoft);background:var(--wbg);border-radius:10px;padding:8px 10px}
@@ -1121,8 +1122,7 @@ function renderWeek(){
   ${days.map((d,i)=>{const m=MN(d.meal);const cut=d.cut?` · ${esc(d.cut)}`:"";
     return `<div class="day${dayCls(d)}" data-d="${i}" style="animation-delay:${i*.04}s">
     <div class="dh"><span>${d.short}${d.cook?" · cook":""}${d.grab?" · grab":""}</span><span class="dha">${d.kind!=="hol"?shopBtn(i):""}
-      <button type="button" class="dact ico-btn" data-swapd="${i}" aria-label="Swap ${d.short} dinner">${icons.swap}</button>
-      <button type="button" class="dact del ico-btn" data-del="${i}" aria-label="Delete ${d.short} dinner">${icons.del}</button>
+      <button type="button" class="swap-link" data-swapd="${i}" aria-label="Swap ${d.short} dinner">${icons.swap} Swap</button>
       <span class="memo-sm">${d.e}</span></span></div>
     <div class="db"><div class="emo-row"><span class="memo">${d.e}</span>${dayBadge(d)}</div>
     <p class="dinner">${d.meal&&rateOf(d.meal)===2?'<span class="favb">❤️ favorite</span> ':""}${cutTag(d)}${esc(d.dinner)}</p>${dayNut(d)}
@@ -1130,7 +1130,7 @@ function renderWeek(){
     <p class="dl">Lunch at Woody's: ${esc(d.lunch||"—")}</p>
     ${d.bf?`<p class="dl b">${bfLine(d.bf)}</p>`:""}
     ${W.open===i&&m?`<div class="rec"><h4>${m.emoji} ${esc(m.name)}</h4>${tipHTML(m).replace('class="tip"','')}</div>`:""}
-    <p class="hint">${W.open===i?"▾ tap to close":"▸ tap for how-to + temps"}</p>${d.meal&&M(d.meal)?rateRow(d.meal):""}${d.kind==="rm"||d.kind==="hol"?"":logRow(i,d)}</div></div>`}).join("")}
+    <p class="hint">${W.open===i?"▾ tap to close":"▸ tap for how-to + temps"}</p>${rateRow(d.meal&&M(d.meal)?d.meal:null,i,d.short)}${d.kind==="rm"||d.kind==="hol"?"":logRow(i,d)}</div></div>`}).join("")}
   ${weekReview(days)}
   ${ratingsPanel()}
   ${W.extra.length?`<div class="nextwk">🔄 Next week rotation: ${W.extra.map(g=>({pork:mv("pork"),brats:mv("brats"),chicken:"chicken",burger:"burgers",steak:"steak"}[g])).join(", ")}</div>`:""}
@@ -1414,7 +1414,9 @@ function getRates(){try{const j=JSON.parse(localStorage.getItem(RKEY)||"{}");if(
 function rateOf(id){const r=getRates()[id];return r?r.r:0}
 function setRate(id,r){const all=getRates();if(!r||(all[id]&&all[id].r===r))delete all[id];else all[id]={r,d:isoD(new Date())};
   try{localStorage.setItem(RKEY,JSON.stringify(all))}catch(_){}}
-function rateRow(id){const r=rateOf(id);return `<div class="rate" onclick="event.stopPropagation()"><span>Made it? Rate it:</span>${[[-1,"👎","Tried it, no — never suggest again"],[1,"👍","Good"],[2,"❤️","Favorite"]].map(([v,e,t])=>`<button data-rate="${v}" data-m="${id}" aria-pressed="${r===v}" title="${t}">${e}</button>`).join("")}</div>`}
+function rateRow(id,i,short){const del=`<button type="button" class="rate-del ico-btn" data-del="${i}" aria-label="Delete ${esc(short||"")} dinner">${icons.del}</button>`;
+  if(!id)return `<div class="rate" onclick="event.stopPropagation()">${del}</div>`;
+  const r=rateOf(id);return `<div class="rate" onclick="event.stopPropagation()"><span>Made it? Rate it:</span>${[[-1,"👎","Tried it, no — never suggest again"],[1,"👍","Good"],[2,"❤️","Favorite"]].map(([v,e,t])=>`<button data-rate="${v}" data-m="${id}" aria-pressed="${r===v}" title="${t}">${e}</button>`).join("")}${del}</div>`}
 function ratingsPanel(){const all=getRates();const ids=Object.keys(all).filter(id=>M(id));
   const row=(id,restore)=>`<li><span>${M(id).emoji} ${esc(M(id).name)}${restore?` <small>👎 never suggest</small>`:""}${timesMade(id)?` <small>· made ${timesMade(id)}×</small>`:""}</span><small>${esc(all[id].d||"")}</small><button class="have" data-unrate="${id}">${restore?"Restore":"Clear"}</button></li>`;
   const g=r=>ids.filter(id=>all[id].r===r);
