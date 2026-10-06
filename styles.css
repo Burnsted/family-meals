@@ -2437,3 +2437,25 @@ html[data-theme="dark"] .modal h3,
 html[data-theme="dark"] .modal .day-sub { color: var(--ink); }
 html[data-theme="dark"] .modal .day-sub { color: var(--teal-deep); }
 html[data-theme="dark"] .close-btn { background: #0b1220; color: var(--ink); }
+
+/* fix-round: tot full-width + sync-note dark */
+.store-totals .tot,
+.gpanel .tot,
+.tot {
+  grid-template-columns: 1fr;
+}
+.store-totals .tot .best,
+.tot .best {
+  text-align: left;
+  padding: 0.65rem 0.9rem;
+  min-height: auto;
+}
+html[data-theme="dark"] .sync-note,
+html[data-theme="dark"] .howto .sync-note {
+  background: rgba(251, 146, 60, 0.18);
+  color: #ffe8cc;
+  border: 1px solid rgba(251, 146, 60, 0.4);
+}
+html[data-theme="dark"] {
+  --coral-soft: rgba(251, 146, 60, 0.18);
+}

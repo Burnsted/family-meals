@@ -3349,10 +3349,10 @@ function sidesBlockHTML(dayId, day) {
         <div><b>${planned}</b><small>planned</small></div>
       </div>
       ${highlights.length ? `<ul class="wr-hi">${highlights.slice(0,3).map((s)=>`<li>${escapeHtml(s)}</li>`).join("")}</ul>` : ""}
-      <div class="wr-block"><h3>Times made (all time)</h3>
-        <ul>${tmKeys.length ? tmKeys.slice(0,5).map((n)=>`<li>${escapeHtml(n)} · ${times[n]}×</li>`).join("") : ""}</ul>
+      ${tmKeys.length ? `<div class="wr-block"><h3>Times made (all time)</h3>
+        <ul>${tmKeys.slice(0,5).map((n)=>`<li>${escapeHtml(n)} · ${times[n]}×</li>`).join("")}</ul>
         ${tmKeys.length > 5 ? `<button type="button" class="chip-btn" id="tm-see-all">See all (${tmKeys.length})</button>` : ""}
-      </div>
+      </div>` : ""}
     `;
     const see = body.querySelector("#tm-see-all");
     if (see) see.onclick = () => {
@@ -4546,11 +4546,12 @@ function sidesBlockHTML(dayId, day) {
     const estLeft = useStore === "publix" ? tots.pLeft : tots.aLeft;
     const estLab = useStore === "publix" ? "Publix" : "Aldi";
     const budAmt = scaledBudgetAmount();
-    const leftBit = estLeft != null ? ` · ${formatMoney2(estLeft)} left to buy` : "";
-    const budBit = budAmt != null ? ` · budget ${formatMoney2(budAmt)}` : "";
+    const checkedDiffers = Number.isFinite(estLeft) && Math.abs(estVal - estLeft) > 0.009;
+    const leftBit = checkedDiffers ? ` · ${formatMoney2(estLeft)} left to buy` : "";
+    const budBit = budAmt != null ? ` · budget ${formatMoney(budAmt)} for the week` : "";
     totalBar.innerHTML = `
       <div class="tot" role="group" aria-label="Estimated total">
-        <div class="best">Est. total (${estLab})<b>${formatMoney2(estVal)}</b><small>est.${budBit}${leftBit}</small></div>
+        <div class="best">Est. ${formatMoney2(estVal)}${budBit}${leftBit}<small>${estLab}</small></div>
       </div>
       <p class="pchk">${escapeHtml(state.storeName || "Aldi")} · ${escapeHtml(loc)} · Prices ${escapeHtml(fmtDateLong(PRICE_META.updated))}${PRICE_META.loaded ? "" : " (estimates)"}</p>`;
     totalBar.querySelectorAll("[data-store]").forEach((btn) => {
@@ -5524,6 +5525,21 @@ function sidesBlockHTML(dayId, day) {
       return true;
     });
   }
+
+  function assertRootDinnerGroceryCoverage() {
+    const missing = Object.keys(EXTRA_DINNERS).filter((k) => {
+      const ex = EXTRA_DINNERS[k];
+      if (!ex || ex.kind !== "dinner") return false;
+      return !(ex.groceries && ex.groceries.length);
+    });
+    if (missing.length) {
+      console.error("[root grocery self-check] dinners with no groceries:", missing);
+      throw new Error("Root dinner grocery coverage failed: " + missing.join(", "));
+    }
+    console.log("[root grocery self-check] ok");
+    return true;
+  }
+  window.__assertRootDinnerGroceryCoverage = assertRootDinnerGroceryCoverage;
   function shuffleWeek() {
     // Self-check: uniqueness — `exclude` Set + `used.includes` / `prevSet` ensure no meal key is
     // assigned twice in one shuffle; previous shuffle set is preferred-avoided via SHUFFLE_PREV_KEY.
@@ -5604,14 +5620,20 @@ function sidesBlockHTML(dayId, day) {
       }
     }
 
-    const dinnerKeys = pickN(need.length + 2, { exclude });
+    // PRESERVE_LEFTOVER_STRUCTURE: template leftover nights stay leftovers; only shuffle cook slots
+    const isTplLeft = (td) => {
+      const eff = effectiveDay(td);
+      return eff.overrideType === "leftovers" || /leftover/i.test(String(eff.dinner || "")) || (td.dinnerKey === "leftovers");
+    };
+    const cookNeed = need.filter((td) => !isTplLeft(td));
+    const leftNeed = need.filter((td) => isTplLeft(td));
+    const dinnerKeys = pickN(cookNeed.length + 2, { exclude });
     let di = 0;
     const used = [];
-    need.forEach((td) => {
+    cookNeed.forEach((td) => {
       let key;
       if (chiliDay && td.id === chiliDay && chiliKey) key = chiliKey;
       else {
-        // skip chili keys for weekdays
         while (di < dinnerKeys.length && EXTRA_DINNERS[dinnerKeys[di]].weekendOnly) di++;
         key = dinnerKeys[di++] || pickN(1, { exclude: new Set(used) })[0];
       }
@@ -5619,6 +5641,9 @@ function sidesBlockHTML(dayId, day) {
       used.push(key);
       exclude.add(key);
       state.dayOverrides[td.id] = { type: "pick", key };
+    });
+    leftNeed.forEach((td) => {
+      state.dayOverrides[td.id] = { type: "leftovers" };
     });
 
     // Taco leftovers → next dinner: if a taco night is picked, force next fillable to leftovers
