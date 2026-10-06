@@ -1,0 +1,144 @@
+/* Lock-in + sheet chrome shared across draft-week-art apps. Mood via CSS vars. */
+.week-lock-block {
+  margin: 0 0 18px;
+  padding-bottom: 4px;
+}
+.btn-lock-week {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 16px;
+  border: 2px solid var(--lock-border, var(--accent, #0f6e6e));
+  border-radius: 4px;
+  background: var(--lock-bg, var(--accent, #0f6e6e));
+  color: var(--lock-ink, #fffaf4);
+  font: inherit;
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+  text-align: center;
+}
+.btn-lock-week.is-locked {
+  background: var(--lock-locked-bg, var(--soft, #d4efef));
+  color: var(--lock-locked-ink, var(--ink, #173042));
+  border-color: var(--lock-border, var(--accent, #0f6e6e));
+  cursor: default;
+}
+.btn-edit-week {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 8px;
+  padding: 12px 16px;
+  border: 2px solid var(--lock-border, var(--line, #c9a88a));
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink, #173042);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.lock-helper {
+  margin: 8px 0 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--mut, #5c5348);
+  line-height: 1.35;
+}
+.week-is-locked .week-strip-chip,
+.week-is-locked .day-card,
+.week-is-locked .card[data-day],
+.week-is-locked .day {
+  pointer-events: none;
+}
+.week-is-locked .week-strip-chip {
+  opacity: 0.95;
+}
+.week-is-locked .swap-link,
+.week-is-locked [data-swap],
+.week-is-locked #shuffle,
+.week-is-locked #shuffle-btn,
+.week-is-locked #shuffleBtn,
+.week-is-locked #custB,
+.week-is-locked #repeat-btn {
+  display: none !important;
+}
+
+/* Summary sheet */
+.lock-sheet-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(23, 48, 66, 0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+.lock-sheet-bg[hidden] { display: none !important; }
+.lock-sheet {
+  width: min(520px, 100%);
+  max-height: min(88vh, 720px);
+  overflow: auto;
+  background: var(--card, #fffaf4);
+  color: var(--ink, #173042);
+  border-radius: 4px 4px 0 0;
+  padding: 18px 16px calc(78px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.18);
+}
+.lock-sheet h2 {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+}
+.lock-sheet .lock-dates {
+  margin: 0 0 14px;
+  color: var(--mut, #5c5348);
+  font-weight: 600;
+}
+.lock-sheet-day {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line, #c9a88a);
+}
+.lock-sheet-day:last-of-type { border-bottom: 0; }
+.lock-sheet-day .food-art {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+.lock-sheet-day .lsd-letter {
+  font-weight: 800;
+  width: 1.2em;
+  flex-shrink: 0;
+}
+.lock-sheet-day .lsd-name {
+  font-weight: 700;
+  flex: 1;
+  line-height: 1.25;
+}
+.lock-grocery-count {
+  margin: 14px 0;
+  font-weight: 700;
+}
+.lock-sheet-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+body.has-lock-sheet {
+  overflow: hidden;
+}
+
+/* Footer reserve: consent bar + feedback FAB */
+.app,
+.wrap {
+  padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+}

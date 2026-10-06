@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Burns Family meal week planner and grocery list for Ted & Samantha." />
+  <meta name="theme-color" content="#0b1220" id="theme-color-meta" />
+  <script>(function(){try{var t=localStorage.getItem("fm-theme");if(t!=="light"&&t!=="dark")t="dark";document.documentElement.setAttribute("data-theme",t);document.documentElement.style.colorScheme=t;}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();</script>
+  <title>Burns Family Meals</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f6e6e'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%23fffaf4' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23d9a441'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="week-strip.css" />
+  <link rel="stylesheet" href="lock-week.css" />
+  <link rel="stylesheet" href="home-hero.css" />
+</head>
+<body>
+  <div id="home-gate" class="home-gate" hidden></div>
+  <div class="app" id="main-app">
+    <div class="rcpt-top">
+      <button type="button" class="back-link" id="back-btn" aria-label="Back" hidden>
+        <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        <span>Back</span>
+      </button>
+      <button type="button" class="rcpt-btn icon-btn" id="rcpt-btn" aria-label="Upload receipt">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h3l2-2h6l2 2h3v12H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <span>Upload receipt</span>
+      </button>
+      <button type="button" class="gear-btn icon-btn" id="settings-btn" aria-label="Settings">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+
+    <header class="hero-card" id="hero-card">
+      <p class="brand-kicker">Kitchen HQ</p>
+      <h1 class="brand">Burns Family Meals</h1>
+      <div class="week-label-wrap">
+        <label class="visually-hidden" for="week-label">Week label</label>
+        <input
+          id="week-label"
+          class="week-label"
+          type="text"
+          maxlength="80"
+          value="Oct 5–11, 2026"
+          aria-label="Editable week title"
+        />
+        <button type="button" class="cal-btn icon-btn" id="cal-btn" aria-label="Pick a week on a calendar">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M8 3.5v3M16 3.5v3M3.5 10h17"/></svg>
+        </button>
+      </div>
+      <p class="plan-note" id="house-note" hidden></p>
+      <div hidden aria-hidden="true">
+        <div id="budget-band"><button type="button" id="budget-chip"></button><span id="store-chip"></span>
+          <p id="estimate-band"></p><div id="budget-progress"><div id="budget-progress-fill"></div></div>
+          <div id="budget-compare"></div>
+        </div>
+      </div>
+    </header>
+
+    <section class="templates" aria-labelledby="templates-title">
+      <div class="month-plan-head">
+        <div class="section-title month-title-row">
+          <h2 id="templates-title">Month plan</h2>
+          <div class="month-ctrl" id="month-ctrl">
+          <button type="button" class="month-arrow icon-btn" id="month-prev" aria-label="Previous month">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <button type="button" class="month-name-btn" id="month-name" aria-haspopup="menu">October 2026</button>
+          <button type="button" class="month-arrow icon-btn" id="month-next" aria-label="Next month">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+          <div class="month-menu" id="month-menu" hidden role="menu">
+            <button type="button" role="menuitem" id="month-dup">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 012-2h10"/></svg>
+              Duplicate this month
+            </button>
+          </div>
+        </div>
+      </div>
+      <p class="month-hold-hint">Hold a week to customize</p>
+      </div>
+      <div class="month-grid" id="month-grid" role="group" aria-label="Week templates A and B"></div>
+    </section>
+
+    <section class="howto" aria-labelledby="howto-title">
+      <h2 id="howto-title">Share</h2>
+      <p class="sync-note">Copy share link syncs the week to the other phone. No account.</p>
+    </section>
+
+    <div class="actions">
+      <button type="button" class="btn btn-primary icon-btn" id="copy-share">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 012-2h10"/></svg>
+        Copy share link
+      </button>
+      <button type="button" class="btn btn-secondary icon-btn" id="copy-grocery" aria-label="Share list">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      </button>
+      <span class="shop-mode-wrap">
+        <button type="button" class="btn btn-ghost" id="shop-mode" aria-pressed="false">Shop mode: Off</button>
+        <button type="button" class="tip-i" id="shop-mode-tip" aria-label="What shop mode does" aria-expanded="false" aria-controls="shop-mode-tip-pop">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        </button>
+        <span class="tip-pop" id="shop-mode-tip-pop" role="tooltip" hidden>Shop mode: larger grocery checkboxes, checked items move to the bottom, and the screen stays on while you shop.</span>
+      </span>
+      <button type="button" class="btn btn-ghost" id="reset-checks" hidden>Uncheck all grocery items</button>
+    </div>
+    <div class="copy-photo" id="copy-photo" hidden></div>
+
+    <section aria-labelledby="week-title" id="week-section">
+      <h2 class="week-hero-label" id="week-strip-heading">This week</h2>
+      <div class="week-strip" id="week-strip" role="list" aria-label="Week at a glance"></div>
+      <div class="section-title week-actions-row">
+        <h2 id="week-title">This week's dinners</h2>
+        <div class="week-actions" id="week-actions-row">
+          <button type="button" class="week-text-link" id="shuffle-btn" aria-label="Shuffle meals"><span>Shuffle meals</span></button>
+          <button type="button" class="week-text-link" id="random-meal-btn" aria-label="Random meal"><span>Random meal</span></button>
+          <button type="button" class="week-text-link" id="repeat-btn" aria-label="Repeat last week"><span>Repeat last week</span></button>
+        </div>
+      </div>
+      <div class="week-lock-block" id="week-lock-block">
+        <button type="button" class="btn-lock-week" id="lock-week-btn">Lock in this week</button>
+        <button type="button" class="btn-edit-week" id="edit-week-btn" hidden>Edit week</button>
+      </div>
+      <div class="week-utils-block" id="week-utils-block">
+        <button type="button" class="btn btn-ghost" id="jump-grocery">Grocery list</button>
+      </div>
+      <div class="week-grid" id="week-grid"></div>
+    </section>
+
+    <section class="week-review-panel" id="week-review-panel" aria-labelledby="week-review-title" hidden>
+      <div class="section-title">
+        <h2 id="week-review-title">Week review</h2>
+        <span></span>
+      </div>
+      <div id="week-review-body"></div>
+    </section>
+
+    <section class="ratings-panel" aria-labelledby="ratings-title">
+      <div class="section-title">
+        <h2 id="ratings-title">My ratings</h2>
+        <span></span>
+      </div>
+      <div id="my-ratings"></div>
+    </section>
+
+    <section class="stock-panel" id="stock-panel" aria-labelledby="stock-title">
+      <div class="section-title">
+        <h2 id="stock-title">Stock photos</h2>
+        <span>Pantry · fridge · freezer</span>
+      </div>
+      <p class="muted2" style="margin:0 0 10px">Snap what’s on hand. Multiple photos per section are fine — add more anytime.</p>
+      <div id="stock-sections"></div>
+    </section>
+
+    <section class="grocery-panel" aria-labelledby="grocery-title">
+      <div class="section-title">
+        <h2 id="grocery-title">Grocery checklist</h2>
+        <span id="checked-count">0 left · 0 checked</span>
+      </div>
+      <div class="grocery-add-sticky" id="grocery-add-sticky">
+        <label class="visually-hidden" for="custom-category">Category</label>
+        <select id="custom-category" aria-label="Custom item category">
+          <option>Produce</option>
+          <option>Dairy</option>
+          <option>Meat</option>
+          <option selected>Pantry</option>
+          <option>Frozen</option>
+          <option>Tucker lunchbox</option>
+          <option>Other</option>
+          <option value="__new__">+ New category…</option>
+        </select>
+        <label class="visually-hidden" for="custom-new-cat">New category name</label>
+        <input id="custom-new-cat" type="text" maxlength="40" placeholder="Name the new category…" hidden />
+        <button type="button" class="btn btn-secondary" id="del-custom-cat" hidden>Delete category</button>
+        <label class="visually-hidden" for="custom-name">Custom grocery item</label>
+        <input id="custom-name" type="text" maxlength="80" placeholder="Item name" />
+        <label class="visually-hidden" for="custom-price">Optional price</label>
+        <input id="custom-price" type="number" min="0" step="1" inputmode="decimal" placeholder="$" aria-label="Optional price estimate" />
+        <button type="button" class="btn btn-secondary" id="add-custom">+ Add item</button>
+      </div>
+      <div class="grocery-meta">
+        <span class="chip" id="list-store-chip">By aisle</span>
+        <span class="chip">Qty · note · Have it</span>
+      </div>
+      <div class="grocery-controls" id="grocery-controls" aria-label="List controls"></div>
+      <div id="grocery-list"></div>
+      <div class="est-store-total" id="est-store-total" hidden></div>
+      <div class="grocery-footer-row" role="group" aria-label="Grocery list actions">
+        <button type="button" class="btn btn-ghost" id="reset-checks-footer">Uncheck all grocery items</button>
+        <button type="button" class="btn btn-ghost" id="footer-share-list">Share list</button>
+        <button type="button" class="btn btn-ghost" id="generate-list">Generate list</button>
+      </div>
+    </section>
+
+    <p class="footer-note">Burns Family Meals · local only</p>
+  </div>
+
+  <div
+    class="modal-backdrop"
+    id="recipe-modal"
+    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+  >
+    <div class="modal">
+      <div class="modal-top">
+        <div>
+          <h3 id="modal-title">Recipe</h3>
+          <p class="day-sub" id="modal-lunch"></p>
+        </div>
+        <button type="button" class="close-btn" id="modal-close" aria-label="Close recipe">×</button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <div
+    class="modal-backdrop"
+    id="swap-modal"
+    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="swap-title"
+  >
+    <div class="modal modal-swap">
+      <div class="modal-top">
+        <div>
+          <h3 id="swap-title">Swap night</h3>
+          <p class="day-sub">Leftovers, eat out, grab &amp; go, or another dinner</p>
+        </div>
+        <button type="button" class="close-btn" id="swap-close" aria-label="Close swap">×</button>
+      </div>
+      <div id="swap-body"></div>
+    </div>
+  </div>
+
+  <div
+    class="modal-backdrop settings-backdrop"
+    id="settings-modal"
+    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="settings-title"
+  >
+    <div class="modal modal-settings">
+      <div class="modal-top">
+        <div>
+          <h3 id="settings-title">Settings</h3>
+          <p class="day-sub">House rules · holidays · store</p>
+        </div>
+        <button type="button" class="close-btn" id="settings-close" aria-label="Close settings">×</button>
+      </div>
+      <div id="settings-body"></div>
+    </div>
+  </div>
+
+  <div class="sheet-bg" id="sheet" aria-hidden="true"><div class="sheet" role="dialog" aria-modal="true" id="sheetIn"></div></div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="gentle-banner" id="gentle-banner" hidden></div>
+
+  <style>
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0);
+      white-space: nowrap; border: 0;
+    }
+  </style>
+  <div class="lock-sheet-bg" id="lock-sheet-bg" hidden>
+    <div class="lock-sheet" role="dialog" aria-modal="true" aria-labelledby="lock-sheet-title" id="lock-sheet-inner"></div>
+  </div>
+  <script src="food-art.js"></script>
+  <script src="home-hero.js"></script>
+  <script src="lock-week.js"></script>
+  <script src="app.js"></script>
+  <script>
+    window.__fbwContext = function () {
+      return location.hash || location.pathname || document.title;
+    };
+    window.FEEDBACK_CONFIG = {
+      endpointUrl: 'https://formspree.io/f/mrpeegjd',
+      fieldMap: {
+        message: 'message',
+        page: 'page',
+        screen: 'screen',
+        browser: 'browser',
+        time: 'time',
+        honeypot: '_gotcha'
+      }
+    };
+  </script>
+  <script
+    src="feedback-widget/feedback-widget.min.js"
+    data-app="family-meals"
+    data-endpoint-url="https://formspree.io/f/mrpeegjd"
+    data-context-fn="__fbwContext"
+    data-hide-when=".modal-backdrop.open,.sheet-bg.open,.lock-sheet-bg:not([hidden])"
+    data-consent-selector="[data-consent-bar]"
+  ></script>
+</body>
+</html>

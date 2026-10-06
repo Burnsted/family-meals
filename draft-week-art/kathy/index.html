@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Kathy's Table. Meal planner for older adults cooking for one or two.">
+<meta name="theme-color" content="#fff4e6" id="theme-color-meta">
+<script>(function(){try{var t=localStorage.getItem("kt-theme");if(t!=="light"&&t!=="dark")t="light";document.documentElement.setAttribute("data-theme",t);document.documentElement.style.colorScheme=t;}catch(e){document.documentElement.setAttribute("data-theme","light");}})();</script>
+<title>Kathy's Table</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%232b1a10'/%3E%3Cpath d='M8 22h16M10 22V12c0-2 2-4 6-4s6 2 6 4v10' fill='none' stroke='%23fff4e6' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../week-strip.css">
+<link rel="stylesheet" href="../home-hero.css">
+<link rel="stylesheet" href="../lock-week.css">
+</head>
+<body>
+<div id="app" class="app"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../food-art.js"></script>
+<script src="../home-hero.js"></script>
+<script src="../lock-week.js"></script>
+<script src="meals.js"></script>
+<script src="app.js"></script>
+<script>
+  window.__fbwContext = function () {
+    return location.hash || location.pathname || document.title;
+  };
+  window.FEEDBACK_CONFIG = {
+    endpointUrl: 'https://formspree.io/f/mrpeegjd',
+    fieldMap: {
+      message: 'message',
+      page: 'page',
+      screen: 'screen',
+      browser: 'browser',
+      time: 'time',
+      honeypot: '_gotcha'
+    }
+  };
+</script>
+<script
+  src="../feedback-widget/feedback-widget.min.js"
+  data-app="kathy"
+  data-endpoint-url="https://formspree.io/f/mrpeegjd"
+  data-context-fn="__fbwContext"
+  data-consent-selector="[data-consent-bar]"
+></script>
+</body>
+</html>
