@@ -4551,7 +4551,7 @@ function sidesBlockHTML(dayId, day) {
     const budBit = budAmt != null ? ` · budget ${formatMoney(budAmt)} for the week` : "";
     totalBar.innerHTML = `
       <div class="tot" role="group" aria-label="Estimated total">
-        <div class="best">Est. ${formatMoney2(estVal)}${budBit}${leftBit}<small>${estLab}</small></div>
+        <div class="best">Est. ${formatMoney2(estVal)}${budBit}${leftBit}<small> · ${estLab}</small></div>
       </div>
       <p class="pchk">${escapeHtml(state.storeName || "Aldi")} · ${escapeHtml(loc)} · Prices ${escapeHtml(fmtDateLong(PRICE_META.updated))}${PRICE_META.loaded ? "" : " (estimates)"}</p>`;
     totalBar.querySelectorAll("[data-store]").forEach((btn) => {

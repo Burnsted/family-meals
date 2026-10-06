@@ -664,8 +664,8 @@ function deleteCustomMeal(id){
   try{const all=getRates();delete all[id];localStorage.setItem(RKEY,JSON.stringify(all))}catch(_){}
 }
 
-const allMeals=()=>[...MEALS,...EXTRA_MEALS,...CUSTOM_MEALS];
-const M=id=>allMeals().find(m=>m.id===id);
+const allMeals=()=>[...MEALS,...(typeof MORE_MEALS!=="undefined"?MORE_MEALS:[]),...EXTRA_MEALS,...CUSTOM_MEALS];
+const M=id=>{const a=allMeals();const hit=a.find(m=>m.id===id);if(hit)return hit;return (typeof MORE_MEALS!=="undefined"?MORE_MEALS:[]).find(m=>m.id===id)};
 const WELCOME_KEY="cameron-meals-welcome-done-v1";
 /* ---- Name / titles ---- */
 function aboutNameRaw(){const a=(st&&st.about)||getAbout();return a&&Object.prototype.hasOwnProperty.call(a,"name")?String(a.name||"").trim():null}
@@ -1775,12 +1775,13 @@ function sidesFor(){
 
 
 function mealShopKeys(mid){
-  const m=M(mid); if(!m)return [];
-  if(m.shop&&m.shop.length)return m.shop.slice();
-  if(C.MEAL_SHOP&&C.MEAL_SHOP[mid])return C.MEAL_SHOP[mid].slice();
+  if(C.MEAL_SHOP&&C.MEAL_SHOP[mid]&&C.MEAL_SHOP[mid].length)return C.MEAL_SHOP[mid].slice();
+  const m=M(mid);
+  if(m&&m.shop&&m.shop.length)return m.shop.slice();
   const g=MG[mid]; if(g)return ["__group__:"+g];
-  if(m.grab&&(C.PRICES||{})[mid])return [mid];
-  if(typeof BUILDS!=="undefined"&&BUILDS[mid])return ["__build__:"+mid];
+  if(m&&m.grab&&(C.PRICES||{})[mid])return [mid];
+  if(m&&typeof BUILDS!=="undefined"&&BUILDS[mid])return ["__build__:"+mid];
+  if(m&&!m.bf&&!m.grab)return []; // known meal, no mapping
   return [];
 }
 function assertCamDinnerGroceryCoverage(){
