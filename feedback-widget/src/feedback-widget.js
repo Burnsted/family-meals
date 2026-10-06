@@ -538,18 +538,32 @@
     function setConsentClearance() {
       if (!root) return;
       var m = measureConsentClearance(doc, consentSelector);
-      root.style.setProperty('--fbw-consent-clearance', m.clearance + 'px');
+      var next = m.clearance + 'px';
+      // Only write when changed. Re-setting style retriggers the MutationObserver.
+      if (root.style.getPropertyValue('--fbw-consent-clearance') !== next) {
+        root.style.setProperty('--fbw-consent-clearance', next);
+      }
     }
 
     function syncFabVisibility() {
       if (!fab || !fab.setAttribute) return;
       var hide = isHostUiBlocking(doc, hideWhen);
+      var wantHidden = hide ? '1' : '0';
+      if (fab.getAttribute('data-fbw-hidden') === wantHidden) {
+        // Still keep IDL hidden in sync for harnesses, but avoid attribute churn.
+        try {
+          if (!!fab.hidden !== !!hide) fab.hidden = !!hide;
+        } catch (e) {
+          /* harness may lack hidden setter */
+        }
+        return;
+      }
       try {
         fab.hidden = !!hide;
       } catch (e) {
         /* harness may lack hidden setter */
       }
-      fab.setAttribute('data-fbw-hidden', hide ? '1' : '0');
+      fab.setAttribute('data-fbw-hidden', wantHidden);
       fab.setAttribute('aria-hidden', hide ? 'true' : 'false');
       if (hide) fab.setAttribute('tabindex', '-1');
       else if (typeof fab.removeAttribute === 'function') fab.removeAttribute('tabindex');
@@ -568,9 +582,16 @@
       setConsentClearance();
       syncFabVisibility();
       if (typeof MutationObserver !== 'undefined') {
+        var moBusy = false;
         consentObs = new MutationObserver(function () {
-          setConsentClearance();
-          syncFabVisibility();
+          if (moBusy) return;
+          moBusy = true;
+          try {
+            setConsentClearance();
+            syncFabVisibility();
+          } finally {
+            moBusy = false;
+          }
         });
         consentObs.observe(doc.body, {
           childList: true,
