@@ -3363,36 +3363,6 @@ function sidesBlockHTML(dayId, day) {
   function maybeGentleBanner() {
     const el = els.gentleBanner;
     if (el) { el.hidden = true; el.innerHTML = ""; }
-    return;
-    if (!el) return;
-    const today = todayIso();
-    const last = state.lastGentleAt;
-    let show = false;
-    if (!last) show = true;
-    else {
-      const a = new Date(last + "T12:00:00");
-      const b = new Date(today + "T12:00:00");
-      const days = Math.round((b - a) / 864e5);
-      if (days >= 3) show = true;
-    }
-    // Only if there are unlogged dinners this week
-    const unlogged = currentPlan().days.some((td) => {
-      const day = effectiveDay(td);
-      if (day.overrideType === "holiday" || day.overrideType === "removed" || day.overrideType === "pickmeal") return false;
-      return !getLog(td.id).status;
-    });
-    if (show && unlogged) {
-      el.hidden = false;
-      el.innerHTML = `Gentle nudge: log a few dinners (Made / Skipped / Ate out) — helps the week review. <button type="button" class="chip-btn" id="gentle-dismiss">Got it</button>`;
-      const btn = document.getElementById("gentle-dismiss");
-      if (btn) btn.onclick = () => {
-        state.lastGentleAt = today;
-        el.hidden = true;
-        persist();
-      };
-    } else {
-      el.hidden = true;
-    }
   }
 
   function persist() {
@@ -3970,8 +3940,8 @@ function sidesBlockHTML(dayId, day) {
   }
 
   function jumpToGroceryDay(dayId) {
-    state.groceryDayFilter = dayId;
-    highlightDayId = dayId;
+    state.groceryDayFilter = "all";
+    highlightDayId = dayId || null;
     persist();
     renderGrocery();
     const panel = document.getElementById("grocery-list");
@@ -3980,7 +3950,6 @@ function sidesBlockHTML(dayId, day) {
       panel.classList.add("jump-flash");
       setTimeout(() => panel.classList.remove("jump-flash"), 1200);
     }
-    showToast(`Showing groceries for ${dayId}`);
   }
 
   function renderCalendar() {
@@ -4357,12 +4326,6 @@ function sidesBlockHTML(dayId, day) {
     return items.filter((item) => {
       if (itemHaveIt(item.id) && !state.showHiddenHave) return false;
       if (state.hideChecked && itemChecked(item.id)) return false;
-      const filt = state.groceryDayFilter || "all";
-      if (filt !== "all") {
-        if (item.custom) return true;
-        if (!Array.isArray(item.days) || item.days.length === 0) return filt === "all";
-        if (!item.days.includes(filt)) return false;
-      }
       return true;
     });
   }
@@ -4391,8 +4354,6 @@ function sidesBlockHTML(dayId, day) {
     const checked = items.filter((i) => itemChecked(i.id)).length;
     const left = items.length - checked;
     els.checkedCount.textContent = `${left} left · ${checked} checked`;
-    const days = ["all", "mon", "tue", "wed", "thu", "fri", "sat", "sun"];
-    const labels = { all: "All days", mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun" };
     state.groceryDayFilter = "all";
     els.groceryControls.innerHTML = `
       <button type="button" class="chip-btn${state.hideChecked ? " is-on" : ""}" id="hide-checked-btn" aria-pressed="${state.hideChecked}">
@@ -4404,7 +4365,6 @@ function sidesBlockHTML(dayId, day) {
     `;
     const hideBtn = document.getElementById("hide-checked-btn");
     const hiddenBtn = document.getElementById("hidden-have-btn");
-    const dayFilter = document.getElementById("day-filter");
     if (hideBtn) {
       hideBtn.addEventListener("click", () => {
         state.hideChecked = !state.hideChecked;
@@ -4420,13 +4380,6 @@ function sidesBlockHTML(dayId, day) {
         persist();
         renderGrocery();
         showToast(state.showHiddenHave ? "Showing Have-it items" : "Have-it items hidden again");
-      });
-    }
-    if (dayFilter) {
-      dayFilter.addEventListener("change", () => {
-        state.groceryDayFilter = dayFilter.value;
-        persist();
-        renderGrocery();
       });
     }
   }
@@ -4513,11 +4466,6 @@ function sidesBlockHTML(dayId, day) {
     } catch (_) {
       copyText(text, "List copied");
     }
-    const sms = document.getElementById("grocery-sms");
-    if (sms) {
-      sms.href = "sms:?&body=" + encodeURIComponent(text.slice(0, 1500));
-      sms.hidden = false;
-    }
   }
 
   function renderGrocery() {
@@ -4558,7 +4506,6 @@ function sidesBlockHTML(dayId, day) {
       <label class="visually-hidden" for="grocery-search">Search list</label>
       <input type="search" id="grocery-search" class="grocery-search" placeholder="Search list" value="${escapeAttr(q)}" autocomplete="off" />
       <button type="button" class="share-list-link" id="grocery-share">Share list</button>
-      <a class="share-list-link" id="grocery-sms" hidden>Text list</a>
     `;
     els.groceryList.appendChild(tools);
     const searchEl = tools.querySelector("#grocery-search");
@@ -4598,9 +4545,12 @@ function sidesBlockHTML(dayId, day) {
     const estVal = useStore === "publix" ? tots.p : tots.a;
     const estLeft = useStore === "publix" ? tots.pLeft : tots.aLeft;
     const estLab = useStore === "publix" ? "Publix" : "Aldi";
+    const budAmt = scaledBudgetAmount();
+    const leftBit = estLeft != null ? ` · ${formatMoney2(estLeft)} left to buy` : "";
+    const budBit = budAmt != null ? ` · budget ${formatMoney2(budAmt)}` : "";
     totalBar.innerHTML = `
       <div class="tot" role="group" aria-label="Estimated total">
-        <div class="best">Est. total (${estLab})<b>${formatMoney2(estVal)}</b><small>est.${estLeft != null ? " · " + formatMoney2(estLeft) + " vs budget" : ""}</small></div>
+        <div class="best">Est. total (${estLab})<b>${formatMoney2(estVal)}</b><small>est.${budBit}${leftBit}</small></div>
       </div>
       <p class="pchk">${escapeHtml(state.storeName || "Aldi")} · ${escapeHtml(loc)} · Prices ${escapeHtml(fmtDateLong(PRICE_META.updated))}${PRICE_META.loaded ? "" : " (estimates)"}</p>`;
     totalBar.querySelectorAll("[data-store]").forEach((btn) => {
