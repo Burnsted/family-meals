@@ -1,4 +1,4 @@
-/* Home hero mock strip + CTAs (Steve bar). Labels easy to change. */
+/* Home hero: interactive photo-real week board (Ted home=JPG lock). */
 (function (root) {
   "use strict";
 
@@ -17,47 +17,44 @@
   };
 
   const MOCK_MEALS = [
-    { short: "Mon", letter: "M", title: "Lemon chicken", art: "chicken" },
-    { short: "Tue", letter: "T", title: "Chicken again", art: "leftover" },
-    { short: "Wed", letter: "W", title: "Turkey chili", art: "chili" },
-    { short: "Thu", letter: "T", title: "Chili bowl", art: "leftover" },
-    { short: "Fri", letter: "F", title: "Baked salmon", art: "fish" },
-    { short: "Sat", letter: "S", title: "Egg bake", art: "eggs" },
-    { short: "Sun", letter: "S", title: "Light plate", art: "light" },
+    { short: "Mon", letter: "M", title: "Lemon chicken", art: "chicken", note: "Easy start" },
+    { short: "Tue", letter: "T", title: "Chicken again", art: "leftover", note: "Leftovers", kind: "leftover" },
+    { short: "Wed", letter: "W", title: "Turkey chili", art: "chili", note: "Football day" },
+    { short: "Thu", letter: "T", title: "Chili bowl", art: "leftover", note: "Leftovers", kind: "leftover" },
+    { short: "Fri", letter: "F", title: "Baked salmon", art: "salmon", note: "Ted leftovers" },
+    { short: "Sat", letter: "S", title: "Egg bake", art: "eggs", note: "Family cooks" },
+    { short: "Sun", letter: "S", title: "Light plate", art: "light", note: "Light day", kind: "light" },
   ];
 
-  function mockStripHTML() {
-    const FA = root.FoodArt;
-    const today = new Date().getDay(); // 0 Sun
-    // Mon-Sun order for mock: Mon=1 ... Sun=0 → indices 0..6 in MOCK_MEALS are already Mon-Sun
+  function mockBoardDays() {
+    const today = new Date().getDay();
     const jsToMockToday = today === 0 ? 6 : today - 1;
-    return (
-      '<div class="home-mock-strip-wrap">' +
-      '<p class="home-mock-label">' +
-      (root.HOME_HERO_COPY.mockLabel || "Your week") +
-      "</p>" +
-      '<div class="home-mock-strip" aria-hidden="true">' +
-      MOCK_MEALS.map(function (d, i) {
-        const art = FA ? FA.art(d.art) : "";
-        const name = FA ? FA.shortMealName(d.title, 3) : d.title;
-        return (
-          '<div class="home-mock-chip' +
-          (i === jsToMockToday ? " is-today" : "") +
-          '">' +
-          '<span class="wsc-day">' +
-          d.letter +
-          "</span>" +
-          '<span class="wsc-art">' +
-          art +
-          "</span>" +
-          '<span class="wsc-name">' +
-          name +
-          "</span>" +
-          "</div>"
-        );
-      }).join("") +
-      "</div></div>"
-    );
+    return MOCK_MEALS.map(function (d, i) {
+      return {
+        index: i,
+        short: d.short,
+        name: d.short,
+        title: d.title,
+        dinner: d.title,
+        boardNote: d.note,
+        kind: d.kind || "cook",
+        today: i === jsToMockToday,
+        active: false,
+        artKey: d.art,
+      };
+    });
+  }
+
+  function mockBoardHTML(mood) {
+    const WB = root.WeekBoard;
+    if (!WB || !WB.boardHTML) return "";
+    return WB.boardHTML(mockBoardDays(), {
+      mood: mood === "kathy" ? "kathy" : "burns",
+      title: mood === "kathy" ? "Kathy's Table" : "Burns Family Dinners",
+      weekTitle: "this week",
+      id: mood === "kathy" ? "home-kathy-board" : "home-burns-board",
+      tucker: mood !== "kathy",
+    });
   }
 
   function homeHeroHTML(opts) {
@@ -85,7 +82,7 @@
       '<p class="hero-sub">' +
       (mood === "kathy" ? C.kathySub : C.burnsSub) +
       "</p>" +
-      mockStripHTML() +
+      mockBoardHTML(mood) +
       '<button type="button" class="home-cta-primary" id="' +
       primaryId +
       '">' +
@@ -104,7 +101,8 @@
 
   root.HomeHero = {
     html: homeHeroHTML,
-    mockStripHTML: mockStripHTML,
+    mockBoardHTML: mockBoardHTML,
+    mockBoardDays: mockBoardDays,
     MOCK_MEALS: MOCK_MEALS,
   };
 })(typeof window !== "undefined" ? window : globalThis);

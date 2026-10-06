@@ -800,17 +800,14 @@
     }
     app.innerHTML = HH.html({ mood: "kathy", returning: isReturningUser(), primaryId: "home-primary-cta" });
     wireTop();
-    const primary = document.getElementById("home-primary-cta");
-    if (primary) primary.onclick = () => {
+    const goWeek = () => {
       state.showHome = false;
       if (isReturningUser()) {
-        // Resume saved week / mid-flow — do NOT wipe setupStep
         if (state.week || state.doneSetup) {
           state.doneSetup = true;
           state.setupStep = "week";
           if (!state.week) buildDefaultWeek();
         }
-        // else keep current setupStep from autosave
       } else {
         if (!state.setupStep || state.setupStep === "first") {
           state.setupStep = "first";
@@ -821,6 +818,11 @@
       render();
       window.scrollTo(0, 0);
     };
+    const primary = document.getElementById("home-primary-cta");
+    if (primary) primary.onclick = goWeek;
+    document.querySelectorAll("#home-kathy-board [data-strip-day]").forEach((b) => {
+      b.addEventListener("click", goWeek);
+    });
     const photos = document.getElementById("home-setup-photos");
     if (photos) photos.onclick = () => {
       state.showHome = false;
@@ -1592,6 +1594,11 @@
     AIS.open({
       defaultSection: defaultSection || "Miscellaneous munchies",
       large: true,
+      priceLabel: "Price",
+      priceRequired: (defaultSection || "Miscellaneous munchies") === "Menu extras",
+      priceHint: (defaultSection || "") === "Menu extras"
+        ? "Enter a dollar amount so it counts in your grocery total."
+        : "Leave blank if you do not know.",
       onAdd: (item) => {
         const section = item.section;
         if (section === "Stock produce") {
@@ -1706,12 +1713,13 @@
 
   function openSwap(dayIndex) {
     if (state.weekLocked) { toast("Unlock the week to swap meals."); return; }
-    const pool = filterPool();
+    const DAY_MEAL_MAX = 7;
+    const pool = filterPool().slice(0, DAY_MEAL_MAX);
     const app = document.getElementById("app");
     app.innerHTML = `
       ${topbar(true)}
       <h1>Swap ${esc(DN[dayIndex])}</h1>
-      <p class="muted">Pick a batch dish from your pool.</p>
+      <p class="muted">Up to ${DAY_MEAL_MAX} dinners from your pool.</p>
       <div class="btn-row">
         <button type="button" class="btn btn-ghost" data-light="1">Make it a light day</button>
       </div>
