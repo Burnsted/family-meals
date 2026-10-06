@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cameron's Meal Picker (sample)</title>
+<style>
+  :root{--bg:#0f172a;--card:#1e293b;--ink:#f1f5f9;--mut:#94a3b8;--yes:#22c55e;--no:#ef4444;--chip:#334155;--on:#0ea5e9}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;justify-content:center}
+  .wrap{width:100%;max-width:440px;padding:20px 16px 40px}
+  .top{display:flex;justify-content:space-between;align-items:center;color:var(--mut);font-size:14px;margin-bottom:10px}
+  .bar{height:6px;background:var(--chip);border-radius:6px;overflow:hidden;margin-bottom:18px}
+  .bar i{display:block;height:100%;background:var(--on);transition:width .3s}
+  .card{background:var(--card);border-radius:18px;padding:24px 20px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .emoji{font-size:72px;line-height:1;margin:6px 0 12px}
+  h1{font-size:26px;margin:0 0 6px}
+  p.sub{color:var(--mut);margin:0 0 20px}
+  .yn{display:flex;gap:12px}
+  .yn button{flex:1;border:0;border-radius:14px;padding:18px 0;font-size:20px;font-weight:700;color:#fff;cursor:pointer}
+  .b-yes{background:var(--yes)} .b-no{background:var(--no)}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:6px 0 22px}
+  .chip{border:2px solid var(--on);background:var(--on);color:#fff;border-radius:999px;padding:10px 14px;font-size:16px;cursor:pointer;user-select:none}
+  .chip.off{background:transparent;color:var(--mut);border-color:var(--chip);text-decoration:line-through}
+  .next{width:100%;border:0;border-radius:14px;padding:16px;font-size:18px;font-weight:700;background:var(--on);color:#fff;cursor:pointer}
+  .sum{text-align:left}
+  .sum h2{font-size:18px;margin:18px 0 8px}
+  .sum ul{margin:0;padding-left:20px} .sum li{margin:4px 0}
+  .tag{display:inline-block;background:var(--chip);border-radius:999px;padding:4px 10px;margin:3px;font-size:14px}
+  .muted{color:var(--mut);font-size:13px;margin-top:18px}
+  .restart{margin-top:16px;background:var(--chip)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><span>Cameron's Meal Picker · sample</span><span id="count"></span></div>
+  <div class="bar"><i id="prog" style="width:0"></i></div>
+  <div class="card" id="card"></div>
+  <p class="muted">Sample only: 5 of the 20 meals. Taps only, no typing. Nothing is saved or sent anywhere.</p>
+</div>
+<script>
+const MEALS=[
+ {name:"Burgers",emoji:"🍔",ing:["Beef patty","Bun","Cheese","Lettuce","Tomato","Onion","Pickles","Ketchup","Mustard","Bacon"]},
+ {name:"Tacos",emoji:"🌮",ing:["Ground beef","Chicken","Hard shells","Soft tortillas","Cheese","Lettuce","Tomato","Sour cream","Salsa","Taco seasoning"]},
+ {name:"Chicken Alfredo",emoji:"🍝",ing:["Chicken breast","Fettuccine","Alfredo sauce","Parmesan","Broccoli","Garlic bread"]},
+ {name:"Chicken Stir-Fry",emoji:"🥡",ing:["Chicken","Rice","Broccoli","Bell peppers","Carrots","Snap peas","Soy sauce","Teriyaki sauce"]},
+ {name:"Grilled Cheese",emoji:"🧀",ing:["Bread","American cheese","Cheddar","Butter","Ham","Tomato soup on the side"]}
+];
+let i=0, stage="ask", picks={}, liked=[], passed=[];
+const card=document.getElementById("card");
+function steps(){return MEALS.length}
+function progress(){
+  const done=i+(stage==="ing"?0.5:0);
+  document.getElementById("prog").style.width=(Math.min(done/steps(),1)*100)+"%";
+  document.getElementById("count").textContent=i<steps()?`Meal ${i+1} of ${steps()}`:"Done";
+}
+function render(){
+  progress();
+  if(i>=steps()) return summary();
+  const m=MEALS[i];
+  if(stage==="ask"){
+    card.innerHTML=`<div class="emoji">${m.emoji}</div><h1>${m.name}?</h1><p class="sub">Would you eat this?</p>
+      <div class="yn"><button class="b-no" id="no">No</button><button class="b-yes" id="yes">Yes</button></div>`;
+    document.getElementById("yes").onclick=()=>{picks[m.name]=new Set(m.ing);stage="ing";render()};
+    document.getElementById("no").onclick=()=>{passed.push(m.name);i++;render()};
+  } else {
+    card.innerHTML=`<div class="emoji">${m.emoji}</div><h1>${m.name}</h1><p class="sub">Tap off anything you don't want.</p>
+      <div class="chips">${m.ing.map(x=>`<span class="chip${picks[m.name].has(x)?"":" off"}" data-x="${x}">${x}</span>`).join("")}</div>
+      <button class="next" id="nx">${i===steps()-1?"See my picks":"Next meal →"}</button>`;
+    card.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{const x=c.dataset.x,s=picks[m.name];s.has(x)?s.delete(x):s.add(x);c.classList.toggle("off")});
+    document.getElementById("nx").onclick=()=>{liked.push(m.name);stage="ask";i++;render()};
+  }
+}
+function summary(){
+  const all={};
+  liked.forEach(n=>picks[n].forEach(x=>all[x]=(all[x]||0)+1));
+  const shared=Object.entries(all).filter(([,c])=>c>1).map(([x])=>x);
+  const skipped={};
+  liked.forEach(n=>{const m=MEALS.find(z=>z.name===n);skipped[n]=m.ing.filter(x=>!picks[n].has(x))});
+  card.innerHTML=`<div class="sum"><h1 style="text-align:center">Your picks</h1>
+    <h2>✅ Meals you'd eat (${liked.length})</h2>
+    ${liked.length?`<ul>${liked.map(n=>`<li><b>${n}</b>: ${[...picks[n]].join(", ")}${skipped[n].length?`<br><span style="color:var(--mut)">No: ${skipped[n].join(", ")}</span>`:""}</li>`).join("")}</ul>`:"<p>None yet.</p>"}
+    <h2>❌ Passed on</h2><p>${passed.length?passed.join(", "):"Nothing"}</p>
+    <h2>🔁 Shows up in more than one meal (buy once, use twice)</h2>
+    <p>${shared.length?shared.map(x=>`<span class="tag">${x}</span>`).join(""):"Nothing shared yet"}</p>
+    <p class="muted">In the real version, the chef bot turns this into a cheap weekly plan, a grocery list sorted by aisle with prices, and freezer notes.</p>
+    <button class="next restart" id="rs">Start over</button></div>`;
+  document.getElementById("rs").onclick=()=>{i=0;stage="ask";picks={};liked=[];passed=[];render()};
+}
+render();
+</script>
+</body>
+</html>
