@@ -466,25 +466,64 @@ body::before {
 
 .swap-btn {
   appearance: none;
-  border: 1.5px solid rgba(255, 255, 255, 0.75);
-  background: rgba(255, 255, 255, 0.16);
+  border: none;
+  background: transparent;
   color: white;
   font: inherit;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  border-radius: 999px;
-  padding: 0.28rem 0.65rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  border-radius: 0;
+  padding: 0;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  box-shadow: none;
+  transition: opacity 0.15s ease;
 }
 
 .swap-btn:hover,
 .swap-btn:focus-visible {
-  background: rgba(255, 255, 255, 0.28);
+  background: transparent;
   outline: none;
-  transform: translateY(-1px);
+  transform: none;
+  opacity: 0.85;
+}
+
+.swap-link {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  border-radius: 0;
+  padding: 0 0.15rem;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  box-shadow: none;
+}
+.swap-link .ico { stroke: #fff; width: 18px; height: 18px; }
+.swap-link:hover,
+.swap-link:focus-visible {
+  opacity: 0.88;
+  outline: none;
 }
 
 .day-head .emoji {
@@ -1258,7 +1297,7 @@ body.shop-mode .price-input {
 .shr-msg { font-size: 0.85rem; font-weight: 700; margin: 0.4rem 0 0; }
 .emo-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.35rem; }
 .emo-row .meal-emoji { margin-bottom: 0; }
-.pc { display: inline-flex; flex-direction: column; gap: 1px; font-size: 0.74rem; font-weight: 800; color: var(--ink-soft); background: var(--bg); border-radius: 10px; padding: 0.25rem 0.5rem; line-height: 1.25; text-align: left; }
+.pc { display: inline-flex; flex-direction: column; gap: 1px; font-size: 0.74rem; font-weight: 800; color: var(--ink-soft); background: transparent; border-radius: 0; padding: 0; line-height: 1.25; text-align: left; }
 /* store totals */
 .tot { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; margin: 0 0 0.5rem; }
 .tot button { appearance: none; border: 2px solid transparent; background: var(--bg); border-radius: 12px; padding: 0.45rem 0.3rem; text-align: center; font: inherit; font-weight: 800; font-size: 0.8rem; color: var(--ink-soft); cursor: pointer; min-height: 72px; }
@@ -1277,11 +1316,153 @@ body.shop-mode .price-input {
 .pr span.qty-l { background: transparent; padding-left: 0; }
 .price-foot { font-size: 0.78rem; font-weight: 650; color: var(--ink-soft); margin: 0.8rem 0 0; line-height: 1.45; }
 .price-foot a { color: var(--teal); }
-/* ratings */
-.rate-row { display: flex; align-items: center; gap: 0.35rem; padding: 0 0.85rem 0.8rem; flex-wrap: wrap; font-size: 0.8rem; font-weight: 800; color: var(--ink-soft); }
-.rate-row button { min-width: 48px; min-height: 40px; border-radius: 12px; border: 2px solid rgba(15, 110, 110, 0.25); background: var(--bg); font-size: 1rem; cursor: pointer; }
-.rate-row button[aria-pressed="true"] { background: var(--teal-soft); border-color: var(--teal); box-shadow: 0 0 0 2px rgba(15, 110, 110, 0.2); }
-.fav-badge { display: inline-block; font-size: 0.72rem; font-weight: 800; background: #fff3c4; color: #8a5a00; border-radius: 999px; padding: 0.1rem 0.45rem; vertical-align: middle; }
+/* ratings — bare emojis matching day-head .emoji (1.25rem), no pills */
+.rate-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0 0.85rem 0.8rem;
+  flex-wrap: nowrap;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+}
+.rate-row button[data-rate] {
+  appearance: none;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  letter-spacing: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.4;
+  transform: none;
+}
+.rate-row button[data-rate][aria-pressed="true"] {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  opacity: 1;
+  font-size: 1.35rem;
+}
+.rate-row button[data-rate]:hover,
+.rate-row button[data-rate]:focus-visible {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  opacity: 0.85;
+}
+.rate-row .rate-del,
+.rate-row button.rate-del {
+  margin-left: auto;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--coral-deep);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+.rate-row .rate-del:hover,
+.rate-row .rate-del:focus-visible {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  opacity: 0.8;
+  outline: none;
+}
+.rate-row .rate-del .ico { stroke: currentColor; width: 20px; height: 20px; }
+.rate-row-del-only { justify-content: flex-end; }
+
+/* Bare emojis project-wide — no pill/chip/bg around emoji glyphs */
+.fav-badge {
+  display: inline;
+  font-size: 1.25rem;
+  font-weight: 800;
+  background: none;
+  color: inherit;
+  border-radius: 0;
+  padding: 0;
+  margin-right: 0.25rem;
+  vertical-align: middle;
+  letter-spacing: 0;
+}
+.pc {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  line-height: 1.25;
+  text-align: left;
+}
+.day-swap-badge {
+  margin: 0.35rem 0 0;
+  display: inline;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--coral-deep);
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+}
+.edited-badge {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.55rem;
+  background: transparent;
+  color: var(--coral-deep);
+  border-radius: 0;
+  padding: 0;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.cal-badge,
+.pc.cal-badge {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+}
+.day-tag {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+.hol-mark,
+.month-opt .hol-mark {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+.meal-log .log-chip {
+  /* text-only chips may keep style — only strip if they are emoji-led; leave text chips */
+}
 .ratings-panel { background: var(--white); border-radius: 20px; box-shadow: var(--shadow); padding: 0.9rem 1rem; margin: 1rem 0; }
 .ratings-panel h3 { margin: 0.6rem 0 0.3rem; font-size: 0.95rem; color: var(--teal-deep); }
 .ratings-panel ul { list-style: none; margin: 0; padding: 0; }
