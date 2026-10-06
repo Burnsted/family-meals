@@ -3442,6 +3442,7 @@ function sidesBlockHTML(dayId, day) {
         const key = ov.key || ov.k;
         if (GRAB_GO[key]) out[dayId] = { type: "grabgo", key };
         else if (parseDinnerKey(key)) out[dayId] = { type: "pick", key };
+        else if (typeof EXTRA_DINNERS !== "undefined" && EXTRA_DINNERS[key]) out[dayId] = { type: "pick", key };
       }
     });
     return out;
@@ -5488,7 +5489,9 @@ function sidesBlockHTML(dayId, day) {
       ".gentle-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:1rem;z-index:40;max-width:min(92vw,26rem);background:#124f4f;color:#fff;padding:.75rem 1rem;border-radius:14px;font-weight:750;box-shadow:var(--shadow)}",
       ".gentle-banner .chip-btn{margin-left:.5rem;background:#fff;color:var(--teal-deep)}",
       ".settings-backdrop.open,.modal-backdrop.open{display:flex}",
-      ".modal-settings{max-width:32rem;width:min(96vw,32rem);max-height:85vh;overflow:auto}",
+      ".modal-settings{max-width:32rem;width:min(96vw,32rem);max-height:85vh;overflow:auto;padding-bottom:2rem}",
+      "#settings-body{padding-bottom:.75rem}",
+      "#settings-body #set-save{margin-bottom:.5rem}",
       ".set-block{margin:0 0 1rem;padding-bottom:.75rem;border-bottom:1px dashed rgba(23,48,66,.15)}",
       ".set-block h4{margin:0 0 .35rem}",
       ".set-block textarea,.set-block .inp, .set-block select{width:100%;font:inherit;font-weight:700;border:2px solid rgba(15,110,110,.25);border-radius:12px;padding:.55rem .7rem;box-sizing:border-box}",
@@ -5540,6 +5543,18 @@ function sidesBlockHTML(dayId, day) {
     return true;
   }
   window.__assertRootDinnerGroceryCoverage = assertRootDinnerGroceryCoverage;
+  window.__fmTest = {
+    shuffleWeek,
+    getDayOverrides: () => JSON.parse(JSON.stringify(state.dayOverrides || {})),
+    normalizeDayOverrides,
+    getState: () => state,
+    persist,
+    STORAGE_KEY: "family-meals-state-v4",
+    groceryCount: () => {
+      try { return allGroceryItems().length; } catch (_) {}
+      return document.querySelectorAll("#grocery-list .item, .item[data-id]").length;
+    },
+  };
   function shuffleWeek() {
     // Self-check: uniqueness — `exclude` Set + `used.includes` / `prevSet` ensure no meal key is
     // assigned twice in one shuffle; previous shuffle set is preferred-avoided via SHUFFLE_PREV_KEY.
@@ -5620,11 +5635,21 @@ function sidesBlockHTML(dayId, day) {
       }
     }
 
-    // PRESERVE_LEFTOVER_STRUCTURE: template leftover nights stay leftovers; only shuffle cook slots
+    // Structure from ORIGINAL base week template only — never leftovers Shuffle created.
+    // Cook dinners that mention "leftover" ingredients (e.g. taco rebuild) stay cook slots.
+    // Leftovers nights are only: template leftover labels, then taco → next-day (item 20).
     const isTplLeft = (td) => {
-      const eff = effectiveDay(td);
-      return eff.overrideType === "leftovers" || /leftover/i.test(String(eff.dinner || "")) || (td.dinnerKey === "leftovers");
+      if (td.dinnerKey === "leftovers") return true;
+      const d = String(td.dinner || "").trim();
+      return /^leftovers?$/i.test(d);
     };
+    // Drop prior shuffle leftovers/picks on unlocked nights before refill
+    need.forEach((td) => {
+      const ov = state.dayOverrides[td.id];
+      if (ov && (ov.type === "leftovers" || ov.type === "pick" || ov.type === "grabgo")) {
+        delete state.dayOverrides[td.id];
+      }
+    });
     const cookNeed = need.filter((td) => !isTplLeft(td));
     const leftNeed = need.filter((td) => isTplLeft(td));
     const dinnerKeys = pickN(cookNeed.length + 2, { exclude });
@@ -5646,7 +5671,7 @@ function sidesBlockHTML(dayId, day) {
       state.dayOverrides[td.id] = { type: "leftovers" };
     });
 
-    // Taco leftovers → next dinner: if a taco night is picked, force next fillable to leftovers
+    // Taco leftovers → next dinner (item 20): if a taco night is picked, force next fillable to leftovers
     const ordered = fillable.map((d) => d.id);
     ordered.forEach((id, idx) => {
       const ov = state.dayOverrides[id];
@@ -5655,8 +5680,10 @@ function sidesBlockHTML(dayId, day) {
       if (!/taco/i.test(name)) return;
       const nextId = ordered[idx + 1];
       if (!nextId || locked.has(nextId)) return;
-      const nextEff = effectiveDay(days.find((d) => d.id === nextId) || { id: nextId });
-      if (nextEff.holiday) return;
+      const nextTd = days.find((d) => d.id === nextId) || { id: nextId };
+      if (nextTd.holiday) return;
+      const nextDate = dateForDayId(nextId);
+      if (nextDate && holidayOnDate(nextDate)) return;
       state.dayOverrides[nextId] = { type: "leftovers" };
     });
 
