@@ -42,7 +42,7 @@
       <input id="add-item-qty" class="add-item-inp" type="text" maxlength="40" value="1" inputmode="text" />
       <label class="add-item-lab" for="add-item-price">Price (your approx)</label>
       <input id="add-item-price" class="add-item-inp" type="text" maxlength="12" inputmode="decimal" placeholder="Optional" />
-      <p class="add-item-hint">Never invent a price — leave blank if you don't know.</p>
+      <p class="add-item-hint">Leave blank if you do not know. Never invent a price.</p>
       <label class="add-item-lab" for="add-item-section">Category</label>
       <select id="add-item-section" class="add-item-inp">
         ${SECTIONS.map((s) => `<option value="${esc(s)}"${s === defSec ? " selected" : ""}>${esc(s)}</option>`).join("")}
