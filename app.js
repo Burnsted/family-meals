@@ -2558,10 +2558,10 @@
     if (!showRates) {
       return `<div class="rate-row rate-row-del-only" role="group" aria-label="Remove dinner">${del}</div>`;
     }
-    return `<div class="rate-row" role="group" aria-label="Rate this dinner after you make it"><span>Made it? Rate it:</span>
-      <button type="button" data-rate="-1" aria-pressed="${r === -1}" title="Tried it, no">👎</button>
-      <button type="button" data-rate="1" aria-pressed="${r === 1}" title="Good">👍</button>
-      <button type="button" data-rate="2" aria-pressed="${r === 2}" title="Favorite">❤️</button>
+    return `<div class="rate-row" role="group" aria-label="Rate this dinner">
+      <button type="button" data-rate="-1" aria-label="Thumbs down — never suggest again" aria-pressed="${r === -1}" title="Tried it, no">👎</button>
+      <button type="button" data-rate="1" aria-label="Thumbs up — good" aria-pressed="${r === 1}" title="Good">👍</button>
+      <button type="button" data-rate="2" aria-label="Favorite" aria-pressed="${r === 2}" title="Favorite">❤️</button>
       ${del}</div>`;
   }
   function bindRateRow(root, name) {
@@ -2577,13 +2577,13 @@
     if (!box) return;
     const all = Object.keys(state.ratings || {}).map((k) => ({ k, ...state.ratings[k] }));
     const grp = (r) => all.filter((x) => x.r === r).sort((a, b) => (b.d || "").localeCompare(a.d || ""));
-    const row = (x, restore) => `<li><span>${escapeHtml(x.n || x.k)}${restore ? ` <small>${x.x ? "🗑 removed for good" : "👎 tried it, no"}</small>` : ""}</span><small>${x.d ? escapeHtml(x.d) : ""}</small>${restore ? `<button type="button" class="chip-btn" data-restore="${escapeAttr(x.k)}">Restore</button>` : `<button type="button" class="chip-btn" data-clear="${escapeAttr(x.k)}">Clear</button>`}</li>`;
+    const row = (x, restore) => `<li><span>${escapeHtml(x.n || x.k)}${restore ? ` <small>${"👎 hidden from Swap"}</small>` : ""}</span><small>${x.d ? escapeHtml(x.d) : ""}</small>${restore ? `<button type="button" class="chip-btn" data-restore="${escapeAttr(x.k)}">Restore</button>` : `<button type="button" class="chip-btn" data-clear="${escapeAttr(x.k)}">Clear</button>`}</li>`;
     const fav = grp(2), good = grp(1), down = grp(-1);
     box.innerHTML = all.length
-      ? `${fav.length ? `<h3>⭐ Favorites (❤️)</h3><ul>${fav.map((x) => row(x)).join("")}</ul>` : ""}
+      ? `${fav.length ? `<h3>❤️ Favorites</h3><ul>${fav.map((x) => row(x)).join("")}</ul>` : ""}
          ${good.length ? `<h3>👍 Good</h3><ul>${good.map((x) => row(x)).join("")}</ul>` : ""}
-         ${down.length ? `<h3>🗑 Removed meals</h3><p class="muted2" style="margin-top:0">Rated 👎 or removed from the menu for good. Hidden from suggestions and Swap. Tap Restore to bring one back.</p><ul>${down.map((x) => row(x, true)).join("")}</ul>` : ""}`
-      : `<p class="muted2">No ratings yet. After you make a dinner, tap 👎 / 👍 / ❤️ on its day card. ❤️ = ⭐ favorite, suggested first.</p>`;
+         ${down.length ? `<h3>🗑 Removed meals</h3><p class="muted2" style="margin-top:0">Rated 👎 — hidden from suggestions and Swap. Tap Restore to bring one back. (Old “remove for good” entries live here too.)</p><ul>${down.map((x) => row(x, true)).join("")}</ul>` : ""}`
+      : `<p class="muted2">No ratings yet. After you make a dinner, tap 👎 / 👍 / ❤️ on its day card. ❤️ = favorite, suggested first.</p>`;
     box.querySelectorAll("[data-restore],[data-clear]").forEach((b) => b.addEventListener("click", () => {
       delete state.ratings[b.dataset.restore || b.dataset.clear];
       persist();
@@ -3393,41 +3393,38 @@
           }</p>`
         : "";
       const holClass = day.holiday || day.overrideType === "holiday";
-      const showDel = isDupMonth() || !holClass;
+      const hideRates = !!(holClass || day.overrideType === "eatout" || day.overrideType === "removed" || day.overrideType === "pickmeal");
       card.innerHTML = `
         <div class="day-head">
           <span>${day.short}</span>
           <div class="day-head-actions">
-            ${holClass ? "" : `<button type="button" class="swap-btn" data-swap-day="${escapeAttr(templateDay.id)}" aria-label="Swap ${escapeAttr(day.day)} dinner">Swap</button>`}
-            ${holClass ? "" : `<button type="button" class="swap-btn del-btn" data-del-day="${escapeAttr(templateDay.id)}" aria-label="Delete ${escapeAttr(day.day)} dinner">🗑</button>`}
-            ${holClass ? "" : `<button type="button" class="swap-btn jump-btn" data-jump-day="${escapeAttr(templateDay.id)}" aria-label="Jump to groceries for ${escapeAttr(day.day)}">🛒</button>`}
+            ${holClass ? "" : `<button type="button" class="swap-link" data-swap-day="${escapeAttr(templateDay.id)}" aria-label="Swap ${escapeAttr(day.day)} dinner">${typeof ICO !== "undefined" ? ICO.swap : ""}<span>Swap</span></button>`}
+            ${holClass ? "" : `<button type="button" class="cart-btn icon-btn" data-jump-day="${escapeAttr(templateDay.id)}" aria-label="Jump to groceries for ${escapeAttr(day.day)}">${typeof ICO !== "undefined" ? ICO.cart : "🛒"}</button>`}
             <span class="emoji" aria-hidden="true">${day.icon}</span>
           </div>
         </div>
         <button type="button" class="day-body day-body-btn${holClass ? " is-holiday" : ""}" aria-label="${escapeAttr(day.day)}: ${escapeAttr(day.dinner)}. Tap for recipe.">
           <span class="emo-row"><span class="meal-emoji" aria-hidden="true">${day.mealEmoji}</span>${prepCookBadge(day)}</span>
-          ${calorieBadges(day)}
-          <p class="day-dinner">${isFav(day.dinner) ? '<span class="fav-badge">⭐ favorite</span> ' : ""}${escapeHtml(day.dinner)}</p>
+          ${typeof calorieBadges === "function" ? calorieBadges(day) : ""}
+          <p class="day-dinner">${isFav(day.dinner) ? '<span class="fav-badge">❤️</span> ' : ""}${escapeHtml(day.dinner)}</p>
           ${day.tag ? `<p class="day-tag">${escapeHtml(day.tag)}</p>` : ""}
           ${swapBadge}
           ${tedLine}
           ${adultLine}
           <p class="tap-hint">${holClass ? "Holiday · no plan" : "Day note · tap for recipe"}</p>
         </button>
-        ${holClass || day.overrideType === "eatout" || day.overrideType === "removed" || day.overrideType === "pickmeal" ? "" : rateRowHTML(day.dinner)}
-        ${mealLogHTML(templateDay.id, day)}
+        ${rateRowHTML(day.dinner, templateDay.id, { hideRates })}
+        ${typeof mealLogHTML === "function" ? mealLogHTML(templateDay.id, day) : ""}
       `;
       card.querySelector(".day-body-btn").addEventListener("click", () => openRecipe(day));
-      if (!holClass && day.overrideType !== "eatout" && day.overrideType !== "removed" && day.overrideType !== "pickmeal") {
-        bindRateRow(card, day.dinner);
-      }
-      bindMealLog(card, templateDay.id);
+      bindRateRow(card, day.dinner);
+      if (typeof bindMealLog === "function") bindMealLog(card, templateDay.id);
       const swapBtn = card.querySelector("[data-swap-day]");
       if (swapBtn) swapBtn.addEventListener("click", (e) => { e.stopPropagation(); openSwapPicker(templateDay.id); });
       const delBtn = card.querySelector("[data-del-day]");
       if (delBtn) delBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        if (isDupMonth()) {
+        if (typeof isDupMonth === "function" && isDupMonth()) {
           const prev = state.dayOverrides[templateDay.id];
           state.dayOverrides[templateDay.id] = { type: "pickmeal" };
           persist(); renderAll();
@@ -3435,13 +3432,18 @@
             if (prev) state.dayOverrides[templateDay.id] = prev; else delete state.dayOverrides[templateDay.id];
             persist(); renderAll(); showToast("Undone");
           });
+        } else if (typeof removeDayFromWeek === "function") {
+          removeDayFromWeek(templateDay.id);
         } else {
           openDeleteDay(templateDay.id);
         }
       });
       const jumpBtn = card.querySelector("[data-jump-day]");
-      if (jumpBtn) jumpBtn.addEventListener("click", (e) => { e.stopPropagation(); jumpToGroceryDay(templateDay.id); });
-      void showDel;
+      if (jumpBtn) jumpBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (typeof jumpToGroceryDay === "function") jumpToGroceryDay(templateDay.id);
+        else if (typeof jumpToDayGroceries === "function") jumpToDayGroceries(templateDay.id);
+      });
       els.weekGrid.appendChild(card);
     });
   }
@@ -4032,45 +4034,26 @@
     const t = new Date();
     return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
   }
-  function openDeleteDay(dayId) {
+  function removeDayFromWeek(dayId) {
     const td = currentPlan().days.find((d) => d.id === dayId);
     if (!td) return;
-    const day = effectiveDay(td);
-    const special = ["leftovers", "eatout", "removed", "pickmeal", "holiday", "grabgo"].includes(day.overrideType);
-    const inn = openSheet(shTop(`🗑 Delete ${td.day} dinner`) + `
-      <p style="margin:0 0 10px;font-weight:800">${day.mealEmoji} ${escapeHtml(day.dinner)}</p>
-      <button type="button" class="sh-btn wide" data-rm="week" ${day.overrideType === "removed" ? "disabled" : ""}>Remove from this week</button>
-      <p class="muted2" style="margin:4px 0 12px">Frees up this night and takes its grocery lines off the list. You get 5 seconds to Undo.</p>
-      <button type="button" class="sh-btn wide danger" data-rm="good" ${special ? "disabled" : ""}>Remove from menu for good</button>
-      <p class="muted2" style="margin:4px 0 0">${special ? "Only real dinners can be removed for good (this night isn't one)." : `Moves “${escapeHtml(day.dinner)}” to Removed meals. It won't be suggested or offered in Swap. Tap Restore there anytime.`}</p>`, "Delete dinner");
-    inn.querySelector('[data-rm="week"]').addEventListener("click", () => {
-      const prev = state.dayOverrides[dayId];
-      state.dayOverrides[dayId] = { type: "removed" };
-      persist(); closeSheet(); renderAll();
-      showUndoToast(`Removed from this week: ${td.short}`, () => {
-        if (prev) state.dayOverrides[dayId] = prev; else delete state.dayOverrides[dayId];
-        persist(); renderAll(); showToast("Undone — it's back on the week");
-      });
-    });
-    if (!special) inn.querySelector('[data-rm="good"]').addEventListener("click", () => confirmRemoveForGood(day.dinner));
-  }
-  function confirmRemoveForGood(name) {
-    const inn = openSheet(shTop("Remove for good?") + `
-      <p style="margin:0 0 8px;font-weight:800">Remove “${escapeHtml(name)}” from your menu for good?</p>
-      <p class="muted2" style="margin:0 0 10px">It moves to <b>Removed meals</b> and won't be suggested or offered in Swap. You can tap Restore there anytime.</p>
-      <div class="sh-row2"><button type="button" class="sh-btn" data-c="no">Cancel</button><button type="button" class="sh-btn danger" data-c="yes">Remove for good</button></div>`, "Confirm remove from menu for good");
-    inn.querySelector('[data-c="no"]').addEventListener("click", closeSheet);
-    inn.querySelector('[data-c="yes"]').addEventListener("click", () => {
-      const k = rateKey(name);
-      if (!state.ratings) state.ratings = {};
-      state.ratings[k] = { r: -1, d: todayIso(), n: String(name).slice(0, 80), x: 1 };
-      currentPlan().days.forEach((td) => {
-        if (rateKey(effectiveDay(td).dinner) === k) state.dayOverrides[td.id] = { type: "removed" };
-      });
-      persist(); closeSheet(); renderAll();
-      showToast("Removed from menu for good — Restore it in Removed meals");
+    if (dayOverride(dayId) && dayOverride(dayId).type === "removed") {
+      showToast("Already off this week — tap Swap to pick something");
+      return;
+    }
+    const prev = state.dayOverrides[dayId] ? JSON.parse(JSON.stringify(state.dayOverrides[dayId])) : null;
+    state.dayOverrides[dayId] = { type: "removed" };
+    persist();
+    renderAll();
+    showUndoToast(`Removed from this week: ${td.short}`, () => {
+      if (prev) state.dayOverrides[dayId] = prev;
+      else delete state.dayOverrides[dayId];
+      persist();
+      renderAll();
+      showToast("Undone — it's back on the week");
     });
   }
+  function openDeleteDay(dayId) { removeDayFromWeek(dayId); }
 
   const copyPhotoFiles = [];
   let copyPhotoOpts = null;

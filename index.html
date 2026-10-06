@@ -13,8 +13,17 @@
 </head>
 <body>
   <div class="app">
-    <header class="site-header">
-      <div class="rcpt-top"><button type="button" class="rcpt-btn" id="rcpt-btn">📷 Upload receipt</button></div>
+    <div class="rcpt-top">
+      <button type="button" class="rcpt-btn icon-btn" id="rcpt-btn" aria-label="Upload receipt">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-2h6l2 2h3v12H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <span>Upload receipt</span>
+      </button>
+      <button type="button" class="gear-btn icon-btn" id="settings-btn" aria-label="Settings">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.2M12 19.3v2.2M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></svg>
+      </button>
+    </div>
+
+    <header class="hero-card" id="hero-card">
       <p class="brand-kicker">Kitchen HQ</p>
       <h1 class="brand">Burns Family Meals</h1>
       <div class="week-label-wrap">
@@ -27,51 +36,50 @@
           value="Oct 5–11, 2026"
           aria-label="Editable week title"
         />
-        <button type="button" class="cal-btn" id="cal-btn" aria-label="Pick a week on a calendar">📅</button>
+        <button type="button" class="cal-btn icon-btn" id="cal-btn" aria-label="Pick a week on a calendar">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M8 3.5v3M16 3.5v3M3.5 10h17"/></svg>
+        </button>
+        <button type="button" class="repeat-btn icon-btn" id="repeat-btn" aria-label="Repeat last week">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+        </button>
       </div>
       <p class="tagline">Cook once for dinners · leftover lunches for adults · Tucker’s fixed school kit</p>
-      <div class="budget-row">
-        <button type="button" class="budget-pill" id="budget-band" aria-label="Budget. Tap to edit">Budget band ~$100–130</button>
-        <div class="estimate-pill" id="estimate-band" title="Sum of optional $ estimates still unchecked">Est. left $0</div>
+
+      <div class="hero-budget" id="budget-band" role="button" tabindex="0" aria-label="Budget. Tap to edit">
+        <div class="hero-budget-top">
+          <button type="button" class="budget-chip" id="budget-chip">Budget $120 / 14 days</button>
+          <span class="store-chip" id="store-chip">Aldi · Vero Beach</span>
+        </div>
+        <p class="hero-sentence" id="estimate-band">Groceries this week: about $0 of your budget</p>
+        <div class="budget-progress" id="budget-progress" aria-hidden="true">
+          <div class="budget-progress-fill" id="budget-progress-fill"></div>
+        </div>
+        <div class="bcmp" id="budget-compare" hidden></div>
       </div>
-      <div class="bcmp" id="budget-compare" hidden></div>
       <p class="plan-note" id="house-note" hidden></p>
     </header>
 
-    <aside class="rules-banner" aria-label="House rules">
-      <h2>House rules</h2>
-      <ul>
-        <li><strong>Tucker lunch (Mon–Fri):</strong> yogurt, cheese stick, pretzels/Pringles, fruit snack, beef stick, apple juice — never dinner leftovers. Restock midweek.</li>
-        <li><strong>Adults:</strong> leftover-lunch from dinner is fine.</li>
-        <li><strong>Chili:</strong> weekend daytime only — Week 1A Sat + Week 2B Sat. Not twice/week, not every week, not midweek.</li>
-        <li><strong>Fish nights:</strong> Samantha’s plate; Ted uses the leftover substitute noted on that day.</li>
-      </ul>
-    </aside>
-
     <section class="templates" aria-labelledby="templates-title">
-      <div class="section-title">
-        <h2 id="templates-title">Load a week template</h2>
-        <span>One tap</span>
+      <div class="section-title month-title-row">
+        <h2 id="templates-title">Month plan</h2>
+        <div class="month-ctrl" id="month-ctrl">
+          <button type="button" class="month-arrow icon-btn" id="month-prev" aria-label="Previous month">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <button type="button" class="month-name-btn" id="month-name" aria-haspopup="menu">October 2026</button>
+          <button type="button" class="month-arrow icon-btn" id="month-next" aria-label="Next month">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+          <div class="month-menu" id="month-menu" hidden role="menu">
+            <button type="button" role="menuitem" id="month-dup">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 012-2h10"/></svg>
+              Duplicate this month
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="template-grid" role="group" aria-label="Week templates">
-        <button type="button" class="template-btn" data-week="1" data-plan="A" aria-pressed="true">
-          <span class="template-id">Week 1 · A</span>
-          <small id="tpl-1a">Tacos · Alfredo · salmon · weekend chili</small>
-        </button>
-        <button type="button" class="template-btn" data-week="1" data-plan="B" aria-pressed="false">
-          <span class="template-id">Week 1 · B</span>
-          <small id="tpl-1b">Sheet-pan · quesadillas · tilapia · burgers</small>
-        </button>
-        <button type="button" class="template-btn" data-week="2" data-plan="A" aria-pressed="false">
-          <span class="template-id">Week 2 · A</span>
-          <small id="tpl-2a">Tacos · Alfredo · salmon · sausage · no chili</small>
-        </button>
-        <button type="button" class="template-btn" data-week="2" data-plan="B" aria-pressed="false">
-          <span class="template-id">Week 2 · B</span>
-          <small id="tpl-2b">Chicken · quesadillas · tilapia · weekend chili</small>
-        </button>
-      </div>
-      <p class="lp-tip">Tip: press and hold a week to customize it.</p>
+      <div class="month-grid" id="month-grid" role="group" aria-label="Week templates A and B"></div>
+      <p class="lp-tip">Tip: tap to load · press and hold a week to customize it.</p>
     </section>
 
     <section class="howto" aria-labelledby="howto-title">
@@ -89,8 +97,14 @@
     </section>
 
     <div class="actions">
-      <button type="button" class="btn btn-primary" id="copy-share">Copy share link</button>
-      <button type="button" class="btn btn-secondary" id="copy-grocery">Copy grocery list as text</button>
+      <button type="button" class="btn btn-primary icon-btn" id="copy-share">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 012-2h10"/></svg>
+        Copy share link
+      </button>
+      <button type="button" class="btn btn-secondary icon-btn" id="copy-grocery">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 012-2h10"/></svg>
+        Copy grocery list as text
+      </button>
       <button type="button" class="btn btn-ghost" id="shop-mode" aria-pressed="false">Shop mode: Off</button>
       <button type="button" class="btn btn-ghost" id="reset-checks">Clear checkmarks</button>
     </div>
@@ -104,10 +118,18 @@
       <div class="week-grid" id="week-grid"></div>
     </section>
 
+    <section class="week-review-panel" id="week-review-panel" aria-labelledby="week-review-title" hidden>
+      <div class="section-title">
+        <h2 id="week-review-title">Week review</h2>
+        <span>Made vs planned · leftovers · tips</span>
+      </div>
+      <div id="week-review-body"></div>
+    </section>
+
     <section class="ratings-panel" aria-labelledby="ratings-title">
       <div class="section-title">
         <h2 id="ratings-title">My ratings</h2>
-        <span>👎 hides from Swap · ❤️ = ⭐ favorite</span>
+        <span>👎 hides from Swap · ❤️ = favorite</span>
       </div>
       <div id="my-ratings"></div>
     </section>
@@ -118,7 +140,7 @@
         <span id="checked-count">0 left · 0 checked</span>
       </div>
       <div class="grocery-meta">
-        <span class="chip">By aisle</span>
+        <span class="chip" id="list-store-chip">By aisle</span>
         <span class="chip">Aldi vs Publix est.</span>
         <span class="chip">Qty · note · Have it</span>
         <span class="chip">Share link encodes state</span>
@@ -180,7 +202,7 @@
       <div class="modal-top">
         <div>
           <h3 id="swap-title">Swap night</h3>
-          <p class="day-sub">Leftovers, eat out, or another dinner</p>
+          <p class="day-sub">Leftovers, eat out, grab &amp; go, or another dinner</p>
         </div>
         <button type="button" class="close-btn" id="swap-close" aria-label="Close swap">×</button>
       </div>
@@ -188,9 +210,30 @@
     </div>
   </div>
 
+  <div
+    class="modal-backdrop settings-backdrop"
+    id="settings-modal"
+    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="settings-title"
+  >
+    <div class="modal modal-settings">
+      <div class="modal-top">
+        <div>
+          <h3 id="settings-title">Settings</h3>
+          <p class="day-sub">House rules · holidays · store</p>
+        </div>
+        <button type="button" class="close-btn" id="settings-close" aria-label="Close settings">×</button>
+      </div>
+      <div id="settings-body"></div>
+    </div>
+  </div>
+
   <div class="sheet-bg" id="sheet" aria-hidden="true"><div class="sheet" role="dialog" aria-modal="true" id="sheetIn"></div></div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="gentle-banner" id="gentle-banner" hidden></div>
 
   <style>
     .visually-hidden {
