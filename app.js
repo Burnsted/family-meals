@@ -134,9 +134,9 @@
       adultLunch: "adult lunch → leftovers (opt)",
       tedNote: "",
       recipe: {
-        title: "Leftovers night",
+        title: "Leftovers",
         have: "whatever’s already cooked",
-        steps: ["Pull leftovers from the fridge; reheat and plate.", "No new grocery run for this night."],
+        steps: ["Use what’s already cooked.", "Nothing new to buy for this night."],
         enjoy: "Clear the fridge — one less cook.",
         buy: "none",
       },
@@ -3938,6 +3938,11 @@ function sidesBlockHTML(dayId, day) {
       els.shopMode.setAttribute("aria-pressed", String(state.shopMode));
       els.shopMode.textContent = state.shopMode ? "Shop mode: On" : "Shop mode: Off";
     }
+    if (els.resetChecks) {
+      const checkedN = Object.keys(state.checked || {}).filter((id) => state.checked[id]).length;
+      els.resetChecks.hidden = checkedN === 0;
+      els.resetChecks.textContent = "Uncheck all grocery items";
+    }
   }
 
   function jumpToGroceryDay(dayId) {
@@ -6168,15 +6173,63 @@ function sidesBlockHTML(dayId, day) {
       updateWakeLock();
       showToast(
         state.shopMode
-          ? "Shop mode on — big taps, checked sink to bottom, screen stays awake"
+          ? "Shop mode on — larger checkboxes, checked items to the bottom, screen stays on"
           : "Shop mode off"
       );
     });
+    const tipBtn = document.getElementById("shop-mode-tip");
+    const tipPop = document.getElementById("shop-mode-tip-pop");
+    if (tipBtn && tipPop) {
+      const tipText =
+        "Shop mode: larger grocery checkboxes, checked items move to the bottom, and the screen stays on while you shop.";
+      tipPop.textContent = tipText;
+      tipBtn.title = tipText;
+      let tipTimer = null;
+      const openTip = () => {
+        tipPop.hidden = false;
+        tipPop.classList.add("is-open");
+        tipBtn.setAttribute("aria-expanded", "true");
+        clearTimeout(tipTimer);
+        tipTimer = setTimeout(closeTip, 4000);
+      };
+      const closeTip = () => {
+        tipPop.classList.remove("is-open");
+        tipPop.hidden = true;
+        tipBtn.setAttribute("aria-expanded", "false");
+        clearTimeout(tipTimer);
+      };
+      tipBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (tipPop.classList.contains("is-open")) closeTip();
+        else openTip();
+      });
+      let lpTimer = null;
+      const clearLp = () => {
+        clearTimeout(lpTimer);
+        lpTimer = null;
+      };
+      tipBtn.addEventListener("pointerdown", () => {
+        clearLp();
+        lpTimer = setTimeout(() => {
+          openTip();
+          lpTimer = null;
+        }, 450);
+      });
+      tipBtn.addEventListener("pointerup", clearLp);
+      tipBtn.addEventListener("pointerleave", clearLp);
+      tipBtn.addEventListener("pointercancel", clearLp);
+      document.addEventListener("click", (e) => {
+        if (!tipPop.classList.contains("is-open")) return;
+        if (e.target === tipBtn || tipBtn.contains(e.target) || tipPop.contains(e.target)) return;
+        closeTip();
+      });
+    }
     els.resetChecks.addEventListener("click", () => {
       state.checked = {};
       persist();
-      renderGrocery();
-      showToast("Cleared checkmarks on this device");
+      renderAll();
+      showToast("Unchecked all grocery items");
     });
 
     els.modalClose.addEventListener("click", closeRecipe);
