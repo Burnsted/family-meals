@@ -21,8 +21,8 @@
   /**
    * @param {object} opts
    * @param {string} [opts.name]
-   * @param {string} [opts.defaultSection] — Menu extras | Stock produce | Miscellaneous munchies
-   * @param {boolean} [opts.large] — Kathy large targets
+   * @param {string} [opts.defaultSection] Menu extras | Stock produce | Miscellaneous munchies
+   * @param {boolean} [opts.large] Kathy large targets
    * @param {(item:{name,qty,price,section})=>void} opts.onAdd
    * @param {()=>void} [opts.onCancel]
    */
@@ -82,7 +82,7 @@
         const n = Number(rawPrice);
         if (Number.isFinite(n) && n >= 0) price = Math.round(n * 100) / 100;
       }
-      // Never invent — null if blank/invalid
+      // Never invent a price: null if blank or invalid
       const section = SECTIONS.includes(secEl.value) ? secEl.value : defSec;
       closeSheet();
       if (opts.onAdd) opts.onAdd({ name: name, qty: qty, price: price, section: section });

@@ -159,7 +159,7 @@
       };
       recog.onerror = () => toast("Could not hear that. Try again or tap an answer.");
       recog.start();
-      toast("Listening…");
+      toast("Listening...");
     } catch (_) {
       toast("Could not start the microphone.");
     }
@@ -426,7 +426,7 @@
             <button type="button" class="linkish have-chip${have ? " is-on" : ""}" data-have="${esc(it.id)}">${have ? "Still need it" : "Have it"}</button>
             ${have ? `<span class="have-back-hint">${esc(haveItHint(it.id))}</span>` : ""}
             ${it.custom || it.standing ? ` <button type="button" class="linkish" data-del-custom="${esc(it.id)}" data-del-section="${esc(it.section || "")}">Remove</button>` : ""}
-            ${state.openAltId === it.id && alts.length ? IA.bubbleHTML("Swap for…", alts, it.name, true) : ""}
+            ${state.openAltId === it.id && alts.length ? IA.bubbleHTML("Swap for", alts, it.name, true) : ""}
           </span>
         </label>`;
       }).join("");
@@ -1124,7 +1124,7 @@
         const cur = saved || info.current || dish.protein;
         meatRow = `<div class="day-meat-row kathy-large" data-day-meat="${day.i}">
           <span class="meat-label">${esc(cur)}</span>${IA.chevronHTML(cur, true)}
-          ${state.openAltId === "meat:" + day.i ? IA.bubbleHTML("Swap meat for…", info.alts, cur, true) : ""}
+          ${state.openAltId === "meat:" + day.i ? IA.bubbleHTML("Swap meat for", info.alts, cur, true) : ""}
         </div>`;
       }
     }
