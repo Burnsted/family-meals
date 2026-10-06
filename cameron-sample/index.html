@@ -53,13 +53,13 @@
   .ph-sec.done{border-color:var(--on)}
   .ph-sec-lab{font-size:13px;font-weight:800;color:var(--ink);line-height:1.2;padding-right:4px;word-break:break-word}
   .ph-sec-lab .big{display:block;font-size:28px;margin-bottom:2px}
-  .ph-thumbs{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+  .ph-thumbs{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;align-items:center}
   .ph-thumb{position:relative;width:56px;height:56px;border-radius:8px;overflow:hidden;border:2px solid var(--chip);flex-shrink:0}
   .ph-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-  .ph-thumb .ph-x{position:absolute;top:1px;right:1px;width:20px;height:20px;border:0;border-radius:50%;background:rgba(15,23,42,.75);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;line-height:0}
-  .ph-thumb .ph-x .ico{width:12px;height:12px;stroke:#fff}
-  .ph-add{appearance:none;border:0;background:transparent;color:var(--tealD,#0ea5e9);font:inherit;font-size:12px;font-weight:800;text-decoration:underline;text-underline-offset:2px;cursor:pointer;min-height:36px;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:4px 2px}
-  .ph-add .ico{width:14px;height:14px;stroke:currentColor}
+  .ph-thumb .ph-x{position:absolute;top:0;right:0;width:28px;height:28px;border:0;border-radius:0;background:transparent;box-shadow:none;color:#000;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;line-height:0}
+  .ph-thumb .ph-x .ico{width:14px;height:14px;stroke:#000}
+  .ph-add{appearance:none;border:2px solid var(--chip,#334155);background:var(--card,#1e293b);color:var(--ink,#f1f5f9);width:36px;height:36px;min-height:36px;min-width:36px;border-radius:50%;padding:0;margin:0;font:inherit;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:none;gap:0}
+  .ph-add .ico{width:18px;height:18px;stroke:currentColor;display:block}
   .ph-add-sec{appearance:none;border:2px dashed var(--chip);border-radius:14px;background:transparent;color:var(--mut);min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;font:inherit;font-weight:800;font-size:13px}
   .ph-add-sec .ico{width:22px;height:22px;stroke:currentColor}
   .ph-sec-del{appearance:none;position:absolute;top:4px;right:4px;width:24px;height:24px;border:0;border-radius:50%;background:rgba(15,23,42,.7);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
@@ -2731,12 +2731,10 @@ function renderStoragePhotosUI(opts){
     const photos=map[sec.id]||[];
     const custom=!BUILTIN_STORAGE.some(b=>b.id===sec.id);
     const thumbs=photos.map((src,i)=>`<span class="ph-thumb"><img alt="" src="${src}"><button type="button" class="ph-x" data-rmph="${esc(sec.id)}" data-i="${i}" aria-label="Remove photo">${icons.close}</button></span>`).join("");
-    const addLab=photos.length?"Add more photos":"Add photos";
     return `<div class="ph-sec${photos.length?" done":""}" data-sec="${esc(sec.id)}">
       ${custom?`<button type="button" class="ph-sec-del" data-delsec="${esc(sec.id)}" aria-label="Delete section">${icons.close}</button>`:""}
       <div class="ph-sec-lab">${sec.emoji?`<span class="big">${sec.emoji}</span>`:""}${esc(sec.label)}</div>
-      ${thumbs?`<div class="ph-thumbs">${thumbs}</div>`:""}
-      <button type="button" class="ph-add" data-addph="${esc(sec.id)}">${icons.cam}<span>${addLab}</span></button>
+      <div class="ph-thumbs">${thumbs}<button type="button" class="ph-add" data-addph="${esc(sec.id)}" aria-label="Add photos">${icons.plus}</button></div>
       <input type="file" accept="image/*" multiple data-phfile="${esc(sec.id)}" hidden>
     </div>`;
   }).join("");
