@@ -1,0 +1,1750 @@
+{
+ "updated": "2026-10-06",
+ "note": "Price file for the Burns family planner. source: receipt | ad | estimate (also allowed: weekly-ad, shelf-photo, online-listing). price null = not carried. Keyed by store-location id (e.g. aldi:vero-beach). When a location has no price, fall back to the store's general estimate labeled 'est. (not this store yet)'. Update from receipts / Publix app Purchases screenshots; no scraping.",
+ "stores": {
+  "aldi:vero-beach": {
+   "chain": "Aldi",
+   "location": "Vero Beach",
+   "id": "aldi:vero-beach"
+  },
+  "publix:vero-beach": {
+   "chain": "Publix",
+   "location": "Vero Beach",
+   "id": "publix:vero-beach"
+  },
+  "aldi:st-petersburg": {
+   "chain": "Aldi",
+   "location": "St. Petersburg",
+   "id": "aldi:st-petersburg"
+  },
+  "publix:st-petersburg": {
+   "chain": "Publix",
+   "location": "St. Petersburg",
+   "id": "publix:st-petersburg"
+  },
+  "aldi": {
+   "chain": "Aldi",
+   "location": null,
+   "id": "aldi",
+   "general": true
+  },
+  "publix": {
+   "chain": "Publix",
+   "location": null,
+   "id": "publix",
+   "general": true
+  }
+ },
+ "items": {
+  "fam-rotisserie": {
+   "name": "Rotisserie chicken",
+   "size": "1 whole",
+   "aisle": "Meat",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 4.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Publix deli price varies; Aldi when stocked"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 7.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Publix deli price varies; Aldi when stocked"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 4.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 7.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-chicken": {
+   "name": "Chicken breasts, boneless skinless",
+   "size": "~2.5 lb",
+   "aisle": "Meat",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 5.73,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi ~$2.29/lb · Publix ~$5.53/lb (St. Pete listings, Oct 2026)"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 13.83,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi ~$2.29/lb · Publix ~$5.53/lb (St. Pete listings, Oct 2026)"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 5.73,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 13.83,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-beef": {
+   "name": "Ground beef 80/20",
+   "size": "~1.5 lb",
+   "aisle": "Meat",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 7.94,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi ~$5.29/lb · Publix ~$8.85/lb (listings, Oct 2026)"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 13.28,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi ~$5.29/lb · Publix ~$8.85/lb (listings, Oct 2026)"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 7.94,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 13.28,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-salmon": {
+   "name": "Salmon fillets",
+   "size": "~1 lb",
+   "aisle": "Meat",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 9.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 12.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 9.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 12.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-tilapia": {
+   "name": "Tilapia fillets",
+   "size": "~1 lb",
+   "aisle": "Meat",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 4.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 7.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 4.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 7.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-sausage": {
+   "name": "Sausage (breakfast or smoked)",
+   "size": "1 pack",
+   "aisle": "Meat",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 2.79,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 4.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 2.79,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 4.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-eggs": {
+   "name": "Large eggs",
+   "size": "1 dozen",
+   "aisle": "Meat",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 1.85,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi Goldhen · Publix 12 ct (listings, Oct 2026)"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 2.19,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi Goldhen · Publix 12 ct (listings, Oct 2026)"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 1.85,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 2.19,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-potatoes": {
+   "name": "Potatoes",
+   "size": "5 lb bag",
+   "aisle": "Produce",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 2.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 4.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 2.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 4.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-onion": {
+   "name": "Yellow onions",
+   "size": "3 lb bag",
+   "aisle": "Produce",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 2.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 3.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 2.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 3.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-salad": {
+   "name": "Salad bag",
+   "size": "1 bag",
+   "aisle": "Produce",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 1.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 3.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 1.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 3.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-fruit": {
+   "name": "Fruit (bananas + apples)",
+   "size": "~6 bananas + 3 lb apples",
+   "aisle": "Produce",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 4.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 6.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 4.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 6.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-peppers": {
+   "name": "Bell peppers",
+   "size": "3 pk",
+   "aisle": "Produce",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 2.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 4.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 2.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 4.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-broccoli": {
+   "name": "Broccoli crowns",
+   "size": "~1 lb",
+   "aisle": "Produce",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 1.79,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 2.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 1.79,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 2.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-veg": {
+   "name": "Veg for sides",
+   "size": "1 bag / bunch",
+   "aisle": "Produce",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 1.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 2.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 1.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 2.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-cheese": {
+   "name": "Shredded cheese",
+   "size": "8 oz",
+   "aisle": "Dairy",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 2.29,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 3.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 2.29,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 3.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-milk": {
+   "name": "Milk",
+   "size": "1 gallon",
+   "aisle": "Dairy",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 3.09,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 4.69,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 3.09,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 4.69,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-tortillas": {
+   "name": "Flour tortillas",
+   "size": "10 ct",
+   "aisle": "Pantry",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 1.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 3.29,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 1.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 3.29,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-alfredo": {
+   "name": "Alfredo sauce + pasta",
+   "size": "1 jar + 1 lb box",
+   "aisle": "Pantry",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 2.94,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 5.08,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 2.94,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 5.08,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-chili-cans": {
+   "name": "Chili beans + diced tomatoes",
+   "size": "2 + 2 cans",
+   "aisle": "Pantry",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 3.2,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 5.36,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 3.2,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 5.36,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-rice": {
+   "name": "Long grain rice",
+   "size": "2 lb bag",
+   "aisle": "Pantry",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 1.79,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 2.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 1.79,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 2.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-buns": {
+   "name": "Hamburger buns",
+   "size": "8 ct",
+   "aisle": "Pantry",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 1.55,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi L'oven Fresh · Publix Bakery (listings, Oct 2026)"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 4.41,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi L'oven Fresh · Publix Bakery (listings, Oct 2026)"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 1.55,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 4.41,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-t-yogurt": {
+   "name": "Chobani yogurt cups",
+   "size": "multipack",
+   "aisle": "Tucker lunchbox",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": null,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi look-alike yogurt ~$3.30"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 6.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi look-alike yogurt ~$3.30"
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 6.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "brand": "Chobani",
+   "aldi_lookalike": 3.3,
+   "page": "family"
+  },
+  "fam-t-cheese": {
+   "name": "Polly-O string cheese",
+   "size": "12 ct",
+   "aisle": "Tucker lunchbox",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": null,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi look-alike string cheese ~$2.89"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 5.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi look-alike string cheese ~$2.89"
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 5.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "brand": "Polly-O",
+   "aldi_lookalike": 2.89,
+   "page": "family"
+  },
+  "fam-t-pretzels": {
+   "name": "Pretzels / Pringles",
+   "size": "1 bag or can",
+   "aisle": "Tucker lunchbox",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 1.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 2.79,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 1.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 2.79,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-t-fruit-snack": {
+   "name": "Fruit snacks",
+   "size": "10 ct box",
+   "aisle": "Tucker lunchbox",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 1.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 3.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 1.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 3.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-t-beef-stick": {
+   "name": "Natural beef sticks",
+   "size": "multipack",
+   "aisle": "Tucker lunchbox",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 3.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 5.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 3.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 5.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "page": "family"
+  },
+  "fam-t-juice": {
+   "name": "Apple & Eve apple juice boxes",
+   "size": "8 pk",
+   "aisle": "Tucker lunchbox",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": null,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi look-alike juice boxes ~$1.99"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 3.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "source_ref": "Aldi look-alike juice boxes ~$1.99"
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 3.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-05",
+     "by": "assistant",
+     "general": true
+    }
+   ],
+   "brand": "Apple & Eve",
+   "aldi_lookalike": 1.99,
+   "page": "family"
+  },
+  "fam-gg-rotisserie-salad": {
+   "name": "Publix rotisserie chicken + bagged salad",
+   "size": "1 chicken + 1 salad bag",
+   "page": "family",
+   "aisle": "deli",
+   "tag": "grab-go",
+   "prices": [
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 11.48,
+     "per": "meal",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 11.48,
+     "per": "meal",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": null,
+     "per": "meal",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    }
+   ]
+  },
+  "fam-gg-subs": {
+   "name": "Publix subs (family)",
+   "size": "4 subs",
+   "page": "family",
+   "aisle": "deli",
+   "tag": "grab-go",
+   "prices": [
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 27.96,
+     "per": "meal",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 27.96,
+     "per": "meal",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": null,
+     "per": "meal",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    }
+   ]
+  },
+  "fam-gg-hotbar": {
+   "name": "Publix hot bar chicken + sides",
+   "size": "family portion",
+   "page": "family",
+   "aisle": "deli",
+   "tag": "grab-go",
+   "prices": [
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 18,
+     "per": "meal",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 18,
+     "per": "meal",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": null,
+     "per": "meal",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    }
+   ]
+  },
+  "fam-gg-pizza": {
+   "name": "Frozen pizza night (2–3 pizzas)",
+   "size": "2–3 pizzas",
+   "page": "family",
+   "aisle": "frozen",
+   "tag": "grab-go",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 8.97,
+     "per": "meal",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 14.97,
+     "per": "meal",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 8.97,
+     "per": "meal",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 14.97,
+     "per": "meal",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant",
+     "general": true
+    }
+   ]
+  },
+  "fam-pork": {
+   "name": "Pork chops / boneless pork",
+   "size": "~2 lb",
+   "page": "family",
+   "aisle": "meat",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 6.98,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 11.98,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 6.98,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 11.98,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant",
+     "general": true
+    }
+   ]
+  },
+  "fam-sweet-potatoes": {
+   "name": "Sweet potatoes",
+   "size": "3 lb",
+   "page": "family",
+   "aisle": "produce",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 2.49,
+     "per": "bag",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 3.99,
+     "per": "bag",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 2.49,
+     "per": "bag",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 3.99,
+     "per": "bag",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant",
+     "general": true
+    }
+   ]
+  },
+  "fam-green-beans": {
+   "name": "Green beans",
+   "size": "~1 lb",
+   "page": "family",
+   "aisle": "produce",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 1.69,
+     "per": "bag",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 2.79,
+     "per": "bag",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 1.69,
+     "per": "bag",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 2.79,
+     "per": "bag",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant",
+     "general": true
+    }
+   ]
+  },
+  "fam-subs-bread": {
+   "name": "Sub rolls / sandwich bread",
+   "size": "1 pack",
+   "page": "family",
+   "aisle": "bakery",
+   "prices": [
+    {
+     "store": "aldi:vero-beach",
+     "location": "Vero Beach",
+     "price": 1.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    },
+    {
+     "store": "publix:vero-beach",
+     "location": "Vero Beach",
+     "price": 3.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant"
+    },
+    {
+     "store": "aldi",
+     "location": null,
+     "price": 1.99,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant",
+     "general": true
+    },
+    {
+     "store": "publix",
+     "location": null,
+     "price": 3.49,
+     "per": "pkg",
+     "channel": "in-store",
+     "source": "estimate",
+     "checked": "2026-10-06",
+     "by": "assistant",
+     "general": true
+    }
+   ]
+  }
+ }
+}
