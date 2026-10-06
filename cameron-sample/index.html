@@ -781,7 +781,7 @@ function meals(){
   card.innerHTML=`<div class="emoji">🥩</div><h1>What sounds good?</h1><p class="sub">Tap Yes or No on each.${fm?" 🔥 = great on your Foreman.":""} Protein chips let you pick several cuts.</p>
    <div class="meals">${cooked.map(row).join("")}</div>
    ${grabs.length?`<p class="lbl">🛍 Grab & go (0–5 min · no real cooking)</p><div class="meals">${grabs.map(row).join("")}</div>`:""}
-   ${removed.length?`<details class="box"><summary>🗑 Removed meals (${removed.length})</summary><p class="no" style="margin:6px 0">Rated 👎 or removed from the menu for good. Hidden from suggestions and Swap. Tap Restore to bring one back.</p>${removed.map(m=>`<div class="mrow" style="margin-top:6px"><span>${m.emoji} ${esc(m.name)}</span><button class="popt" style="margin-left:auto" data-restore="${m.id}">Restore</button></div>`).join("")}</details>`:""}
+   ${removed.length?`<details class="box"><summary>Removed meals (${removed.length})</summary><p class="no" style="margin:6px 0">👎 = never suggest again. Hidden from suggestions and Swap. Tap Restore to bring one back.</p>${removed.map(m=>`<div class="mrow" style="margin-top:6px"><span>${m.emoji} ${esc(m.name)}</span><button class="popt" style="margin-left:auto" data-restore="${m.id}">Restore</button></div>`).join("")}</details>`:""}
    <p class="lbl">Something else you like?</p>
    <div class="chips">${st.mealCustom.map(x=>`<span class="chip cust" data-mc="${esc(x)}">${esc(x)}</span>`).join("")}${customChip("meals")}</div>${customRow("meals")}
    ${tipsBox()}
@@ -1407,17 +1407,20 @@ function dayNut(d){const g=guideFor(st.about||{});const m=d.meal&&M(d.meal);if(!
 
 /* ---- meal ratings: 👎 tried it, no · 👍 good · ❤️ favorite (saved on this phone) ---- */
 const RKEY="cameron-meals-ratings-v1";
-function getRates(){try{const j=JSON.parse(localStorage.getItem(RKEY)||"{}");return j&&typeof j==="object"?j:{}}catch(_){return {}}}
+function getRates(){try{const j=JSON.parse(localStorage.getItem(RKEY)||"{}");if(!j||typeof j!=="object")return {};
+  // migrate old "remove for good" (x:1) into Removed meals as plain 👎
+  let changed=false;Object.keys(j).forEach(id=>{if(j[id]&&j[id].x){j[id]={r:-1,d:j[id].d||isoD(new Date())};changed=true}});
+  if(changed)try{localStorage.setItem(RKEY,JSON.stringify(j))}catch(_){ }return j}catch(_){return {}}}
 function rateOf(id){const r=getRates()[id];return r?r.r:0}
-function setRate(id,r,forGood){const all=getRates();if(!r||(all[id]&&all[id].r===r&&!forGood))delete all[id];else{all[id]={r,d:isoD(new Date())};if(forGood)all[id].x=1}
+function setRate(id,r){const all=getRates();if(!r||(all[id]&&all[id].r===r))delete all[id];else all[id]={r,d:isoD(new Date())};
   try{localStorage.setItem(RKEY,JSON.stringify(all))}catch(_){}}
-function rateRow(id){const r=rateOf(id);return `<div class="rate" onclick="event.stopPropagation()"><span>Made it? Rate it:</span>${[[-1,"👎","Tried it, no"],[1,"👍","Good"],[2,"❤️","Favorite"]].map(([v,e,t])=>`<button data-rate="${v}" data-m="${id}" aria-pressed="${r===v}" title="${t}">${e}</button>`).join("")}</div>`}
+function rateRow(id){const r=rateOf(id);return `<div class="rate" onclick="event.stopPropagation()"><span>Made it? Rate it:</span>${[[-1,"👎","Tried it, no — never suggest again"],[1,"👍","Good"],[2,"❤️","Favorite"]].map(([v,e,t])=>`<button data-rate="${v}" data-m="${id}" aria-pressed="${r===v}" title="${t}">${e}</button>`).join("")}</div>`}
 function ratingsPanel(){const all=getRates();const ids=Object.keys(all).filter(id=>M(id));
-  const row=(id,restore)=>`<li><span>${M(id).emoji} ${esc(M(id).name)}${restore?` <small>${all[id].x?"🗑 removed for good":"👎 tried it, no"}</small>`:""}${timesMade(id)?` <small>· made ${timesMade(id)}×</small>`:""}</span><small>${esc(all[id].d||"")}</small><button class="have" data-unrate="${id}">${restore?"Restore":"Clear"}</button></li>`;
+  const row=(id,restore)=>`<li><span>${M(id).emoji} ${esc(M(id).name)}${restore?` <small>👎 never suggest</small>`:""}${timesMade(id)?` <small>· made ${timesMade(id)}×</small>`:""}</span><small>${esc(all[id].d||"")}</small><button class="have" data-unrate="${id}">${restore?"Restore":"Clear"}</button></li>`;
   const g=r=>ids.filter(id=>all[id].r===r);
   return `<section class="gpanel rpanel"><div class="stitle" style="margin-top:0"><h2>My ratings</h2><span>👎 hides · ❤️ = favorite</span></div>
-    ${ids.length?`${g(2).length?`<h3 class="aisle">❤️ Favorites</h3><ul>${g(2).map(id=>row(id)).join("")}</ul>`:""}${g(1).length?`<h3 class="aisle">👍 Good</h3><ul>${g(1).map(id=>row(id)).join("")}</ul>`:""}${g(-1).length?`<h3 class="aisle">🗑 Removed meals</h3><p class="hint" style="margin:0 0 4px">Rated 👎 or removed from the menu for good. Hidden from suggestions and Swap. Tap Restore to bring one back.</p><ul>${g(-1).map(id=>row(id,true)).join("")}</ul>`:""}`
-      :`<p class="hint">No ratings yet. After you make a meal, tap 👎 / 👍 / ❤️ on its day. ❤️ = favorite, picked more; 👎 meals stop showing up.</p>`}</section>`}
+    ${ids.length?`${g(2).length?`<h3 class="aisle">❤️ Favorites</h3><ul>${g(2).map(id=>row(id)).join("")}</ul>`:""}${g(1).length?`<h3 class="aisle">👍 Good</h3><ul>${g(1).map(id=>row(id)).join("")}</ul>`:""}${g(-1).length?`<h3 class="aisle">Removed meals</h3><p class="hint" style="margin:0 0 4px">👎 means never suggest again. Hidden from suggestions and Swap. Tap Restore to bring one back.</p><ul>${g(-1).map(id=>row(id,true)).join("")}</ul>`:""}`
+      :`<p class="hint">No ratings yet. After you make a meal, tap 👎 / 👍 / ❤️ on its day. ❤️ = favorite; 👎 = never suggest again (Removed meals).</p>`}</section>`}
 /* receipt button */
 function bindReceipt(root){root.querySelectorAll("[data-rcpt]").forEach(b=>b.onclick=openReceipt)}
 function photoShare(o){o.btn.onclick=()=>o.input.click();attachShare({inputs:[o.input],thumbs:o.thumbs,act:o.act,files:o.store,shareLabel:o.shareLabel,title:o.title,text:o.text,fallback:o.fallback})}
@@ -1510,19 +1513,10 @@ function openDaySwap(i){const d=effDays(W.ov)[i],o=W.ov[i];
   const done=(v,msg)=>{if(v)W.ov[i]=v;else delete W.ov[i];recomputeList();closeSheet();renderWeek();toast(msg)};
   inn.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{const a=b.dataset.o;done(a==="keep"?null:{t:a},a==="keep"?"Back to the original dinner":a==="left"?"Swapped to Leftovers":"Swapped to Eat out")});
   inn.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>done({t:"meal",id:b.dataset.pick},"Dinner swapped. List updated"))}
-function openDelete(i){const d=effDays(W.ov)[i],m=d.meal&&M(d.meal);
-  const inn=openSheet(shTop("🗑 Delete "+esc(d.short)+" dinner")+`<p style="margin:0 0 10px;font-weight:800">${d.e} ${esc(d.dinner)}</p>
-    <button class="sh-btn wide" data-rm="week">Remove from this week</button><p class="muted2" style="margin:4px 0 12px">Frees up this night and takes its groceries off the list. You get 5 seconds to Undo.</p>
-    <button class="sh-btn wide danger" data-rm="good" ${m?"":"disabled"}>Remove from menu for good</button><p class="muted2" style="margin:4px 0 0">${m?`Moves ${esc(m.name)} to Removed meals. It won't be suggested or offered in Swap. Tap Restore there anytime.`:"Only menu meals can be removed for good (this night isn't one)."}</p>`,"Delete dinner");
-  inn.querySelector('[data-rm="week"]').onclick=()=>{const prev=W.ov[i];W.ov[i]={t:"rm"};recomputeList();closeSheet();renderWeek();
-    toast(`Removed from this week: ${d.short}`,()=>{if(prev)W.ov[i]=prev;else delete W.ov[i];recomputeList();renderWeek();toast("Undone. It's back on the week")})};
-  if(m)inn.querySelector('[data-rm="good"]').onclick=()=>confirmForGood(m)}
-function confirmForGood(m){const inn=openSheet(shTop("Remove for good?")+`<p style="margin:0 0 8px;font-weight:800">Remove ${m.emoji} ${esc(m.name)} from your menu for good?</p>
-    <p class="muted2" style="margin:0 0 10px">It moves to <b>Removed meals</b> and won't be suggested or offered in Swap. You can tap Restore there anytime.</p>
-    <div class="sh-row2"><button class="sh-btn" data-c="no">Cancel</button><button class="sh-btn danger" data-c="yes">Remove for good</button></div>`,"Confirm remove from menu for good");
-  inn.querySelector('[data-c="no"]').onclick=closeSheet;
-  inn.querySelector('[data-c="yes"]').onclick=()=>{setRate(m.id,-1,true);effDays(W.ov).forEach((x,j)=>{if(x.meal===m.id)W.ov[j]={t:"rm"}});recomputeList();closeSheet();renderWeek();
-    toast(`${m.name} removed from menu for good. Restore it in Removed meals.`)}}
+/* Trash beside Swap: one tap removes from this week only; 5-sec Undo. No sheet / confirm. 👎 = never suggest again. */
+function openDelete(i){const d=effDays(W.ov)[i];const prev=W.ov[i];
+  W.ov[i]={t:"rm"};recomputeList();renderWeek();
+  toast(`Removed from this week: ${d.short}`,()=>{if(prev)W.ov[i]=prev;else delete W.ov[i];recomputeList();renderWeek();toast("Undone. It's back on the week")})}
 /* meal log (saved on this phone) */
 const LKEY="cameron-meals-log-v1";
 function getLog(){try{const j=JSON.parse(localStorage.getItem(LKEY)||"null");if(j&&typeof j==="object"&&j.log)return j}catch(_){}return {log:{},prompt:null,seen:null}}
