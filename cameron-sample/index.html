@@ -387,6 +387,7 @@
   .grocery-search{flex:1 1 140px;min-height:44px;border-radius:12px;border:2px solid rgba(15,110,110,.28);background:var(--white);color:var(--wink);padding:8px 10px;font:inherit;font-weight:700}
   .share-list-link,.share-app-link{appearance:none;border:0;background:transparent;color:var(--tealD);font:inherit;font-weight:800;font-size:14px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:6px}
   .share-app-link .ico{width:16px;height:16px;stroke:currentColor}
+  .share-app-quiet{display:block;width:100%;text-align:center;margin:18px 0 8px;color:var(--wsoft);font:inherit;font-weight:700;font-size:13px;text-decoration:underline;text-underline-offset:3px;background:none;border:0;cursor:pointer;min-height:40px}
   .g-custom-add{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px;align-items:center}
   .g-custom-add select,.g-custom-add input{min-height:44px;border-radius:12px;border:2px solid rgba(15,110,110,.28);background:var(--white);color:var(--wink);padding:8px 10px;font:inherit;font-weight:700}
   .g-custom-add input[type="text"]{flex:1 1 140px}
@@ -1569,6 +1570,7 @@ function sidesFor(){
 
 const SHUFFLE_PREV_KEY="cameron-meals-shuffle-prev-v1";
 function shuffleWeek(){
+  // Self-check: uniqueness — used[] + while(used.includes) skip duplicates; SHUFFLE_PREV_KEY avoids immediate repeat set.
   if(!W){toast("Finish setup first");return}
   const days=effDays(W.ov);
   const pool=allMeals().filter(m=>!m.bf&&!m.grab&&m.id!=="veg"&&rateOf(m.id)!==-1);
@@ -1866,9 +1868,9 @@ function renderWeek(){
       <button type="button" class="sbtn" id="gAdd">Add item</button>
     </div>
     <p class="emo" style="margin:12px 0 2px">🌡</p><p class="gnote">One-time buy: instant-read thermometer (~$10–15; not in totals).</p>
-    <p style="margin:14px 0 0;text-align:center"><button type="button" class="share-app-link" id="shareAppBottom">${icons.copy}<span>Share this app</span></button> <a class="share-app-link" id="shareAppSms" hidden>Text link</a></p>
   </section>
   <a class="gh" href="${C.REPO.url}" target="_blank" rel="noopener"><b>🛠️ Your own repo, cameron-meals</b><span>Edit meals.js on GitHub to change your menu.</span></a>
+  <button type="button" class="share-app-quiet" id="shareAppQuiet">Share this app</button>
   <button type="button" class="wbtn p ico-btn" id="bk">${icons.back} Back to my picks</button><button type="button" class="wbtn g" id="rs2">Start over</button>
   <div class="foot">All prices are <b>estimates</b> (prices.json when it loads). ${otherStores.length?`Also shop: ${otherStores.map(esc).join(", ")}.`:""}</div>`;
   const wk=$("week");
@@ -1897,7 +1899,7 @@ function renderWeek(){
   wk.querySelectorAll("details.aisle-fold").forEach(d=>d.addEventListener("toggle",()=>{if(typeof camSearchQ==="function"&&!camSearchQ())setCamAisleOpen(d.dataset.aisle,d.open)}));
   const gs=$("grocery-search");if(gs){gs.addEventListener("input",()=>{W.gSearch=gs.value;renderWeek();const el=$("grocery-search");if(el){el.focus();try{el.setSelectionRange(el.value.length,el.value.length)}catch(_){}}})}
   const gshare=$("grocery-share");if(gshare)gshare.onclick=()=>shareCamList();
-  const sab=$("shareAppBottom");if(sab)sab.onclick=()=>shareThisApp();
+  const sab=$("shareAppQuiet");if(sab)sab.onclick=()=>shareThisApp();
   wk.querySelectorAll("[data-rmcustom]").forEach(b=>b.onclick=e=>{e.stopPropagation();setCamCustom(getCamCustom().filter(x=>x.id!==b.dataset.rmcustom));W.ck.delete(b.dataset.rmcustom);renderWeek();toast("Removed")});
   const gCat=$("gCat"),gNew=$("gNewCat"),gName=$("gName"),gQty=$("gQty"),gAdd=$("gAdd");
   if(gCat){gCat.onchange=()=>{W.gCat=gCat.value;if(gNew)gNew.hidden=gCat.value!=="__new__"};if(gNew)gNew.hidden=gCat.value!=="__new__"}
@@ -2031,6 +2033,7 @@ function attachShare(o){
   draw();
 }
 function openReceipt(){
+  try{awardReceipt()}catch(_){}
   const inn=openSheet(shTop("📷 Upload receipt")+`
     <p style="margin:0 0 10px;font-weight:700;font-size:15px">Snap your receipt (or a Publix app Purchases screenshot), then send it to Jarvis.</p>
     <div class="sh-row2" style="margin-top:0;align-items:center"><span class="emo">📷</span><button class="sh-btn p" data-pick="cam">Take photo</button><span class="emo">🖼</span><button class="sh-btn" data-pick="lib">Upload receipt</button></div>
@@ -2339,7 +2342,6 @@ const CG_KEY="cameron-meals-custom-grocery-v1";
 const CC_KEY="cameron-meals-custom-cats-v1";
 const CA_OPEN_KEY="cameron-meals-aisle-open-v1";
 const CAM_SHARE_BASE="https://burnsted.github.io/cameron-meals/";
-const STD_EQUIP=["stove","oven","micro","toaster","fridge"];
 const CAM_AISLE_CHEV=`<svg class="aisle-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
 const BADGES=[
   {id:"setup",name:"Set up",how:"Finish About me basics + confirm equipment"},
@@ -2359,11 +2361,11 @@ function xpToast(msg){let el=document.getElementById("xpToast");if(!el){el=docum
 function refreshStarBtn(){const b=document.getElementById("starBtn");if(!b)return;const x=getXp();b.innerHTML=icons.star+"<span>"+x.stars+"</span>";b.setAttribute("aria-label",x.stars+" stars, open badges")}
 function awardOnce(key,stars,label){const a=getAwards();if(a[key])return false;a[key]=1;setAwards(a);const x=getXp();x.stars=(x.stars||0)+stars;setXp(x);xpToast(label||("+"+stars+" star"+(stars===1?"":"s")));refreshStarBtn();checkBadges();return true}
 function aboutComplete(){const ab=getAbout()||{},set=getSettings()||{},bud=getBud();
-  return{hasName:!!(ab.name&&String(ab.name).trim()),hasEquip:!!(st&&st.equip&&st.equip.size),hasCoffee:!!(st&&(st.equip.has("lavazza")||st.equip.has("nespresso")||st.equip.has("espresso")||(ab.coffee&&ab.coffee.brand))),hasStores:!!(st&&st.stores&&st.stores.size),hasBud:!!(bud&&bud.on),hasBf:!!(set.bfWeekday),hasEx:!!(ab.exercise||ab.ex||ab.activity)}}
-function aboutOk(){const a=aboutComplete();return a.hasName&&a.hasEquip&&a.hasStores&&a.hasBud&&a.hasBf}
+  return{hasName:!!(ab.name&&String(ab.name).trim()),hasEquip:!!(st&&st.equip&&st.equip.size),hasCoffee:!!(st&&(st.equip.has("lavazza")||st.equip.has("nespresso")||st.equip.has("espresso")||(ab.coffee&&ab.coffee.brand))),hasStores:!!(st&&st.stores&&st.stores.size),hasBud:!!(bud&&bud.on),hasBf:!!(set.bfWeekday),hasEx:!!(ab.exercise||ab.ex||ab.activity||ab.act)}}
+function aboutOk(){const a=aboutComplete();return a.hasName&&a.hasEquip&&a.hasCoffee&&a.hasStores&&a.hasBud&&a.hasBf&&a.hasEx}
 function madeMealIds(){const L=getLog().log||{},ids=new Set();Object.keys(L).forEach(iso=>{const e=L[iso];if(e&&e.s==="made"&&(e.m||e.n))ids.add(String(e.m||e.n))});return ids}
 function weekLogCount(weekStart){const L=getLog().log||{};let n=0;for(let i=0;i<7;i++){const iso=isoD(addDays(weekStart,i));if(L[iso]&&L[iso].s)n++}return n}
-function countRated(){try{const r=JSON.parse(localStorage.getItem("cameron-meals-rate-v1")||"{}");return Object.keys(r).filter(k=>r[k]&&r[k].r).length}catch(_){return 0}}
+function countRated(){try{const r=getRates();return Object.keys(r).filter(k=>r[k]&&r[k].r).length}catch(_){return 0}}
 function checkBadges(){const x=getXp();let unlocked=null;const mark=id=>{if(x.badges[id])return;x.badges[id]=1;unlocked=id};
   if(aboutOk())mark("setup");
   if(madeMealIds().size>=1)mark("first_cook");
@@ -2379,12 +2381,12 @@ function awardRate(id){if(id)awardOnce("rate:"+id,1,"+1 star")}
 function awardAboutField(field){awardOnce("about:"+field,1,"+1 star");checkBadges()}
 function awardCustomItem(id){awardOnce("custom:"+id,1,"+1 star")}
 function awardCustomCat(name){awardOnce("cat:"+name,1,"+1 star")}
-function awardReceipt(){awardOnce("receipt:"+isoD(new Date())+":"+Date.now(),1,"+1 star");checkBadges()}
+function awardReceipt(){awardOnce("receipt:"+isoD(new Date()),1,"+1 star");checkBadges()}
 function awardBudgetOk(weekIso){awardOnce("budget_ok:"+weekIso,1,"+1 star");checkBadges()}
 function retroXp(){const a=getAwards();let dirty=false;const bump=k=>{if(a[k])return;a[k]=1;dirty=true;const x=getXp();x.stars++;setXp(x)};
   const L=getLog().log||{};Object.keys(L).forEach(iso=>{if(L[iso]&&L[iso].s)bump("log:"+iso);if(L[iso]&&L[iso].s==="made"&&(L[iso].m||L[iso].n))bump("made:"+(L[iso].m||L[iso].n))});
-  try{const r=JSON.parse(localStorage.getItem("cameron-meals-rate-v1")||"{}");Object.keys(r).forEach(id=>{if(r[id]&&r[id].r)bump("rate:"+id)})}catch(_){}
-  const ab=aboutComplete();["hasName","hasEquip","hasStores","hasBud","hasBf"].forEach(f=>{if(ab[f])bump("about:"+f)});
+  try{const r=getRates();Object.keys(r).forEach(id=>{if(r[id]&&r[id].r)bump("rate:"+id)})}catch(_){}
+  const ab=aboutComplete();["hasName","hasEquip","hasCoffee","hasStores","hasBud","hasBf","hasEx"].forEach(f=>{if(ab[f])bump("about:"+f)});
   if(dirty)setAwards(a);checkBadges();refreshStarBtn()}
 function openBadgesSheet(){const x=getXp();const inn=openSheet("","Badges");
   inn.innerHTML=shTop("Badges")+`<p class="muted2" style="margin:0 0 8px">${x.stars} star${x.stars===1?"":"s"} · quiet progress</p><ul class="badge-list">${BADGES.map(b=>{const on=!!x.badges[b.id];return `<li class="${on?"on":""}">${icons.star.replace('class="ico"','class="ico bico"')}<div><b>${esc(b.name)}</b><small>${on?"Earned":esc(b.how)}</small></div></li>`}).join("")}</ul>`}
@@ -2417,12 +2419,18 @@ function b64url(bytes){let s="";bytes.forEach(b=>s+=String.fromCharCode(b));retu
 function fromB64url(str){str=str.replace(/-/g,"+").replace(/_/g,"/");while(str.length%4)str+="=";const bin=atob(str);const out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out}
 async function compressPayload(obj){
   const json=JSON.stringify(obj);
+  if(typeof LZString!=="undefined"&&LZString.compressToEncodedURIComponent){
+    try{return "z"+LZString.compressToEncodedURIComponent(json)}catch(_){}
+  }
   try{if(window.CompressionStream){const stream=new Blob([json]).stream().pipeThrough(new CompressionStream("gzip"));const buf=new Uint8Array(await new Response(stream).arrayBuffer());return "g"+b64url(buf)}}catch(_){}
   try{return "j"+btoa(unescape(encodeURIComponent(json))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}catch(_){return "j"+encodeURIComponent(json)}
 }
 async function decompressPayload(raw){
   if(!raw)return null;
   try{
+    if(raw.startsWith("z")&&typeof LZString!=="undefined"&&LZString.decompressFromEncodedURIComponent){
+      return JSON.parse(LZString.decompressFromEncodedURIComponent(raw.slice(1)));
+    }
     if(raw.startsWith("g")&&window.DecompressionStream){const bytes=fromB64url(raw.slice(1));const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));const text=await new Response(stream).text();return JSON.parse(text)}
     if(raw.startsWith("j")){const s=raw.slice(1);try{return JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/")))))}catch(_){return JSON.parse(decodeURIComponent(s))}}
     return JSON.parse(decodeURIComponent(raw));
@@ -2430,9 +2438,9 @@ async function decompressPayload(raw){
 }
 function buildShareTemplate(dropPlan,dropRatings){
   const set=getSettings()||{},bud=getBud()||{},rules=typeof getRules==="function"?getRules():[];
-  const ratings={};try{const r=JSON.parse(localStorage.getItem("cameron-meals-rate-v1")||"{}");Object.keys(r).forEach(k=>{if(r[k]&&(r[k].r===1||r[k].r===2||r[k].r===-1))ratings[k]={r:r[k].r}})}catch(_){}
-  const theme=document.documentElement.getAttribute("data-theme")||(document.body.classList.contains("light")?"light":"dark");
-  const tpl={v:1,stores:st?[...st.stores]:[],storeLoc:st&&st.storeLoc?st.storeLoc:{},main:st?st.main:"",budget:bud,breakfast:{bfWeekday:set.bfWeekday,bfAlt:set.bfAlt,bfWeekend:set.bfWeekend,grabNights:set.grabNights},rules,customCats:getCamCats(),customItems:getCamCustom(),theme,meals:st?st.meals:{},mealV:st?st.mealV:{},sides:st?[...st.sides]:[],picks:{}};
+  const ratings={};try{const r=getRates();Object.keys(r).forEach(k=>{if(r[k]&&(r[k].r===1||r[k].r===2||r[k].r===-1))ratings[k]={r:r[k].r}})}catch(_){}
+  const theme=(()=>{try{return localStorage.getItem("cameron-meals-theme-v1")||document.documentElement.getAttribute("data-theme")||"light"}catch(_){return"light"}})();
+  const tpl={v:1,stores:st?[...st.stores]:[],storeLoc:st&&st.storeLoc?st.storeLoc:{},main:st?st.main:"",extra:st?(st.extra||[]).slice():[],budget:bud,breakfast:{bfWeekday:set.bfWeekday,bfAlt:set.bfAlt,bfWeekend:set.bfWeekend,bfAltWeeks:set.bfAltWeeks,grabNights:set.grabNights},rules,customCats:getCamCats(),customItems:getCamCustom(),theme,meals:st?st.meals:{},mealV:st?st.mealV:{},sides:st?[...st.sides]:[],picks:{}};
   if(st&&st.picks)Object.keys(st.picks).forEach(k=>{tpl.picks[k]=[...(st.picks[k]||[])]});
   // exclude equipment + coffee machines entirely
   if(!dropPlan&&W){tpl.week={ov:W.ov||{},base:(W.base||[]).map(d=>({meal:d.meal,dinner:d.dinner,kind:d.kind,sideName:d.sideName,cook:d.cook,grab:d.grab,e:d.e,cut:d.cut}))}}
@@ -2446,52 +2454,128 @@ async function shareThisApp(){
   if(payload.length>6000){tpl=buildShareTemplate(true,true);payload=await compressPayload(tpl)}
   const url=CAM_SHARE_BASE+"#t="+payload;
   const text="Here's my meal planner setup — it's yours to tweak. Your stuff saves on your own phone.";
-  try{if(navigator.share){await navigator.share({title:"Meal Picker",text,url});return}}catch(err){if(err&&err.name==="AbortError")return}
-  try{await navigator.clipboard.writeText(url);toast("Link copied")}catch(_){copyTxt(url,"Link copied")}
-  const sms=$("shareAppSms");if(sms){sms.href="sms:?&body="+encodeURIComponent(text+" "+url.slice(0,1200));sms.hidden=false}
+  try{if(navigator.share){await navigator.share({title:"Meal Picker",text:text+"\n\n"+url,url});return}}catch(err){if(err&&err.name==="AbortError")return}
+  try{await navigator.clipboard.writeText(text+"\n\n"+url);toast("Share link copied")}catch(_){copyTxt(text+"\n\n"+url,"Share link copied")}
 }
 function hasSavedCamData(){
-  try{if(localStorage.getItem("cameron-meals-state-v1")||localStorage.getItem("cameron-meals-rate-v1")||localStorage.getItem(CG_KEY))return true}catch(_){}
+  try{
+    if(localStorage.getItem(WELCOME_KEY)==="1")return true;
+    if(localStorage.getItem(RKEY)&&Object.keys(JSON.parse(localStorage.getItem(RKEY)||"{}")).length)return true;
+    if(localStorage.getItem(CG_KEY)&&JSON.parse(localStorage.getItem(CG_KEY)||"[]").length)return true;
+    if(localStorage.getItem(BKEY))return true;
+    if(localStorage.getItem(AKEY)){const a=JSON.parse(localStorage.getItem(AKEY)||"{}");if(a&&(a.name||a.act))return true}
+  }catch(_){}
   return !!(st&&((st.stores&&st.stores.size)||(st.meals&&Object.keys(st.meals).length)));
 }
-function applyStdEquip(){if(!st)return;st.equip=new Set(STD_EQUIP.filter(id=>(C.EQUIP||[]).some(e=>e.id===id)));st.coffee={brand:"",brandOther:"",machines:new Set(),drinks:new Set(),milk:"No milk",perWeek:7}}
+function ensureStdEquipOptions(){
+  const need=[
+    {id:"stove",label:"Stovetop",emoji:"🍳"},
+    {id:"oven",label:"Oven",emoji:"♨️"},
+    {id:"micro",label:"Microwave",emoji:"📟"},
+    {id:"toaster",label:"Toaster",emoji:"🍞"},
+    {id:"fridge",label:"Fridge / freezer",emoji:"🧊"}
+  ];
+  if(!C.EQUIP)C.EQUIP=[];
+  need.forEach(n=>{if(!C.EQUIP.some(e=>e.id===n.id))C.EQUIP.push(n)});
+}
+function applyStdEquip(){
+  if(!st)return;
+  ensureStdEquipOptions();
+  // Friend baseline: common kitchen appliances only — never Cameron's Foreman / coffee gear
+  const ids=STD_EQUIP.filter(id=>(C.EQUIP||[]).some(e=>e.id===id));
+  st.equip=new Set(ids);
+  st.coffee={brand:"",brandOther:"",machines:new Set(),drinks:new Set(),milk:"No milk",perWeek:7};
+  st.photos={};
+}
+function stdEquipLabels(){
+  ensureStdEquipOptions();
+  return STD_EQUIP.map(id=>{const e=(C.EQUIP||[]).find(x=>x.id===id);return e?e.label:id}).filter(Boolean);
+}
 async function importTemplate(tpl,replace){
   if(!tpl||typeof tpl!=="object")return;
-  if(replace){/* wipe sensitive */ try{localStorage.removeItem(XP_KEY);localStorage.removeItem(XP_AWARD_KEY)}catch(_){}}
+  if(replace){try{localStorage.removeItem(XP_KEY);localStorage.removeItem(XP_AWARD_KEY);localStorage.removeItem(LKEY)}catch(_){}}
   if(!st)reset();
   applyStdEquip();
+  // Never import Cameron's equipment / coffee even if an old payload included them
   if(Array.isArray(tpl.stores))st.stores=new Set(tpl.stores);
   if(tpl.storeLoc)st.storeLoc=tpl.storeLoc;
+  if(tpl.extra)st.extra=tpl.extra.slice();
   if(tpl.main)st.main=tpl.main;
   if(tpl.meals)st.meals=tpl.meals;
   if(tpl.mealV)st.mealV=tpl.mealV;
   if(Array.isArray(tpl.sides))st.sides=new Set(tpl.sides);
   if(tpl.picks){st.picks={};Object.keys(tpl.picks).forEach(k=>st.picks[k]=new Set(tpl.picks[k]||[]))}
-  if(tpl.budget){try{localStorage.setItem("cameron-meals-budget-v1",JSON.stringify(tpl.budget))}catch(_){}}
+  if(tpl.budget){try{localStorage.setItem(BKEY,JSON.stringify(tpl.budget))}catch(_){}}
   if(tpl.breakfast){const set=getSettings();Object.assign(set,tpl.breakfast);setSettings(set)}
   if(Array.isArray(tpl.rules)){try{setRules(tpl.rules)}catch(_){}}
   if(Array.isArray(tpl.customCats))setCamCats(tpl.customCats);
   if(Array.isArray(tpl.customItems))setCamCustom(tpl.customItems);
-  if(tpl.ratings){try{localStorage.setItem("cameron-meals-rate-v1",JSON.stringify(tpl.ratings))}catch(_){}}
-  if(tpl.theme){try{document.documentElement.setAttribute("data-theme",tpl.theme);localStorage.setItem("cm-theme",tpl.theme)}catch(_){}}
-  // clear name for friend
-  const ab=getAbout()||{};delete ab.name;delete ab.exercise;delete ab.ex;delete ab.activity;setAbout(ab);st.about=ab;
-  if(tpl.week&&tpl.week.base){/* rebuild week from template structure */}
+  if(tpl.ratings){try{const cur={};Object.keys(tpl.ratings).forEach(id=>{const r=tpl.ratings[id];if(r&&r.r)cur[id]={r:r.r,d:isoD(new Date())}});localStorage.setItem(RKEY,JSON.stringify(cur))}catch(_){}}
+  if(tpl.theme){try{document.documentElement.setAttribute("data-theme",tpl.theme);localStorage.setItem("cameron-meals-theme-v1",tpl.theme)}catch(_){}}
+  // clear name / health for friend — ask name + confirm equipment
+  const ab=getAbout()||{};delete ab.name;delete ab.exercise;delete ab.ex;delete ab.activity;delete ab.act;setAbout(ab);st.about=ab;
   toast("Template loaded — confirm your name & equipment");
 }
 async function handleTemplateHash(){
   const m=location.hash.match(/^#t=(.+)$/);
-  if(!m)return;
+  if(!m)return false;
   const tpl=await decompressPayload(m[1]);
   history.replaceState(null,"",location.pathname+location.search);
-  if(!tpl){toast("Could not read shared setup");return}
-  const apply=async(replace)=>{await importTemplate(tpl,replace);st._fromTemplate=true;st._needName=true;st._needEquipConfirm=true;refreshTitles();if(typeof startWelcome==="function")startWelcome(true);else render()};
+  if(!tpl){toast("Could not read shared setup");return true}
+  const apply=async(replace)=>{
+    await importTemplate(tpl,replace);
+    setWelcomeDone();
+    st._fromTemplate=true;
+    refreshTitles();
+    // Name-only welcome + equipment pick + review settings
+    startTemplateWelcome();
+  };
   if(hasSavedCamData()){
     const inn=openSheet("","Shared setup");
     inn.innerHTML=shTop("Shared setup")+`<p style="margin:0 0 12px;font-weight:700">Replace your setup with this template?</p><div class="sh-row2"><button class="sh-btn" id="tplKeep">Keep mine</button><button class="sh-btn p" id="tplRep">Replace</button></div>`;
     inn.querySelector("#tplKeep").onclick=()=>closeSheet();
     inn.querySelector("#tplRep").onclick=()=>{closeSheet();apply(true)};
-  }else apply(false);
+    return true;
+  }
+  await apply(false);
+  return true;
+}
+function startTemplateWelcome(){
+  if(welcomeBusy)return;
+  welcomeBusy=true;
+  const root=$("welcomeRoot"); if(!root){welcomeBusy=false;return}
+  const overlay=document.createElement("div");
+  overlay.className="welcome-overlay";overlay.id="welcome-overlay";
+  root.innerHTML="";root.appendChild(overlay);
+  const finish=()=>{setWelcomeDone();stopSpeak();welcomeBusy=false;overlay.remove();refreshTitles();if(st){st.about=getAbout()}render()};
+  const box=document.createElement("div");box.className="welcome-card";overlay.appendChild(box);
+  const labs=()=>stdEquipLabels();
+  const drawName=()=>{
+    speak("Welcome! What's your name? Then we'll confirm your kitchen equipment.");
+    box.innerHTML=`<p class="welcome-q">What's your name?</p>
+      <input class="welcome-field" id="w-name" placeholder="Your name" maxlength="30" autocomplete="off">
+      <div class="welcome-opts"><button type="button" class="welcome-opt primary" data-go="1">Continue</button></div>
+      <p class="welcome-sub">Friend's gear wasn't copied. Next: confirm a standard kitchen baseline.</p>`;
+    box.querySelector("[data-go]").onclick=()=>{
+      const v=($("w-name").value||"").trim().slice(0,30);
+      const ab=getAbout()||{};if(v)ab.name=v;setAbout(ab);if(st)st.about=ab;refreshTitles();
+      drawEquip();
+    };
+  };
+  const drawEquip=()=>{
+    applyStdEquip();
+    const list=labs().join(", ");
+    speak("We've set common kitchen appliances: "+list+". Confirm, or open settings to add or remove gear.");
+    box.innerHTML=`<p class="welcome-q">Confirm your equipment?</p>
+      <p class="welcome-sub">Pre-set baseline: <b>${esc(list)}</b>. No George Foreman grill or coffee machines — add those in Settings if you have them.</p>
+      <div class="welcome-opts">
+        <button type="button" class="welcome-opt primary" data-ok="1">Looks good</button>
+        <button type="button" class="welcome-opt" data-set="1">Review settings</button>
+      </div>`;
+    box.querySelector("[data-ok]").onclick=finish;
+    box.querySelector("[data-set]").onclick=()=>{finish();openSettings()};
+  };
+  drawName();
 }
 
 
@@ -2503,8 +2587,10 @@ const _render=render;
 render=function(){_render();updateBackBtn();wireAllAutocomplete(card);refreshTitles()};
 render();
 setTimeout(()=>{
-  const go=()=>{try{startWelcome(false)}catch(_){};try{retroXp()}catch(_){}};
-  if(typeof handleTemplateHash==="function")handleTemplateHash().then(go).catch(go);else go();
+  const go=()=>{try{retroXp()}catch(_){}};
+  if(typeof handleTemplateHash==="function"){
+    handleTemplateHash().then(handled=>{if(!handled)try{startWelcome(false)}catch(_){};go()}).catch(()=>{try{startWelcome(false)}catch(_){};go()});
+  }else{try{startWelcome(false)}catch(_){};go()}
 },300);
 </script>
 </body>
