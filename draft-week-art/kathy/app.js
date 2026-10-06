@@ -63,6 +63,8 @@
       itemAlts: {},
       meatAlts: {},
       openAltId: null,
+      daySides: {},
+      sideOffers: {},
     };
   }
 
@@ -89,10 +91,12 @@
       base.munchies = Array.isArray(j.munchies) ? j.munchies : [];
       base.itemAlts = j.itemAlts && typeof j.itemAlts === "object" ? j.itemAlts : {};
       base.meatAlts = j.meatAlts && typeof j.meatAlts === "object" ? j.meatAlts : {};
+      base.daySides = j.daySides && typeof j.daySides === "object" ? j.daySides : {};
+      base.sideOffers = j.sideOffers && typeof j.sideOffers === "object" ? j.sideOffers : {};
       base.haveIt = window.HaveItTimed
         ? window.HaveItTimed.normalizeStore(j.haveIt)
         : (j.haveIt && typeof j.haveIt === "object" ? j.haveIt : {});
-      // Never force home on load — mid-flow draft wins (Steve soft-bar)
+      // Never force home on load. Mid-flow draft wins (Steve soft-bar)
       base.showHome = false;
       return base;
     } catch (_) {
@@ -179,18 +183,125 @@
     return (K.DISHES || []).find((d) => d.id === id) || null;
   }
 
-  function sidePhotosFor(dish) {
-    // Optional side photo ideas from the shared sides folder (bare captions, no pill frames).
-    const map = {
-      lemon_chicken: [{ src: "img/sides/potatoes.webp", alt: "Potatoes" }, { src: "img/sides/carrots-ranch.webp", alt: "Carrots" }],
-      turkey_chili: [{ src: "img/sides/black-beans.webp", alt: "Beans" }, { src: "img/sides/side-salad.webp", alt: "Side salad" }],
-      herb_salmon: [{ src: "img/sides/broccoli.webp", alt: "Broccoli" }, { src: "img/sides/sweet-potato.webp", alt: "Sweet potato" }],
-      chicken_soup: [{ src: "img/sides/green-beans.webp", alt: "Green beans" }, { src: "img/sides/rice.webp", alt: "Rice" }],
-      white_fish: [{ src: "img/sides/green-beans.webp", alt: "Green beans" }, { src: "img/sides/rice.webp", alt: "Rice" }],
-      chicken_rice: [{ src: "img/sides/rice.webp", alt: "Rice" }, { src: "img/sides/broccoli.webp", alt: "Broccoli" }],
-      shepherd_pie: [{ src: "img/sides/potatoes.webp", alt: "Potatoes" }, { src: "img/sides/side-salad.webp", alt: "Side salad" }],
-    };
-    return map[dish && dish.id] || [{ src: "img/sides/side-salad.webp", alt: "Side salad" }];
+  const SIDE_CATALOG = [
+    { id: "potatoes", src: "img/sides/potatoes.webp", alt: "Potatoes" },
+    { id: "carrots", src: "img/sides/carrots-ranch.webp", alt: "Carrots" },
+    { id: "beans", src: "img/sides/black-beans.webp", alt: "Beans" },
+    { id: "salad", src: "img/sides/side-salad.webp", alt: "Side salad" },
+    { id: "broccoli", src: "img/sides/broccoli.webp", alt: "Broccoli" },
+    { id: "sweet-potato", src: "img/sides/sweet-potato.webp", alt: "Sweet potato" },
+    { id: "green-beans", src: "img/sides/green-beans.webp", alt: "Green beans" },
+    { id: "rice", src: "img/sides/rice.webp", alt: "Rice" },
+    { id: "corn", src: "img/sides/corn.webp", alt: "Corn" },
+    { id: "asparagus", src: "img/sides/asparagus.webp", alt: "Asparagus" },
+    { id: "garlic-bread", src: "img/sides/garlic-bread.webp", alt: "Garlic bread" },
+    { id: "fruit", src: "img/sides/fruit-cup.webp", alt: "Fruit" },
+  ];
+  const SIDE_BY_ID = Object.fromEntries(SIDE_CATALOG.map((s) => [s.id, s]));
+  const SIDE_SEED = {
+    lemon_chicken: ["potatoes", "carrots"],
+    turkey_chili: ["beans", "salad"],
+    herb_salmon: ["broccoli", "sweet-potato"],
+    chicken_soup: ["green-beans", "rice"],
+    white_fish: ["green-beans", "rice"],
+    chicken_rice: ["rice", "broccoli"],
+    shepherd_pie: ["potatoes", "salad"],
+  };
+
+  function sideSeedIds(dish) {
+    return (dish && SIDE_SEED[dish.id]) || ["salad"];
+  }
+
+  function getDaySideSel(dayKey) {
+    const arr = (state.daySides || {})[dayKey];
+    return Array.isArray(arr) ? arr.map(String) : [];
+  }
+
+  function setDaySideSel(dayKey, ids) {
+    if (!state.daySides) state.daySides = {};
+    const clean = [...new Set(ids)].filter((id) => SIDE_BY_ID[id]).slice(0, 6);
+    if (!clean.length) delete state.daySides[dayKey];
+    else state.daySides[dayKey] = clean;
+  }
+
+  function ensureKathySideOffers(dayKey, dish) {
+    if (!state.sideOffers) state.sideOffers = {};
+    const seed = sideSeedIds(dish).filter((id) => SIDE_BY_ID[id]);
+    if (!seed.length) {
+      delete state.sideOffers[dayKey];
+      return [];
+    }
+    let cur = Array.isArray(state.sideOffers[dayKey])
+      ? state.sideOffers[dayKey].filter((id) => SIDE_BY_ID[id])
+      : [];
+    if (!cur.length) cur = seed.slice();
+    while (cur.length < seed.length) {
+      const SR = window.SideRegen;
+      const pool = SIDE_CATALOG.map((s) => s.id);
+      const next = SR ? SR.pickReplacement(pool, cur) : pool.find((id) => !cur.includes(id));
+      if (!next) break;
+      cur.push(next);
+    }
+    state.sideOffers[dayKey] = cur.slice(0, 6);
+    return state.sideOffers[dayKey];
+  }
+
+  function regenerateKathySideSlot(dayKey, slotIndex) {
+    if (state.weekLocked) {
+      toast("Unlock the week to change sides.");
+      return;
+    }
+    const offers = ((state.sideOffers || {})[dayKey] || []).slice();
+    const i = Number(slotIndex);
+    if (!Number.isFinite(i) || i < 0 || i >= offers.length) return;
+    const old = offers[i];
+    const pool = SIDE_CATALOG.map((s) => s.id);
+    const SR = window.SideRegen;
+    const next = SR ? SR.pickReplacement(pool, offers, old) : pool.find((id) => id !== old && !offers.includes(id));
+    if (!next || next === old) {
+      toast("No other side right now");
+      return;
+    }
+    offers[i] = next;
+    if (!state.sideOffers) state.sideOffers = {};
+    state.sideOffers[dayKey] = offers;
+    const sel = getDaySideSel(dayKey);
+    if (sel.includes(old)) setDaySideSel(dayKey, sel.filter((x) => x !== old));
+    save();
+    render();
+    toast("New side: " + ((SIDE_BY_ID[next] && SIDE_BY_ID[next].alt) || next));
+  }
+
+  function kathySidesBlockHTML(day, dish) {
+    if (!dish || day.kind !== "cook") return "";
+    const dayKey = String(day.i);
+    const offers = ensureKathySideOffers(dayKey, dish);
+    if (!offers.length) return "";
+    const sel = new Set(getDaySideSel(dayKey));
+    const SR = window.SideRegen;
+    const locked = !!state.weekLocked;
+    const slots = offers
+      .map((id, slot) => {
+        const meta = SIDE_BY_ID[id];
+        if (!meta) return "";
+        const on = sel.has(id);
+        const pick =
+          `<button type="button" class="side-pick" data-side-pick="${esc(dayKey)}" data-side-id="${esc(id)}" aria-pressed="${on}">` +
+          `<img src="${esc(meta.src)}" alt="" loading="lazy"><span class="sn">${esc(meta.alt)}</span></button>`;
+        if (SR) {
+          return SR.slotHTML({
+            bodyHtml: pick,
+            dayKey,
+            slotIndex: slot,
+            selected: on,
+            large: true,
+            locked,
+          });
+        }
+        return pick;
+      })
+      .join("");
+    return `<div class="block kathy-sides"><h4>Suggested sides</h4><div class="kathy-side-slots" data-sides-day="${esc(dayKey)}">${slots}</div></div>`;
   }
 
   function filterPool() {
@@ -514,6 +625,8 @@
       checked: Object.assign({}, state.checked),
       grocery: (groceryItems || []).filter((it) => !it.custom && !it.standing).map((it) => ({ id: it.id, name: it.name, qty: it.qty, aisle: it.aisle, price: it.price })),
       customGrocery: JSON.parse(JSON.stringify(state.customGrocery || [])),
+      daySides: JSON.parse(JSON.stringify(state.daySides || {})),
+      sideOffers: JSON.parse(JSON.stringify(state.sideOffers || {})),
       stockProduce: JSON.parse(JSON.stringify(state.stockProduce || [])),
       munchies: JSON.parse(JSON.stringify(state.munchies || [])),
       haveIt: JSON.parse(JSON.stringify(state.haveIt || {})),
@@ -1081,10 +1194,7 @@
       body += `<p class="meta-line">Seasoning: ${esc(dish.season)}. ${esc(dish.fiber)}.</p>`;
       if (dish.twist) body += `<div class="block"><h4>New twist on a classic</h4><p>${esc(dish.twist)}</p></div>`;
       if (dish.quickSwap) body += `<div class="block"><h4>Quick swap</h4><p>${esc(dish.quickSwap)}</p></div>`;
-      const sides = sidePhotosFor(dish);
-      if (sides.length) {
-        body += `<div class="side-photos" aria-label="Side ideas">${sides.map((s) => `<figure><img src="${esc(s.src)}" alt="${esc(s.alt)}" loading="lazy"><figcaption>${esc(s.alt)}</figcaption></figure>`).join("")}</div>`;
-      }
+      body += kathySidesBlockHTML(day, dish);
     }
     if (open && dish) {
       body += `<div class="block"><h4>Parts</h4><ul>${(dish.parts || []).map((p) => `<li>${esc(p)}</li>`).join("")}</ul></div>`;
@@ -1415,6 +1525,27 @@
     });
     document.querySelectorAll("[data-swap]").forEach((b) => {
       b.onclick = () => { if (!state.weekLocked) openSwap(+b.dataset.swap); };
+    });
+    document.querySelectorAll("[data-side-pick]").forEach((b) => {
+      b.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (state.weekLocked) return;
+        const dayKey = b.dataset.sidePick;
+        const id = b.dataset.sideId;
+        const cur = getDaySideSel(dayKey);
+        if (cur.includes(id)) setDaySideSel(dayKey, cur.filter((x) => x !== id));
+        else setDaySideSel(dayKey, [...cur, id]);
+        save();
+        render();
+      };
+    });
+    document.querySelectorAll("[data-regen-day]").forEach((b) => {
+      b.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        regenerateKathySideSlot(b.dataset.regenDay, b.dataset.regenSlot);
+      };
     });
     document.querySelectorAll("[data-rate]").forEach((row) => {
       row.querySelectorAll("button").forEach((btn) => {

@@ -1538,6 +1538,7 @@
     groceryDayFilter: "all",
     lastGentleAt: null,
     daySides: {},
+    sideOffers: {},
     weekLocked: false,
     lockedWeek: null,
     focusDayId: null,
@@ -2284,7 +2285,7 @@
   const SIDE_ITEMS = {
     broccoli: { name: "Broccoli", priceKey: "broccoli", category: "Produce", kcal: 50 },
     "baked-potato": { name: "Baked potato", priceKey: "potatoes", category: "Produce", kcal: 160 },
-    fries: { name: "Fries / chips", priceKey: "fries", category: "Frozen", kcal: 250 },
+    fries: { name: "Fries or chips", priceKey: "fries", category: "Frozen", kcal: 250 },
     salad: { name: "Side salad", priceKey: "salad", category: "Produce", kcal: 180 },
     rice: { name: "Rice", priceKey: "rice", category: "Pantry", kcal: 210 },
     "green-beans": { name: "Green beans", priceKey: "beans", category: "Produce", kcal: 40 },
@@ -2301,8 +2302,8 @@
   // Extend estimate catalog for sides not already in FAM_PRICES
   Object.assign(FAM_PRICES, {
     asparagus: { n: "Asparagus", q: "1 bunch", a: 2.99, p: 4.49 },
-    "garlic-bread": { n: "Garlic bread / Texas toast", q: "1 box", a: 2.49, p: 3.99 },
-    fries: { n: "Frozen fries / tots", q: "1 bag", a: 2.49, p: 3.99 },
+    "garlic-bread": { n: "Garlic bread or Texas toast", q: "1 box", a: 2.49, p: 3.99 },
+    fries: { n: "Frozen fries or tots", q: "1 bag", a: 2.49, p: 3.99 },
     "black-beans": { n: "Black beans (can)", q: "2 cans", a: 1.58, p: 2.38 },
     chips: { n: "Potato chips", q: "1 bag", a: 2.19, p: 5.49 },
     "sweet-potatoes": FAM_PRICES["sweet-potatoes"] || { n: "Sweet potatoes", q: "3 lb", a: 2.49, p: 3.99 },
@@ -2738,23 +2739,87 @@
       `<span class="emo-fb" style="display:none" aria-hidden="true">${emo}</span>` +
       `<span class="sn">${escapeHtml(meta.name)}</span></button>`;
   }
-function sidesBlockHTML(dayId, day) {
-    if (day.overrideType === "holiday" || day.overrideType === "removed" || day.overrideType === "pickmeal" || day.overrideType === "eatout") return "";
-    const added = getDaySides(dayId);
-    const fixed = fixedSidesForDinner(day.dinner).filter((id) => !added.includes(id));
-    const liked = likedSideIds([...fixed, ...added]);
-    if (!fixed.length && !liked.length && !added.length) {
-      // still show fixed defaults even if empty filter somehow
-      const fb = fixedSidesForDinner(day.dinner);
-      if (!fb.length) return "";
+function ensureSideOffers(dayId, day) {
+    if (!state.sideOffers) state.sideOffers = {};
+    const seed = fixedSidesForDinner(day && day.dinner);
+    if (!seed.length) {
+      delete state.sideOffers[dayId];
+      return [];
     }
-    const btn = (id, on) => sideTileHTML(id, on, dayId);
-    const fixedShow = fixedSidesForDinner(day.dinner);
-    if (!fixedShow.length && !liked.length && !added.length) return "";
+    let cur = Array.isArray(state.sideOffers[dayId]) ? state.sideOffers[dayId].filter((id) => SIDE_ITEMS[id]) : [];
+    if (!cur.length) cur = seed.slice();
+    // Keep at least seed length slots
+    while (cur.length < seed.length) {
+      const pool = Object.keys(SIDE_ITEMS);
+      const next = (window.SideRegen && SideRegen.pickReplacement(pool, cur)) || seed[cur.length % seed.length];
+      if (!next || cur.includes(next)) break;
+      cur.push(next);
+    }
+    state.sideOffers[dayId] = cur.slice(0, 6);
+    return state.sideOffers[dayId];
+  }
+
+  function regenerateSideSlot(dayId, slotIndex) {
+    if (state.weekLocked) {
+      showToast("Unlock the week to change sides.");
+      return;
+    }
+    if (!state.sideOffers) state.sideOffers = {};
+    const offers = (state.sideOffers[dayId] || []).slice();
+    const i = Number(slotIndex);
+    if (!Number.isFinite(i) || i < 0 || i >= offers.length) return;
+    const old = offers[i];
+    const pool = Object.keys(SIDE_ITEMS);
+    const SR = window.SideRegen;
+    const next = SR
+      ? SR.pickReplacement(pool, offers, old)
+      : pool.find((id) => id !== old && !offers.includes(id)) || null;
+    if (!next || next === old) {
+      showToast("No other side right now");
+      return;
+    }
+    offers[i] = next;
+    state.sideOffers[dayId] = offers;
+    // Selected stays unless THIS slot is regenerated
+    const sel = getDaySides(dayId);
+    if (sel.includes(old)) setDaySides(dayId, sel.filter((x) => x !== old));
+    persist();
+    renderAll();
+    showToast("New side: " + (SIDE_ITEMS[next] && SIDE_ITEMS[next].name ? SIDE_ITEMS[next].name : next));
+  }
+
+  function sidesBlockHTML(dayId, day) {
+    if (day.overrideType === "holiday" || day.overrideType === "removed" || day.overrideType === "pickmeal" || day.overrideType === "eatout") return "";
+    const offers = ensureSideOffers(dayId, day);
+    const added = getDaySides(dayId);
+    const liked = likedSideIds([...offers, ...added]);
+    if (!offers.length && !liked.length && !added.length) return "";
+    const SR = window.SideRegen;
+    const locked = !!state.weekLocked;
+    const offerSlots = offers
+      .map((id, slot) => {
+        const tile = sideTileHTML(id, added.includes(id), dayId);
+        if (SR) {
+          return SR.slotHTML({
+            bodyHtml: tile,
+            dayKey: dayId,
+            slotIndex: slot,
+            selected: added.includes(id),
+            locked,
+          });
+        }
+        return tile;
+      })
+      .join("");
+    const likedRow = liked.length
+      ? `<span class="sides-lbl">From meals you liked</span><div class="sides-row">${liked
+          .map((id) => sideTileHTML(id, added.includes(id), dayId))
+          .join("")}</div>`
+      : "";
     return `<div class="sides-block" data-sides-day="${escapeAttr(dayId)}">
       <span class="sides-lbl">Suggested sides</span>
-      <div class="sides-row">${fixedShow.map((id) => btn(id, added.includes(id))).join("")}</div>
-      ${liked.length ? `<span class="sides-lbl">From meals you liked</span><div class="sides-row">${liked.map((id) => btn(id, added.includes(id))).join("")}</div>` : ""}
+      <div class="sides-row">${offerSlots}</div>
+      ${likedRow}
     </div>`;
   }
 
@@ -2762,7 +2827,15 @@ function sidesBlockHTML(dayId, day) {
     card.querySelectorAll("[data-side]").forEach((b) => {
       b.addEventListener("click", (e) => {
         e.stopPropagation();
+        if (state.weekLocked) return;
         toggleDaySide(b.dataset.day, b.dataset.side);
+      });
+    });
+    card.querySelectorAll("[data-regen-day]").forEach((b) => {
+      b.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        regenerateSideSlot(b.dataset.regenDay, b.dataset.regenSlot);
       });
     });
   }
@@ -3585,6 +3658,13 @@ function sidesBlockHTML(dayId, day) {
       Object.keys(parsed.daySides).forEach((d) => {
         const arr = parsed.daySides[d];
         if (Array.isArray(arr)) base.daySides[d] = arr.map(String).filter(Boolean).slice(0, 6);
+      });
+    }
+    base.sideOffers = {};
+    if (parsed.sideOffers && typeof parsed.sideOffers === "object") {
+      Object.keys(parsed.sideOffers).forEach((d) => {
+        const arr = parsed.sideOffers[d];
+        if (Array.isArray(arr)) base.sideOffers[d] = arr.map(String).filter(Boolean).slice(0, 6);
       });
     }
     // Lock + standing grocery + meat alts. must survive reload (was dropped → remount wipe)
@@ -6864,6 +6944,7 @@ function sidesBlockHTML(dayId, day) {
       weekTitle: state.weekTitle || (els.weekLabel && els.weekLabel.value) || "",
       dayOverrides: JSON.parse(JSON.stringify(state.dayOverrides || {})),
       daySides: JSON.parse(JSON.stringify(state.daySides || {})),
+      sideOffers: JSON.parse(JSON.stringify(state.sideOffers || {})),
       custom: JSON.parse(JSON.stringify(state.custom || [])),
       stockProduce: JSON.parse(JSON.stringify(state.stockProduce || [])),
       munchies: JSON.parse(JSON.stringify(state.munchies || [])),
