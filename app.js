@@ -881,6 +881,19 @@
         swapped: true,
       };
     }
+    if (ov.type === "removed") {
+      return {
+        ...templateDay,
+        dinner: "Removed from this week",
+        icon: "🚫",
+        mealEmoji: "🚫",
+        adultLunch: "adult lunch → —",
+        tedNote: "",
+        recipe: { title: "Removed from this week", have: "a free night", steps: ["This night was removed from the week.", "Its grocery lines are off the list. Tap Swap to pick something."], enjoy: "Night off.", buy: "none" },
+        overrideType: "removed",
+        swapped: true,
+      };
+    }
     if (ov.type === "pick" && ov.key) {
       const parsed = parseDinnerKey(ov.key);
       if (!parsed) return { ...templateDay, overrideType: null, swapped: false };
@@ -1266,6 +1279,7 @@
       if (!ov) return;
       if (ov.type === "leftovers") acc[dayId] = { t: "l" };
       else if (ov.type === "eatout") acc[dayId] = { t: "e" };
+      else if (ov.type === "removed") acc[dayId] = { t: "r" };
       else if (ov.type === "pick" && ov.key) acc[dayId] = { t: "p", k: ov.key };
     });
     return acc;
@@ -1345,7 +1359,7 @@
   }
   /* prep / cook badge beside the big emoji */
   function prepCookFor(day) {
-    if (day.overrideType === "eatout") return null;
+    if (day.overrideType === "eatout" || day.overrideType === "removed") return null;
     if (day.overrideType === "leftovers") return [2, 5, true];
     const d = String(day.dinner || "").toLowerCase();
     const rules = [
@@ -1363,7 +1377,7 @@
     const mins = (n) => (n >= 60 ? `~${Math.round(n / 60)} hr` : `~${n} min`);
     return `<span class="pc" aria-label="Prep ${pc[0]} minutes, ${pc[2] ? "reheat" : "cook"} ${pc[1]} minutes"><span>🔪 Prep ${mins(pc[0])}</span><span>🔥 ${pc[2] ? "Reheat" : "Cook"} ${mins(pc[1])}</span></span>`;
   }
-  /* ratings: 👎 tried it, no · 👍 good · 👍👍 favorite (keyed by dinner name) */
+  /* ratings: 👎 tried it, no · 👍 good · ❤️ favorite (level 2; old 👍👍 saves are level 2 too, so they show as ❤️) (keyed by dinner name) */
   function rateKey(name) {
     return String(name || "").trim().toLowerCase().slice(0, 80);
   }
@@ -1373,7 +1387,7 @@
     Object.keys(src).forEach((k) => {
       const v = src[k];
       const r = Number(v && v.r);
-      if (r === -1 || r === 1 || r === 2) out[rateKey(k)] = { r, d: typeof v.d === "string" ? v.d.slice(0, 10) : "", n: typeof v.n === "string" ? v.n.slice(0, 80) : k };
+      if (r === -1 || r === 1 || r === 2) { out[rateKey(k)] = { r, d: typeof v.d === "string" ? v.d.slice(0, 10) : "", n: typeof v.n === "string" ? v.n.slice(0, 80) : k }; if (r === -1 && v.x) out[rateKey(k)].x = 1; }
     });
     return out;
   }
@@ -1386,13 +1400,14 @@
   function sortBySuggest(list) {
     return list.map((d, i) => [d, i]).sort((x, y) => (ratingOf(y[0].day.dinner) - ratingOf(x[0].day.dinner)) || x[1] - y[1]).map((x) => x[0]);
   }
-  function setRating(name, r) {
+  function setRating(name, r, forGood) {
     const k = rateKey(name);
     if (!state.ratings) state.ratings = {};
-    if (!r || (state.ratings[k] && state.ratings[k].r === r)) delete state.ratings[k];
+    if (!r || (state.ratings[k] && state.ratings[k].r === r && !forGood)) delete state.ratings[k];
     else {
       const t = new Date();
       state.ratings[k] = { r, d: `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`, n: String(name).slice(0, 80) };
+      if (forGood) state.ratings[k].x = 1;
     }
     persist();
     renderAll();
@@ -1402,14 +1417,14 @@
     return `<div class="rate-row" role="group" aria-label="Rate this dinner after you make it"><span>Made it? Rate it:</span>
       <button type="button" data-rate="-1" aria-pressed="${r === -1}" title="Tried it, no">👎</button>
       <button type="button" data-rate="1" aria-pressed="${r === 1}" title="Good">👍</button>
-      <button type="button" data-rate="2" aria-pressed="${r === 2}" title="Favorite">👍👍</button></div>`;
+      <button type="button" data-rate="2" aria-pressed="${r === 2}" title="Favorite">❤️</button></div>`;
   }
   function bindRateRow(root, name) {
     root.querySelectorAll("[data-rate]").forEach((b) => b.addEventListener("click", (e) => {
       e.stopPropagation();
       const r = Number(b.dataset.rate);
       setRating(name, r);
-      showToast(ratingOf(name) === 0 ? "Rating cleared" : r === -1 ? "👎 Hidden from Swap picks (restore in My ratings)" : r === 2 ? "⭐ Favorite — suggested first" : "👍 Saved");
+      showToast(ratingOf(name) === 0 ? "Rating cleared" : r === -1 ? "👎 Moved to Removed meals (hidden from Swap; tap Restore to bring it back)" : r === 2 ? "❤️ Favorite — suggested first" : "👍 Saved");
     }));
   }
   function renderRatings() {
@@ -1417,13 +1432,13 @@
     if (!box) return;
     const all = Object.keys(state.ratings || {}).map((k) => ({ k, ...state.ratings[k] }));
     const grp = (r) => all.filter((x) => x.r === r).sort((a, b) => (b.d || "").localeCompare(a.d || ""));
-    const row = (x, restore) => `<li><span>${escapeHtml(x.n || x.k)}</span><small>${x.d ? escapeHtml(x.d) : ""}</small>${restore ? `<button type="button" class="chip-btn" data-restore="${escapeAttr(x.k)}">Restore</button>` : `<button type="button" class="chip-btn" data-clear="${escapeAttr(x.k)}">Clear</button>`}</li>`;
+    const row = (x, restore) => `<li><span>${escapeHtml(x.n || x.k)}${restore ? ` <small>${x.x ? "🗑 removed for good" : "👎 tried it, no"}</small>` : ""}</span><small>${x.d ? escapeHtml(x.d) : ""}</small>${restore ? `<button type="button" class="chip-btn" data-restore="${escapeAttr(x.k)}">Restore</button>` : `<button type="button" class="chip-btn" data-clear="${escapeAttr(x.k)}">Clear</button>`}</li>`;
     const fav = grp(2), good = grp(1), down = grp(-1);
     box.innerHTML = all.length
-      ? `${fav.length ? `<h3>⭐ Favorites (👍👍)</h3><ul>${fav.map((x) => row(x)).join("")}</ul>` : ""}
+      ? `${fav.length ? `<h3>⭐ Favorites (❤️)</h3><ul>${fav.map((x) => row(x)).join("")}</ul>` : ""}
          ${good.length ? `<h3>👍 Good</h3><ul>${good.map((x) => row(x)).join("")}</ul>` : ""}
-         ${down.length ? `<h3>👎 Removed meals</h3><p class="muted2" style="margin-top:0">Hidden from Swap picks and suggestions. Tap Restore to bring one back.</p><ul>${down.map((x) => row(x, true)).join("")}</ul>` : ""}`
-      : `<p class="muted2">No ratings yet. After you make a dinner, tap 👎 / 👍 / 👍👍 on its day card.</p>`;
+         ${down.length ? `<h3>🗑 Removed meals</h3><p class="muted2" style="margin-top:0">Rated 👎 or removed from the menu for good. Hidden from suggestions and Swap. Tap Restore to bring one back.</p><ul>${down.map((x) => row(x, true)).join("")}</ul>` : ""}`
+      : `<p class="muted2">No ratings yet. After you make a dinner, tap 👎 / 👍 / ❤️ on its day card. ❤️ = ⭐ favorite, suggested first.</p>`;
     box.querySelectorAll("[data-restore],[data-clear]").forEach((b) => b.addEventListener("click", () => {
       delete state.ratings[b.dataset.restore || b.dataset.clear];
       persist();
@@ -1493,6 +1508,8 @@
         out[dayId] = { type: "leftovers" };
       } else if (ov.type === "eatout" || ov.t === "e") {
         out[dayId] = { type: "eatout" };
+      } else if (ov.type === "removed" || ov.t === "r") {
+        out[dayId] = { type: "removed" };
       } else if ((ov.type === "pick" || ov.t === "p") && (ov.key || ov.k)) {
         const key = ov.key || ov.k;
         if (parseDinnerKey(key)) out[dayId] = { type: "pick", key };
@@ -1571,6 +1588,7 @@
         if (!ov) return acc;
         if (ov.type === "leftovers") acc[dayId] = { t: "l" };
         else if (ov.type === "eatout") acc[dayId] = { t: "e" };
+        else if (ov.type === "removed") acc[dayId] = { t: "r" };
         else if (ov.type === "pick" && ov.key) acc[dayId] = { t: "p", k: ov.key };
         return acc;
       }, {}),
@@ -1584,7 +1602,7 @@
         : undefined,
       st: state.store !== "best" ? state.store : undefined,
       rt: Object.keys(state.ratings || {}).length
-        ? Object.keys(state.ratings).reduce((acc, k) => { acc[k] = [state.ratings[k].r, state.ratings[k].d]; return acc; }, {})
+        ? Object.keys(state.ratings).reduce((acc, k) => { acc[k] = state.ratings[k].x ? [state.ratings[k].r, state.ratings[k].d, 1] : [state.ratings[k].r, state.ratings[k].d]; return acc; }, {})
         : undefined,
       $: Object.keys(state.prices).reduce((acc, id) => {
         const n = Number(state.prices[id]);
@@ -1636,7 +1654,7 @@
         const r = {};
         Object.keys(payload.rt).forEach((k) => {
           const v = payload.rt[k];
-          if (Array.isArray(v)) r[k] = { r: v[0], d: v[1] };
+          if (Array.isArray(v)) r[k] = { r: v[0], d: v[1], x: v[2] };
         });
         next.ratings = normalizeRatings(r);
       }
@@ -1781,6 +1799,8 @@
               ? "Swapped → Leftovers"
               : day.overrideType === "eatout"
                 ? "Swapped → Eat out"
+                : day.overrideType === "removed"
+                ? "🗑 Removed from this week"
                 : `Swapped → ${escapeHtml(day.swapLabel || "dinner")}`
           }</p>`
         : "";
@@ -1789,6 +1809,7 @@
           <span>${day.short}</span>
           <div class="day-head-actions">
             <button type="button" class="swap-btn" data-swap-day="${escapeAttr(templateDay.id)}" aria-label="Swap ${escapeAttr(day.day)} dinner">Swap</button>
+            <button type="button" class="swap-btn del-btn" data-del-day="${escapeAttr(templateDay.id)}" aria-label="Delete ${escapeAttr(day.day)} dinner">🗑</button>
             <span class="emoji" aria-hidden="true">${day.icon}</span>
           </div>
         </div>
@@ -1800,13 +1821,17 @@
           ${adultLine}
           <p class="tap-hint">Day note · tap for recipe</p>
         </button>
-        ${day.overrideType === "eatout" ? "" : rateRowHTML(day.dinner)}
+        ${day.overrideType === "eatout" || day.overrideType === "removed" ? "" : rateRowHTML(day.dinner)}
       `;
       card.querySelector(".day-body-btn").addEventListener("click", () => openRecipe(day));
       bindRateRow(card, day.dinner);
-      card.querySelector(".swap-btn").addEventListener("click", (e) => {
+      card.querySelector("[data-swap-day]").addEventListener("click", (e) => {
         e.stopPropagation();
         openSwapPicker(templateDay.id);
+      });
+      card.querySelector("[data-del-day]").addEventListener("click", (e) => {
+        e.stopPropagation();
+        openDeleteDay(templateDay.id);
       });
       els.weekGrid.appendChild(card);
     });
@@ -2333,6 +2358,86 @@
     return escapeHtml(str).replace(/'/g, "&#39;");
   }
 
+  /* ---- 🗑 Delete a night: Remove from this week (5-sec Undo) or Remove from menu for good (confirm) ---- */
+  function showUndoToast(message, undo) {
+    els.toast.innerHTML = `<span>${escapeHtml(message)}</span><button type="button" class="toast-undo">Undo</button>`;
+    els.toast.classList.add("show");
+    clearTimeout(showToast._t);
+    els.toast.querySelector(".toast-undo").addEventListener("click", () => {
+      clearTimeout(showToast._t);
+      els.toast.classList.remove("show");
+      undo();
+    });
+    showToast._t = setTimeout(() => els.toast.classList.remove("show"), 5000);
+  }
+  function todayIso() {
+    const t = new Date();
+    return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+  }
+  function openDeleteDay(dayId) {
+    const td = currentPlan().days.find((d) => d.id === dayId);
+    if (!td) return;
+    const day = effectiveDay(td);
+    const special = ["leftovers", "eatout", "removed"].includes(day.overrideType);
+    const inn = openSheet(shTop(`🗑 Delete ${td.day} dinner`) + `
+      <p style="margin:0 0 10px;font-weight:800">${day.mealEmoji} ${escapeHtml(day.dinner)}</p>
+      <button type="button" class="sh-btn wide" data-rm="week" ${day.overrideType === "removed" ? "disabled" : ""}>Remove from this week</button>
+      <p class="muted2" style="margin:4px 0 12px">Frees up this night and takes its grocery lines off the list. You get 5 seconds to Undo.</p>
+      <button type="button" class="sh-btn wide danger" data-rm="good" ${special ? "disabled" : ""}>Remove from menu for good</button>
+      <p class="muted2" style="margin:4px 0 0">${special ? "Only real dinners can be removed for good (this night isn't one)." : `Moves “${escapeHtml(day.dinner)}” to Removed meals. It won't be suggested or offered in Swap. Tap Restore there anytime.`}</p>`, "Delete dinner");
+    inn.querySelector('[data-rm="week"]').addEventListener("click", () => {
+      const prev = state.dayOverrides[dayId];
+      state.dayOverrides[dayId] = { type: "removed" };
+      persist(); closeSheet(); renderAll();
+      showUndoToast(`Removed from this week: ${td.short}`, () => {
+        if (prev) state.dayOverrides[dayId] = prev; else delete state.dayOverrides[dayId];
+        persist(); renderAll(); showToast("Undone — it's back on the week");
+      });
+    });
+    if (!special) inn.querySelector('[data-rm="good"]').addEventListener("click", () => confirmRemoveForGood(day.dinner));
+  }
+  function confirmRemoveForGood(name) {
+    const inn = openSheet(shTop("Remove for good?") + `
+      <p style="margin:0 0 8px;font-weight:800">Remove “${escapeHtml(name)}” from your menu for good?</p>
+      <p class="muted2" style="margin:0 0 10px">It moves to <b>Removed meals</b> and won't be suggested or offered in Swap. You can tap Restore there anytime.</p>
+      <div class="sh-row2"><button type="button" class="sh-btn" data-c="no">Cancel</button><button type="button" class="sh-btn danger" data-c="yes">Remove for good</button></div>`, "Confirm remove from menu for good");
+    inn.querySelector('[data-c="no"]').addEventListener("click", closeSheet);
+    inn.querySelector('[data-c="yes"]').addEventListener("click", () => {
+      const k = rateKey(name);
+      if (!state.ratings) state.ratings = {};
+      state.ratings[k] = { r: -1, d: todayIso(), n: String(name).slice(0, 80), x: 1 };
+      currentPlan().days.forEach((td) => {
+        if (rateKey(effectiveDay(td).dinner) === k) state.dayOverrides[td.id] = { type: "removed" };
+      });
+      persist(); closeSheet(); renderAll();
+      showToast("Removed from menu for good — Restore it in Removed meals");
+    });
+  }
+  /* ---- 📷 after Copy: take a photo and share it with what you copied (Web Share; nothing uploaded) ---- */
+  const copyPhotoFiles = [];
+  let copyPhotoOpts = null;
+  function showCopyPhoto(text, label) {
+    const box = document.getElementById("copy-photo");
+    if (!box) return;
+    box.hidden = false;
+    if (!copyPhotoOpts) {
+      box.innerHTML = `<p class="cph-t" data-cpl></p>
+        <button type="button" class="btn btn-secondary cph-btn" data-cpb>📷 Take a photo</button>
+        <input type="file" accept="image/*" capture="environment" hidden data-cpin>
+        <div class="thumbs cph-th" data-cpth></div><div data-cpact></div>
+        <p class="muted2">Opens your camera. Snap the fridge, pantry or a receipt, then tap Share to send it with what you copied. Nothing is uploaded; Share just opens your phone's share sheet.</p>`;
+      box.querySelector("[data-cpb]").addEventListener("click", () => box.querySelector("[data-cpin]").click());
+      copyPhotoOpts = {
+        inputs: [box.querySelector("[data-cpin]")], thumbs: box.querySelector("[data-cpth]"), act: box.querySelector("[data-cpact]"),
+        files: copyPhotoFiles, btnClass: "sh-btn p wide", shareLabel: "Share", title: "Burns Family Meals", text: text, after: "",
+        fallback: "Your browser can't open the share sheet here. Save the photo (long-press → Save) and send it with your message.",
+      };
+      attachShare(copyPhotoOpts);
+    }
+    copyPhotoOpts.text = text;
+    box.querySelector("[data-cpl]").textContent = `✓ ${label} Want to send a photo with it?`;
+  }
+
   function renderAll() {
     els.weekLabel.value = state.weekTitle;
     renderTemplates();
@@ -2441,10 +2546,14 @@
     });
 
     els.copyShare.addEventListener("click", () => {
-      copyText(shareUrl(), "Share link copied — text it to Ted or Samantha");
+      const t = shareUrl();
+      copyText(t, "Share link copied — text it to Ted or Samantha");
+      showCopyPhoto(t, "Share link copied.");
     });
     els.copyGrocery.addEventListener("click", () => {
-      copyText(groceryText(), "Grocery list copied for iMessage/SMS");
+      const t = groceryText();
+      copyText(t, "Grocery list copied for iMessage/SMS");
+      showCopyPhoto(t, "Grocery list copied.");
     });
     els.shopMode.addEventListener("click", () => {
       state.shopMode = !state.shopMode;

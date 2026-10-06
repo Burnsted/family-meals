@@ -1288,3 +1288,13 @@ body.shop-mode .price-input {
 .ratings-panel li { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0; border-bottom: 1px dashed rgba(23, 48, 66, 0.12); font-weight: 700; }
 .ratings-panel li span { flex: 1; }
 .ratings-panel li small { color: var(--ink-soft); font-weight: 650; }
+
+/* v4: delete beside Swap, undo toast, photo after copy */
+.del-btn { font-size: 0.95rem; padding-left: 0.55rem; padding-right: 0.55rem; letter-spacing: 0; }
+.sh-btn.danger { background: #b9441c; color: #fff; border-color: transparent; }
+.sh-btn:disabled { opacity: 0.45; cursor: default; }
+.toast .toast-undo { margin-left: 0.7rem; background: #fff; color: var(--teal-deep); border: 0; border-radius: 10px; padding: 0.45rem 0.85rem; font: inherit; font-weight: 900; cursor: pointer; }
+.copy-photo { background: var(--white); border: 2px dashed rgba(15, 110, 110, 0.35); border-radius: 16px; padding: 0.8rem 1rem; margin: 0 0 1rem; box-shadow: var(--shadow); }
+.cph-t { margin: 0 0 0.5rem; font-weight: 800; color: var(--teal-deep); }
+.cph-btn { width: 100%; }
+.cph-th img { width: 100% !important; height: auto !important; max-height: 240px; object-fit: cover; }
