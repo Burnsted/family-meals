@@ -1479,3 +1479,214 @@ body.shop-mode .price-input {
 .cph-t { margin: 0 0 0.5rem; font-weight: 800; color: var(--teal-deep); }
 .cph-btn { width: 100%; }
 .cph-th img { width: 100% !important; height: auto !important; max-height: 240px; object-fit: cover; }
+
+/* ===== CRITICAL: monochrome line SVG icons (prevents black filled blobs) ===== */
+.ico {
+  width: 20px;
+  height: 20px;
+  display: block;
+  flex-shrink: 0;
+  fill: none !important;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+  pointer-events: none;
+}
+.ico * {
+  fill: none !important;
+  stroke: inherit;
+  stroke-width: inherit;
+  stroke-linecap: inherit;
+  stroke-linejoin: inherit;
+}
+/* filled dots on cart icon only — keep stroke circles */
+.ico circle[r="1.5"] {
+  fill: currentColor !important;
+  stroke: none;
+}
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.rcpt-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+  position: relative;
+}
+.rcpt-btn.icon-btn {
+  color: #fff;
+}
+.rcpt-btn .ico {
+  stroke: #fff;
+  width: 20px;
+  height: 20px;
+}
+.gear-btn {
+  appearance: none;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--teal-deep);
+  cursor: pointer;
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.gear-btn:hover,
+.gear-btn:focus-visible {
+  opacity: 0.85;
+  outline: none;
+}
+.gear-btn .ico { width: 20px; height: 20px; stroke: currentColor; }
+
+.cal-btn.icon-btn,
+.repeat-btn.icon-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 2px solid var(--teal);
+  border-radius: 14px;
+  background: var(--white);
+  color: var(--teal-deep);
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(15, 110, 110, 0.16);
+  font-size: 0; /* hide any leftover glyph */
+}
+.cal-btn .ico,
+.repeat-btn .ico {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+}
+.cal-btn:focus-visible,
+.repeat-btn:focus-visible {
+  outline: 3px solid var(--coral);
+  outline-offset: 2px;
+}
+
+.month-arrow.icon-btn {
+  appearance: none;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+  border: 2px solid rgba(15, 110, 110, 0.3);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--teal-deep);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.month-arrow .ico {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+}
+.month-ctrl {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  position: relative;
+}
+.month-name-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-weight: 800;
+  color: var(--teal-deep);
+  cursor: pointer;
+  min-height: 40px;
+  padding: 0.25rem 0.45rem;
+}
+.month-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 8;
+  background: #fff;
+  border: 2px solid rgba(15, 110, 110, 0.25);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  min-width: 12rem;
+  padding: 0.25rem;
+}
+.month-menu button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-align: left;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.88rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--ink);
+}
+.month-menu .ico { stroke: currentColor; }
+
+.btn.icon-btn .ico {
+  stroke: currentColor;
+  width: 18px;
+  height: 18px;
+}
+.btn-primary.icon-btn .ico { stroke: #fff; }
+
+.cart-btn.icon-btn {
+  appearance: none;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+}
+.cart-btn .ico { stroke: #fff; width: 20px; height: 20px; }
+
+.hero-card {
+  text-align: center;
+  padding: 1rem 1rem 1.1rem;
+  margin: 0 0 1rem;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(15, 110, 110, 0.18), transparent 42%),
+    radial-gradient(circle at 90% 20%, rgba(212, 87, 42, 0.14), transparent 40%),
+    linear-gradient(165deg, #fffaf4 0%, #e7f4ef 55%, #f7efe4 100%);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(15, 110, 110, 0.12);
+}
+.week-label-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
