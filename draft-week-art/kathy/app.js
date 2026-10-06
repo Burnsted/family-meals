@@ -55,7 +55,14 @@
       lockedWeek: null,
       focusDay: null,
       customGrocery: [],
-      showHome: true,
+      showHome: false,
+      haveIt: {},
+      showHiddenHave: false,
+      stockProduce: [],
+      munchies: [],
+      itemAlts: {},
+      meatAlts: {},
+      openAltId: null,
     };
   }
 
@@ -67,7 +74,27 @@
     try {
       const j = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
       if (!j || typeof j !== "object") return defaultState();
-      return { ...defaultState(), ...j, skip: j.skip || [], comfort: j.comfort || [], mind: j.mind || [], stores: j.stores || ["Aldi"], favorites: j.favorites || {}, shelf: j.shelf || {}, checked: j.checked || {}, ratings: j.ratings || {}, log: j.log || {} };
+      const base = { ...defaultState(), ...j };
+      base.skip = j.skip || [];
+      base.comfort = j.comfort || [];
+      base.mind = j.mind || [];
+      base.stores = j.stores || ["Aldi"];
+      base.favorites = j.favorites || {};
+      base.shelf = j.shelf || {};
+      base.checked = j.checked || {};
+      base.ratings = j.ratings || {};
+      base.log = j.log || {};
+      base.customGrocery = Array.isArray(j.customGrocery) ? j.customGrocery : [];
+      base.stockProduce = Array.isArray(j.stockProduce) ? j.stockProduce : [];
+      base.munchies = Array.isArray(j.munchies) ? j.munchies : [];
+      base.itemAlts = j.itemAlts && typeof j.itemAlts === "object" ? j.itemAlts : {};
+      base.meatAlts = j.meatAlts && typeof j.meatAlts === "object" ? j.meatAlts : {};
+      base.haveIt = window.HaveItTimed
+        ? window.HaveItTimed.normalizeStore(j.haveIt)
+        : (j.haveIt && typeof j.haveIt === "object" ? j.haveIt : {});
+      // Never force home on load — mid-flow draft wins (Steve soft-bar)
+      base.showHome = false;
+      return base;
     } catch (_) {
       return defaultState();
     }
@@ -306,19 +333,22 @@
         if (why && !cur.why.includes(why)) cur.why.push(why);
         return;
       }
+      const id = "g-" + key.replace(/[^a-z0-9]+/g, "-");
+      const display = (state.itemAlts && state.itemAlts[id]) || g.name;
       map.set(key, {
-        id: "g-" + key.replace(/[^a-z0-9]+/g, "-"),
-        name: g.name,
+        id,
+        name: display,
+        baseName: g.name,
         qty: g.qty || "",
         aisle: g.aisle || "Other",
         why: why ? [why] : [],
         estimate: true,
         price: g.price != null && isFinite(Number(g.price)) ? Number(g.price) : null,
+        section: "Menu for this week",
       });
     };
     state.week.days.forEach((day) => {
       if (!day || day.light || !day.dishId) return;
-      // Include cook + leftover/reuse (same dish on week) so grocery matches meals on strip
       const d = dishById(day.dishId);
       if (!d) return;
       if (day.kind === "cook") {
@@ -328,9 +358,33 @@
     return [...map.values()];
   }
 
+  function itemHaveIt(id) {
+    const HIT = window.HaveItTimed;
+    if (!HIT) return Boolean(state.haveIt && state.haveIt[id]);
+    if (!state.haveIt) state.haveIt = {};
+    HIT.pruneExpired(state.haveIt);
+    return HIT.isSuppressed(state.haveIt[id]);
+  }
+  function setHaveIt(id, value, item) {
+    const HIT = window.HaveItTimed;
+    if (!state.haveIt) state.haveIt = {};
+    if (!value) {
+      if (HIT) HIT.clearHaveIt(state.haveIt, id);
+      else delete state.haveIt[id];
+      return;
+    }
+    if (HIT) HIT.markHaveIt(state.haveIt, id, item || { id }, Date.now());
+    else state.haveIt[id] = true;
+  }
+  function haveItHint(id) {
+    const HIT = window.HaveItTimed;
+    if (!HIT || !state.haveIt) return "";
+    return HIT.entryHint(state.haveIt[id]) || "";
+  }
+
   function groceryEstTotalHTML(items) {
-    /* Kathy: no store price map yet — omit dollar total; do not invent. */
-    const list = items || [];
+    /* Kathy: no invented prices — only user-entered / known prices count. */
+    const list = (items || []).filter((it) => !itemHaveIt(it.id));
     const priced = list.filter((it) => it.price != null && isFinite(Number(it.price)));
     if (!priced.length) {
       return `<div class="est-store-total" id="est-store-total" hidden></div>`;
@@ -341,6 +395,50 @@
     const main = store ? `$${sum.toFixed(2)} at ${esc(store)}` : `$${sum.toFixed(2)}`;
     const some = unpriced ? `<p class="muted">Some items unpriced</p>` : "";
     return `<div class="est-store-total" id="est-store-total"><p>${main}</p>${some}</div>`;
+  }
+
+  function grocerySectionsHTML(items) {
+    const IA = window.ItemAlts;
+    const SL = window.StandingLists;
+    const order = (SL && SL.SECTION_ORDER) || [
+      "Menu for this week", "Stock produce", "Miscellaneous munchies", "Menu extras",
+    ];
+    const visible = items.filter((it) => !(itemHaveIt(it.id) && !state.showHiddenHave));
+    const pickerHtml = (kind) => {
+      const catalog = kind === "stock" ? (SL && SL.STOCK_PRODUCE) || [] : (SL && SL.MUNCHIES) || [];
+      const list = kind === "stock" ? state.stockProduce || [] : state.munchies || [];
+      const on = new Set(list.map((x) => (x.name || "").toLowerCase()));
+      return `<div class="g-picker kathy-large">${catalog.map((name) => {
+        const isOn = on.has(name.toLowerCase());
+        return `<button type="button" class="${isOn ? "is-on" : ""}" data-stand-toggle="${esc(kind)}" data-stand-name="${esc(name)}" aria-pressed="${isOn}">${esc(name)}</button>`;
+      }).join("")}</div>
+      <div class="g-section-actions"><button type="button" class="btn btn-ghost" data-add-section="${esc(kind === "stock" ? "Stock produce" : "Miscellaneous munchies")}">+ Add item</button></div>`;
+    };
+    return order.map((sec) => {
+      const group = visible.filter((it) => (it.section || "Menu for this week") === sec);
+      const rows = group.map((it) => {
+        const have = itemHaveIt(it.id);
+        const alts = IA && IA.hasAlts(it.baseName || it.name) ? IA.altsFor(it.baseName || it.name) : [];
+        const chev = alts.length ? `<button type="button" class="item-alt-chip is-large" data-alt-item="${esc(it.id)}" aria-haspopup="listbox">${esc(it.name)} <span aria-hidden="true">▾</span></button>` : "";
+        return `<label class="g-item${state.checked[it.id] ? " checked" : ""}${it.custom ? " is-custom" : ""}${have ? " is-have-hidden" : ""}">
+          <input type="checkbox" data-gid="${esc(it.id)}" ${state.checked[it.id] ? "checked" : ""}>
+          <span>
+            <span class="g-name">${esc(it.name)}</span>${it.qty ? `<span class="muted"> · ${esc(it.qty)}</span>` : ""}${it.price != null ? `<span class="muted"> · $${Number(it.price).toFixed(2)}</span>` : ""}
+            ${chev}
+            <button type="button" class="linkish have-chip${have ? " is-on" : ""}" data-have="${esc(it.id)}">${have ? "Still need it" : "Have it"}</button>
+            ${have ? `<span class="have-back-hint">${esc(haveItHint(it.id))}</span>` : ""}
+            ${it.custom || it.standing ? ` <button type="button" class="linkish" data-del-custom="${esc(it.id)}" data-del-section="${esc(it.section || "")}">Remove</button>` : ""}
+            ${state.openAltId === it.id && alts.length ? IA.bubbleHTML("Swap for…", alts, it.name, true) : ""}
+          </span>
+        </label>`;
+      }).join("");
+      return `<div class="g-section-block kathy-large" data-section="${esc(sec)}">
+        <h3 class="g-section-title">${esc(sec)}</h3>
+        ${sec === "Stock produce" ? pickerHtml("stock") : ""}
+        ${sec === "Miscellaneous munchies" ? pickerHtml("munch") : ""}
+        ${rows || (sec === "Menu for this week" ? `<p class="muted">Menu lines come from this week's meals.</p>` : "")}
+      </div>`;
+    }).join("");
   }
 
   function voiceBar(questionText) {
@@ -416,8 +514,13 @@
       cookDays: state.cookDays,
       week: JSON.parse(JSON.stringify(state.week)),
       checked: Object.assign({}, state.checked),
-      grocery: (groceryItems || []).filter((it) => !it.custom).map((it) => ({ id: it.id, name: it.name, qty: it.qty, aisle: it.aisle })),
+      grocery: (groceryItems || []).filter((it) => !it.custom && !it.standing).map((it) => ({ id: it.id, name: it.name, qty: it.qty, aisle: it.aisle, price: it.price })),
       customGrocery: JSON.parse(JSON.stringify(state.customGrocery || [])),
+      stockProduce: JSON.parse(JSON.stringify(state.stockProduce || [])),
+      munchies: JSON.parse(JSON.stringify(state.munchies || [])),
+      haveIt: JSON.parse(JSON.stringify(state.haveIt || {})),
+      meatAlts: JSON.parse(JSON.stringify(state.meatAlts || {})),
+      itemAlts: JSON.parse(JSON.stringify(state.itemAlts || {})),
       daysSummary: order.map((i) => {
         const d = days[i];
         if (!d) return null;
@@ -567,7 +670,11 @@
 
 
   function isReturningUser() {
-    return !!(state.doneSetup || (state.week && state.week.days && state.week.days.length));
+    return !!(state.doneSetup || (state.week && state.week.days && state.week.days.length) ||
+      (state.customGrocery && state.customGrocery.length) ||
+      (state.stockProduce && state.stockProduce.length) ||
+      (state.munchies && state.munchies.length) ||
+      (state.setupStep && state.setupStep !== "first"));
   }
 
   function renderHome() {
@@ -576,7 +683,6 @@
     const HH = window.HomeHero;
     if (!HH) {
       state.showHome = false;
-      state.setupStep = "first";
       save();
       render();
       return;
@@ -587,12 +693,18 @@
     if (primary) primary.onclick = () => {
       state.showHome = false;
       if (isReturningUser()) {
-        state.doneSetup = true;
-        state.setupStep = "week";
-        if (!state.week) buildDefaultWeek();
+        // Resume saved week / mid-flow — do NOT wipe setupStep
+        if (state.week || state.doneSetup) {
+          state.doneSetup = true;
+          state.setupStep = "week";
+          if (!state.week) buildDefaultWeek();
+        }
+        // else keep current setupStep from autosave
       } else {
-        state.setupStep = "first";
-        state.doneSetup = false;
+        if (!state.setupStep || state.setupStep === "first") {
+          state.setupStep = "first";
+          state.doneSetup = false;
+        }
       }
       save();
       render();
@@ -601,7 +713,6 @@
     const photos = document.getElementById("home-setup-photos");
     if (photos) photos.onclick = () => {
       state.showHome = false;
-      state.doneSetup = false;
       state.setupStep = "fresh";
       save();
       render();
@@ -610,8 +721,11 @@
     const qs = document.getElementById("home-setup-questions");
     if (qs) qs.onclick = () => {
       state.showHome = false;
-      state.doneSetup = false;
-      state.setupStep = "first";
+      // Only jump to first if no mid-flow progress
+      if (!state.setupStep || state.setupStep === "week" || state.doneSetup) {
+        state.setupStep = "first";
+        state.doneSetup = false;
+      }
       save();
       render();
       window.scrollTo(0, 0);
@@ -1003,6 +1117,19 @@
     }
     const art = FA ? FA.art(day.title || day.emoji || "default", "lg") : (day.emoji ? `<span class="food-emoji">${day.emoji}</span>` : "");
     const quiet = day.kind === "leftover" || day.kind === "reuse" || day.kind === "light";
+    const IA = window.ItemAlts;
+    let meatRow = "";
+    if (IA && dish && dish.protein && !locked) {
+      const saved = state.meatAlts && state.meatAlts[day.i];
+      const info = IA.meatAltsForDay(saved || dish.protein, day.title || dish.name);
+      if (info.alts && info.alts.length) {
+        const cur = saved || info.current || dish.protein;
+        meatRow = `<div class="day-meat-row kathy-large" data-day-meat="${day.i}">
+          <span class="meat-label">${esc(cur)}</span>${IA.chevronHTML(cur, true)}
+          ${state.openAltId === "meat:" + day.i ? IA.bubbleHTML("Swap meat for…", info.alts, cur, true) : ""}
+        </div>`;
+      }
+    }
     return `<div class="card${day.kind === "cook" ? " is-cook-day" : ""}${quiet ? " is-quiet-day" : ""}" data-day="${day.i}" id="day-card-${day.i}">
       <div class="card-head">
         <span class="day-tag">${esc(day.name)}</span>
@@ -1012,6 +1139,7 @@
         <span aria-hidden="true">${art}</span>
         <p class="dish-title">${esc(day.title)}</p>
       </div>
+      ${meatRow}
       ${body}
       <button type="button" class="linkish" data-toggle="${day.i}">${open ? "Hide details" : "Show details"}</button>
     </div>`;
@@ -1025,12 +1153,11 @@
     // Source of truth: locked package when locked, else live week; always merge custom items
     const items = mergeGroceryWithCustoms(
       locked && state.lockedWeek && Array.isArray(state.lockedWeek.grocery)
-        ? state.lockedWeek.grocery.map((g) => ({ id: g.id, name: g.name, qty: g.qty, aisle: g.aisle || "Other", why: [], custom: !!g.custom }))
+        ? state.lockedWeek.grocery.map((g) => ({ id: g.id, name: g.name, qty: g.qty, aisle: g.aisle || "Other", why: [], custom: !!g.custom, section: "Menu for this week", price: g.price != null ? Number(g.price) : null }))
         : groceryFromWeek()
     );
     const checkedN = items.filter((it) => state.checked[it.id]).length;
-    const byAisle = {};
-    items.forEach((it) => { (byAisle[it.aisle || "Other"] = byAisle[it.aisle || "Other"] || []).push(it); });
+    const hiddenHave = items.filter((it) => itemHaveIt(it.id)).length;
     const stripHtml = FA && FA.weekStripHTML
       ? FA.weekStripHTML(stripDaysForWeek(), { label: "Week at a glance" })
       : "";
@@ -1072,25 +1199,14 @@
       </div>
       <h2 id="grocery-title">Grocery list</h2>
       <div class="grocery-add-sticky" id="grocery-add-sticky">
-        <label class="visually-hidden" for="custom-g-name">Custom grocery item</label>
-        <input class="field" id="custom-g-name" maxlength="80" placeholder="Item name" style="margin:0">
-        <label class="visually-hidden" for="custom-g-qty">Qty</label>
-        <input class="field" id="custom-g-qty" maxlength="20" placeholder="Qty" style="margin:0;max-width:88px">
         <button type="button" class="btn" id="add-custom-g">+ Add item</button>
+        <button type="button" class="btn btn-ghost" id="hidden-have-btn-top" aria-pressed="${state.showHiddenHave ? "true" : "false"}">${state.showHiddenHave ? "Hide suppressed" : "Show hidden"}</button>
       </div>
       <div class="est-note">Rough estimate only until you upload receipts. Store prices are not invented here.</div>
       ${state.budgetOn && state.budgetAmt != null ? `<p class="muted">Your weekly budget target is about $${Number(state.budgetAmt).toFixed(0)}.</p>` : ""}
-      <p class="muted" id="grocery-count">${checkedN} checked · ${items.length - checkedN} left</p>
-      <div id="grocery-list-body">
-      ${Object.keys(byAisle).map((aisle) => `
-        <p class="g-aisle">${esc(aisle)}</p>
-        ${byAisle[aisle].map((it) => `
-          <label class="g-item${state.checked[it.id] ? " checked" : ""}${it.custom ? " is-custom" : ""}">
-            <input type="checkbox" data-gid="${esc(it.id)}" ${state.checked[it.id] ? "checked" : ""}>
-            <span><span class="g-name">${esc(it.name)}</span>${it.qty ? `<span class="muted"> · ${esc(it.qty)}</span>` : ""}${it.custom ? ` <button type="button" class="linkish" data-del-custom="${esc(it.id)}">Remove</button>` : ""}</span>
-          </label>
-        `).join("")}
-      `).join("")}
+      <p class="muted" id="grocery-count">${checkedN} checked · ${items.length - checkedN} left${hiddenHave ? ` · ${hiddenHave} Have it` : ""}</p>
+      <div id="grocery-list-body" class="kathy-large">
+      ${grocerySectionsHTML(items)}
       </div>
       ${groceryEstTotalHTML(items)}
       <div class="grocery-footer-row" role="group" aria-label="Grocery list actions">
@@ -1118,7 +1234,6 @@
     if (editBtn) editBtn.onclick = () => unlockWeek();
     const jumpG = document.getElementById("jump-grocery");
     if (jumpG) jumpG.onclick = () => {
-      // Refresh from source of truth, then scroll
       regenerateGrocery(false);
       const el = document.getElementById("grocery-title");
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1128,36 +1243,121 @@
     document.getElementById("footer-share-list").onclick = () => shareGrocery(currentGroceryItems());
     document.getElementById("clear-checks").onclick = () => { state.checked = {}; save(); render(); toast("Unchecked all grocery items"); };
     document.getElementById("generate-list").onclick = () => regenerateGrocery(true);
-    const addG = document.getElementById("add-custom-g");
-    if (addG) addG.onclick = () => {
-      const nameEl = document.getElementById("custom-g-name");
-      const qtyEl = document.getElementById("custom-g-qty");
-      const name = (nameEl && nameEl.value || "").trim().slice(0, 80);
-      if (!name) { toast("Type an item name"); return; }
-      const qty = (qtyEl && qtyEl.value || "").trim().slice(0, 20);
-      if (!state.customGrocery) state.customGrocery = [];
-      const id = "cg:" + Date.now().toString(36);
-      state.customGrocery.push({ id, name, qty, aisle: "Other", custom: true });
-      if (state.weekLocked && state.lockedWeek) {
-        state.lockedWeek.customGrocery = JSON.parse(JSON.stringify(state.customGrocery));
-      }
-      save();
-      if (nameEl) nameEl.value = "";
-      if (qtyEl) qtyEl.value = "";
-      toast("Added " + name);
-      render();
+    const hideTop = document.getElementById("hidden-have-btn-top");
+    if (hideTop) hideTop.onclick = () => {
+      state.showHiddenHave = !state.showHiddenHave;
+      save(); render();
+      toast(state.showHiddenHave ? "Showing Have it items" : "Have it items hidden again");
     };
+    const addG = document.getElementById("add-custom-g");
+    if (addG) addG.onclick = () => openKathyAddItem("Menu extras");
+    document.querySelectorAll("[data-add-section]").forEach((b) => {
+      b.onclick = () => openKathyAddItem(b.dataset.addSection);
+    });
+    document.querySelectorAll("[data-stand-toggle]").forEach((b) => {
+      b.onclick = () => {
+        const kind = b.dataset.standToggle;
+        const name = b.dataset.standName;
+        const SL = window.StandingLists;
+        const listKey = kind === "stock" ? "stockProduce" : "munchies";
+        const arr = state[listKey] || [];
+        const exists = arr.some((x) => (x.name || "").toLowerCase() === name.toLowerCase());
+        if (exists) {
+          state[listKey] = arr.filter((x) => (x.name || "").toLowerCase() !== name.toLowerCase());
+        } else {
+          const id = kind === "stock" ? (SL && SL.stockId(name)) : (SL && SL.munchId(name));
+          state[listKey] = arr.concat([{ id: id || kind + "-" + Date.now(), name, qty: "1", price: null, standing: true, kind }]);
+        }
+        save(); render();
+      };
+    });
+    document.querySelectorAll("[data-have]").forEach((b) => {
+      b.onclick = (e) => {
+        e.preventDefault();
+        const id = b.dataset.have;
+        const item = items.find((x) => x.id === id) || { id, name: id };
+        if (itemHaveIt(id)) {
+          setHaveIt(id, false);
+          toast("Still need it — back on the list");
+        } else {
+          setHaveIt(id, true, item);
+          const hint = haveItHint(id);
+          toast(hint ? ("Have it — " + hint) : "Have it — hidden for a while");
+        }
+        save(); render();
+      };
+    });
+    document.querySelectorAll("[data-alt-item]").forEach((b) => {
+      b.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = b.dataset.altItem;
+        state.openAltId = state.openAltId === id ? null : id;
+        save(); render();
+      };
+    });
+    document.querySelectorAll(".item-alt-popt[data-alt]").forEach((b) => {
+      b.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const pop = b.closest(".g-item, .day-meat-row");
+        const itemBtn = pop && pop.querySelector("[data-alt-item]");
+        const meatHost = b.closest("[data-day-meat]");
+        if (meatHost) {
+          const dayI = +meatHost.dataset.dayMeat;
+          if (!state.meatAlts) state.meatAlts = {};
+          state.meatAlts[dayI] = b.dataset.alt;
+          // Update matching grocery protein lines
+          const dish = state.week && state.week.days[dayI] && dishById(state.week.days[dayI].dishId);
+          if (dish && dish.grocery) {
+            if (!state.itemAlts) state.itemAlts = {};
+            dish.grocery.forEach((g) => {
+              if (/meat|chicken|beef|pork|fish|salmon|turkey|bacon|steak|shrimp|protein/i.test((g.aisle || "") + " " + (g.name || "")) ||
+                  (dish.protein && (g.name || "").toLowerCase().includes(String(dish.protein).toLowerCase().split(" ")[0]))) {
+                const gid = "g-" + (g.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+                state.itemAlts[gid] = b.dataset.alt;
+              }
+            });
+          }
+          state.openAltId = null;
+          save(); render();
+          toast("Meat swapped");
+          return;
+        }
+        const id = itemBtn ? itemBtn.dataset.altItem : state.openAltId;
+        if (!id) return;
+        if (!state.itemAlts) state.itemAlts = {};
+        state.itemAlts[id] = b.dataset.alt;
+        state.openAltId = null;
+        save(); render();
+        toast("Swapped to " + b.dataset.alt);
+      };
+    });
+    document.querySelectorAll("[data-day-meat] [data-alt-open]").forEach((chip) => {
+      chip.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const host = chip.closest("[data-day-meat]");
+        const dayI = host && host.dataset.dayMeat;
+        const key = "meat:" + dayI;
+        state.openAltId = state.openAltId === key ? null : key;
+        save(); render();
+      };
+    });
     document.querySelectorAll("[data-del-custom]").forEach((b) => {
       b.onclick = (e) => {
         e.preventDefault();
         const id = b.dataset.delCustom;
-        state.customGrocery = (state.customGrocery || []).filter((x) => x.id !== id);
+        const sec = b.dataset.delSection || "";
+        if (sec === "Stock produce") state.stockProduce = (state.stockProduce || []).filter((x) => x.id !== id);
+        else if (sec === "Miscellaneous munchies") state.munchies = (state.munchies || []).filter((x) => x.id !== id);
+        else state.customGrocery = (state.customGrocery || []).filter((x) => x.id !== id);
         delete state.checked[id];
+        if (state.haveIt) delete state.haveIt[id];
         if (state.weekLocked && state.lockedWeek) {
-          state.lockedWeek.customGrocery = JSON.parse(JSON.stringify(state.customGrocery));
-          if (Array.isArray(state.lockedWeek.grocery)) {
-            state.lockedWeek.grocery = state.lockedWeek.grocery.filter((x) => x.id !== id);
-          }
+          state.lockedWeek.customGrocery = JSON.parse(JSON.stringify(state.customGrocery || []));
+          state.lockedWeek.stockProduce = JSON.parse(JSON.stringify(state.stockProduce || []));
+          state.lockedWeek.munchies = JSON.parse(JSON.stringify(state.munchies || []));
         }
         save(); render();
       };
@@ -1230,13 +1430,93 @@
     }
   }
 
+  function openKathyAddItem(defaultSection) {
+    const AIS = window.AddItemSheet;
+    const SL = window.StandingLists;
+    if (!AIS) { toast("Add item sheet unavailable"); return; }
+    AIS.open({
+      defaultSection: defaultSection || "Miscellaneous munchies",
+      large: true,
+      onAdd: (item) => {
+        const section = item.section;
+        if (section === "Stock produce") {
+          const id = (SL && SL.stockId(item.name)) || "stock-" + Date.now().toString(36);
+          if (!state.stockProduce) state.stockProduce = [];
+          state.stockProduce.push({ id, name: item.name, qty: item.qty || "1", price: item.price, standing: true, kind: "stock" });
+        } else if (section === "Miscellaneous munchies") {
+          const id = (SL && SL.munchId(item.name)) || "munch-" + Date.now().toString(36);
+          if (!state.munchies) state.munchies = [];
+          state.munchies.push({ id, name: item.name, qty: item.qty || "1", price: item.price, standing: true, kind: "munch" });
+        } else {
+          const id = "cg:" + Date.now().toString(36);
+          if (!state.customGrocery) state.customGrocery = [];
+          state.customGrocery.push({
+            id, name: item.name, qty: item.qty || "1", aisle: "Other", custom: true,
+            price: item.price, section: "Menu extras",
+          });
+        }
+        if (state.weekLocked && state.lockedWeek) {
+          state.lockedWeek.customGrocery = JSON.parse(JSON.stringify(state.customGrocery || []));
+          state.lockedWeek.stockProduce = JSON.parse(JSON.stringify(state.stockProduce || []));
+          state.lockedWeek.munchies = JSON.parse(JSON.stringify(state.munchies || []));
+        }
+        save();
+        toast("Added " + item.name);
+        render();
+      },
+    });
+  }
+
   function mergeGroceryWithCustoms(base) {
-    const customs = (state.customGrocery || []).map((c) => ({
-      id: c.id, name: c.name, qty: c.qty || "", aisle: c.aisle || "Other", why: [], custom: true
+    const SL = window.StandingLists;
+    const stock = (state.stockProduce || []).map((c) => ({
+      id: c.id,
+      name: (state.itemAlts && state.itemAlts[c.id]) || c.name,
+      baseName: c.name,
+      qty: c.qty || "1",
+      aisle: "Produce",
+      why: [],
+      custom: false,
+      standing: true,
+      section: "Stock produce",
+      price: c.price != null ? Number(c.price) : null,
     }));
-    const seen = new Set((base || []).map((x) => x.id));
-    const out = (base || []).map((x) => ({ ...x, custom: !!x.custom }));
-    customs.forEach((c) => { if (!seen.has(c.id)) out.push(c); });
+    const munch = (state.munchies || []).map((c) => ({
+      id: c.id,
+      name: (state.itemAlts && state.itemAlts[c.id]) || c.name,
+      baseName: c.name,
+      qty: c.qty || "1",
+      aisle: "Other",
+      why: [],
+      custom: false,
+      standing: true,
+      section: "Miscellaneous munchies",
+      price: c.price != null ? Number(c.price) : null,
+    }));
+    const customs = (state.customGrocery || []).map((c) => ({
+      id: c.id,
+      name: (state.itemAlts && state.itemAlts[c.id]) || c.name,
+      baseName: c.name,
+      qty: c.qty || "1",
+      aisle: c.aisle || "Other",
+      why: [],
+      custom: true,
+      section: "Menu extras",
+      price: c.price != null ? Number(c.price) : null,
+    }));
+    const seen = new Set();
+    const out = [];
+    (base || []).forEach((x) => {
+      if (seen.has(x.id)) return;
+      seen.add(x.id);
+      out.push({ ...x, custom: !!x.custom, section: x.section || "Menu for this week" });
+    });
+    stock.concat(munch).concat(customs).forEach((c) => {
+      if (seen.has(c.id)) return;
+      seen.add(c.id);
+      out.push(c);
+    });
+    void SL;
     return out;
   }
 
@@ -1244,7 +1524,9 @@
     let base;
     if (state.weekLocked && state.lockedWeek && Array.isArray(state.lockedWeek.grocery)) {
       base = state.lockedWeek.grocery.map((g) => ({
-        id: g.id, name: g.name, qty: g.qty, aisle: g.aisle || "Other", why: [], custom: !!g.custom
+        id: g.id, name: g.name, qty: g.qty, aisle: g.aisle || "Other", why: [], custom: !!g.custom,
+        section: "Menu for this week",
+        price: g.price != null ? Number(g.price) : null,
       })).filter((g) => !g.custom);
     } else {
       base = groceryFromWeek();
@@ -1252,16 +1534,18 @@
     return mergeGroceryWithCustoms(base);
   }
 
-  function regenerateGrocery(showToast) {
-    // Rebuild generated rows from week; keep customGrocery intact
+  function regenerateGrocery(showToastMsg) {
+    // Rebuild Menu for this week only; keep stock, munchies, customs, Have-it
     const generated = groceryFromWeek();
     if (state.weekLocked && state.lockedWeek) {
-      state.lockedWeek.grocery = generated.map((it) => ({ id: it.id, name: it.name, qty: it.qty, aisle: it.aisle }));
+      state.lockedWeek.grocery = generated.map((it) => ({ id: it.id, name: it.name, qty: it.qty, aisle: it.aisle, price: it.price }));
       state.lockedWeek.week = JSON.parse(JSON.stringify(state.week));
       state.lockedWeek.customGrocery = JSON.parse(JSON.stringify(state.customGrocery || []));
+      state.lockedWeek.stockProduce = JSON.parse(JSON.stringify(state.stockProduce || []));
+      state.lockedWeek.munchies = JSON.parse(JSON.stringify(state.munchies || []));
     }
     save();
-    if (showToast) toast("Built from this week's meals");
+    if (showToastMsg) toast("Menu for this week refreshed — stock & munchies kept");
     render();
   }
 
@@ -1363,14 +1647,8 @@
   }
 
   function render() {
-    if (state.showHome !== false && !state.doneSetup && state.setupStep !== "week") {
-      // First-run home hero (mock week). Returning users with a week skip straight unless showHome forced.
-      if (!isReturningUser()) {
-        renderHome();
-        return;
-      }
-    }
-    if (state.showHome === true && isReturningUser()) {
+    // Home only when explicitly requested — never force remount on reload
+    if (state.showHome === true) {
       renderHome();
       return;
     }
@@ -1396,9 +1674,16 @@
     (map[state.setupStep] || renderFirst)();
   }
 
-  // boot — home hero is the entry (Steve bar)
+  // boot — restore mid-flow from localStorage; home only for true first visit
   tryLoadShare();
-  state.showHome = true;
+  if (!state.doneSetup && !state.week && (!state.setupStep || state.setupStep === "first") &&
+      !(state.customGrocery && state.customGrocery.length) &&
+      !(state.stockProduce && state.stockProduce.length)) {
+    // True first visit: show home hero once
+    state.showHome = true;
+  } else {
+    state.showHome = false;
+  }
   if ((K.DISHES || []).length < 16) {
     console.error("[kathy] need at least 16 dishes, have", (K.DISHES || []).length);
   } else {
