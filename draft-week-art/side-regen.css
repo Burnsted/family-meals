@@ -1,4 +1,4 @@
-/* Per-slot side Regenerate (Ted locked). Label button, not icon-only. */
+/* Per-slot side Regenerate (Ted locked). Circular arrow icon only — no text. */
 .side-slot {
   display: inline-flex;
   flex-direction: column;
@@ -19,32 +19,53 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 36px;
-  width: 100%;
-  padding: 0.25rem 0.35rem;
-  border: 1.5px solid color-mix(in srgb, #0f6e6e 45%, transparent);
-  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+  border: 1.75px solid color-mix(in srgb, #0f6e6e 55%, transparent);
+  border-radius: 999px;
   background: #fffaf4;
   color: #0a5555;
   font: inherit;
-  font-size: 0.72rem;
-  font-weight: 800;
-  line-height: 1.15;
+  font-size: 0;
+  line-height: 0;
   cursor: pointer;
   box-shadow: none;
 }
 .side-slot.is-large .side-regen-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   min-height: 44px;
-  font-size: 0.85rem;
-  padding: 0.4rem 0.45rem;
+}
+.side-regen-btn .side-regen-ico {
+  display: block;
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
 }
 .side-regen-btn:hover,
 .side-regen-btn:focus-visible {
   outline: 2px solid #0f6e6e;
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 .side-slot.is-selected .side-regen-btn {
   border-color: #0f6e6e;
+}
+
+/* Under meal section / under sides row */
+.regen-under {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0.45rem 0 0.15rem;
+  padding: 0;
+}
+.meal-regen-btn {
+  margin: 0 auto;
 }
 
 /* Kathy coastal tweak */

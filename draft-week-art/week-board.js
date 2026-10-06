@@ -30,7 +30,18 @@
 
   /** Always: Week of Oct 5 to 11, 2026 (never "Oct 5 11", never en dash). */
   function weekOfLabel(weekTitle) {
-    let raw = cleanCopy(weekTitle || "");
+    const BURNS_OCT = "Week of Oct 5 to 11, 2026";
+    const src = String(weekTitle == null ? "" : weekTitle);
+    // HARD-RETURN for Burns Oct week — any separator (space, hyphen, en/em dash, missing "to").
+    if (
+      /\bOct(?:ober)?\b/i.test(src) &&
+      /\b5\b/.test(src) &&
+      /\b11\b/.test(src) &&
+      /\b2026\b/.test(src)
+    ) {
+      return BURNS_OCT;
+    }
+    let raw = cleanCopy(src);
     raw = raw.replace(/^week of\s+/i, "");
     // Repair "Oct 5 11, 2026" left by old en-dash scrub
     raw = raw.replace(
@@ -73,6 +84,40 @@
     }
   }
 
+  /** Dish-specific leftover label from dinner / Ted note (never bare "Ted leftovers"). */
+  function dishLeftoverLabel(d) {
+    const ted = cleanCopy((d && d.tedNote) || "");
+    const dinner = cleanCopy((d && (d.title || d.dinner || d.meal)) || "");
+    const blob = (ted + " " + dinner).toLowerCase();
+    let dish = "";
+    if (/taco/.test(blob)) dish = "taco";
+    else if (/alfredo|pasta/.test(blob)) dish = "Alfredo";
+    else if (/rotisserie/.test(blob)) dish = "rotisserie";
+    else if (/quesadilla/.test(blob)) dish = "quesadilla";
+    else if (/chili/.test(blob)) dish = "chili";
+    else if (/chicken/.test(blob)) dish = "chicken";
+    else if (/pork/.test(blob)) dish = "pork";
+    else if (/beef/.test(blob)) dish = "beef";
+    else if (/sausage/.test(blob)) dish = "sausage";
+    else {
+      const m = ted.match(/leftover\s+([a-z][a-z\s/]{1,24}?)(?:\s+\(|$|,|\.|or)/i);
+      if (m) {
+        dish = cleanCopy(m[1]).split(/\s+or\s+/i)[0].trim();
+        if (dish.length > 18) dish = dish.split(/\s+/).slice(0, 2).join(" ");
+      }
+    }
+    if (!dish) {
+      const FA = root.FoodArt;
+      const short =
+        FA && FA.shortMealName ? FA.shortMealName(dinner || "Meal", 2) : (dinner || "").split(/\s+/).slice(0, 2).join(" ");
+      dish = cleanCopy(short).replace(/\bnight\b/i, "").trim() || "dinner";
+    }
+    if (/^ted/i.test(ted) || /salmon|fish|tilapia/i.test(dinner) || /not fish/i.test(ted)) {
+      return "Ted's " + dish + " leftovers";
+    }
+    return dish.charAt(0).toUpperCase() + dish.slice(1) + " leftovers";
+  }
+
   function pillLetter(d) {
     const s = String(d.short || d.name || d.letter || "");
     if (/^mon/i.test(s) || s === "M") return "MON";
@@ -107,14 +152,14 @@
 
   function noteForDay(d) {
     if (d.boardNote) return oneLineNote(d.boardNote, 20);
-    if (d.kind === "leftover" || d.kind === "reuse") return "Leftovers";
+    if (d.kind === "leftover" || d.kind === "reuse") return dishLeftoverLabel(d);
     if (d.kind === "light") return "Light day";
     if (d.note) return oneLineNote(d.note, 20);
     const enjoy = d.recipe && d.recipe.enjoy ? cleanCopy(d.recipe.enjoy) : "";
     if (enjoy && enjoy.length < 22) return enjoy;
     if (d.tedNote) {
       const t = cleanCopy(d.tedNote).replace(/^Ted:\s*/i, "Ted: ");
-      if (/leftover/i.test(t)) return "Ted leftovers";
+      if (/leftover/i.test(t)) return oneLineNote(dishLeftoverLabel(d), 22);
       return oneLineNote(t, 18);
     }
     if (d.tag && /grab/i.test(d.tag)) return "Grab and go";
@@ -124,7 +169,7 @@
     if (/taco/i.test(title)) return "Taco night";
     if (/steak|grill/i.test(title)) return "Ted grills";
     if (/pizza|takeout|take out|grab/i.test(title)) return "Takeout night";
-    if (/salmon|fish|tilapia/i.test(title)) return "Ted leftovers";
+    if (/salmon|fish|tilapia/i.test(title)) return oneLineNote(dishLeftoverLabel(d), 22);
     if (/chili/i.test(title)) return "Football day";
     if (/alfredo|pasta/i.test(title)) return "Family cooks";
     if (/breakfast/i.test(title)) return "Hot plates together";
@@ -230,6 +275,7 @@
     boardHTML: boardHTML,
     weekOfLabel: weekOfLabel,
     cleanCopy: cleanCopy,
+    dishLeftoverLabel: dishLeftoverLabel,
     noteForDay: noteForDay,
     TUCKER_ITEMS: TUCKER_ITEMS,
   };

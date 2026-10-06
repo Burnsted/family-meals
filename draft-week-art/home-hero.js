@@ -18,10 +18,10 @@
 
   const MOCK_MEALS = [
     { short: "Mon", letter: "M", title: "Lemon chicken", art: "chicken", note: "Easy start" },
-    { short: "Tue", letter: "T", title: "Chicken again", art: "leftover", note: "Leftovers", kind: "leftover" },
+    { short: "Tue", letter: "T", title: "Chicken again", art: "leftover", note: "Chicken leftovers", kind: "leftover" },
     { short: "Wed", letter: "W", title: "Turkey chili", art: "chili", note: "Football day" },
-    { short: "Thu", letter: "T", title: "Chili bowl", art: "leftover", note: "Leftovers", kind: "leftover" },
-    { short: "Fri", letter: "F", title: "Baked salmon", art: "salmon", note: "Ted leftovers" },
+    { short: "Thu", letter: "T", title: "Chili bowl", art: "leftover", note: "Chili leftovers", kind: "leftover" },
+    { short: "Fri", letter: "F", title: "Baked salmon", art: "salmon", note: "Ted's chicken leftovers", tedNote: "Ted: leftover chicken (not fish)" },
     { short: "Sat", letter: "S", title: "Egg bake", art: "eggs", note: "Family cooks" },
     { short: "Sun", letter: "S", title: "Light plate", art: "light", note: "Light day", kind: "light" },
   ];

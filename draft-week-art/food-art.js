@@ -43,6 +43,7 @@
   function keyFromText(text) {
     const t = String(text || "").toLowerCase();
     if (/rotisserie/.test(t)) return "rotisserie";
+    if (/fajita/.test(t)) return "fajita";
     if (/taco/.test(t)) return "taco";
     if (/chili/.test(t)) return "chili";
     if (/alfredo/.test(t)) return "alfredo";
@@ -112,7 +113,7 @@
     const known = {
       rotisserie: 1, chicken: 1, chili: 1, soup: 1, salmon: 1, fish: 1, shrimp: 1,
       breakfast: 1, eggs: 1, alfredo: 1, pasta: 1, salad: 1, pie: 1, burrito: 1,
-      quesadilla: 1, pepper: 1, cheese: 1, taco: 1, burger: 1, steak: 1, pizza: 1,
+      quesadilla: 1, pepper: 1, cheese: 1, taco: 1, fajita: 1, burger: 1, steak: 1, pizza: 1,
       sandwich: 1, sausage: 1, potato: 1, meat: 1, rice: 1, soup: 1, grill: 1,
       light: 1, leftover: 1, default: 1,
     };

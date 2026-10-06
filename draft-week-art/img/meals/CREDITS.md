@@ -6,7 +6,7 @@ Wikimedia Commons photos for draft-week-art week board (photo-real craft).
 |---|---|---|---|
 | `chicken.webp` | Willis Lam | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File%3ABoston_Market_Half_Rotisserie_Chicken_Meal_%2818400272521%29.jpg |
 | `rotisserie.webp` | Joe Schneid, Louisville, KY | CC BY 3.0 | https://commons.wikimedia.org/wiki/File%3ARotisserieChicken.jpg |
-| `taco.webp` | 1000b | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File%3ATacos_rojos_de_deshebrada_con_cueritos_de_cerdo.jpg |
+| `taco.webp` | BOSTON66 | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File%3AGround_Beef_Crispy_Tacos.jpg |
 | `chili.webp` | Andy Melton from Lancing, TN, USA | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File%3ABowl_of_chili_with_sour_cream_and_cheese.jpg |
 | `fish.webp` | HaJunkiyada | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File%3ALiat_Portal_for_Foodie_Disorder_-_Oven-baked_teriyaki_salmon_with_vegetables.jpg |
 | `salmon.webp` | HaJunkiyada | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File%3ALiat_Portal_for_Foodie_Disorder_-_Grilled_salmon_with_sweet_potatoes.jpg |
@@ -34,3 +34,4 @@ Wikimedia Commons photos for draft-week-art week board (photo-real craft).
 | `default.webp` | HaJunkiyada | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File%3ALiat_Portal_for_Foodie_Disorder_-_Homemade_Grilled_Chicken_Dinner.jpg |
 | `grill.webp` | Shixart1985 | CC BY 2.0 | https://commons.wikimedia.org/wiki/File%3AGrilled_meat_served_on_a_black_plate_with_green_and_red_chilies.jpg |
 | `pepper.webp` | Mark Bonica | CC BY 2.0 | https://commons.wikimedia.org/wiki/File%3AQuinoa_stuffed_peppers.jpg |
+| `fajita.webp` | jeffreyw | CC BY 2.0 | https://commons.wikimedia.org/wiki/File%3AChicken_fajitas.jpg |

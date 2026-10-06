@@ -128,13 +128,13 @@
   const SPECIAL_DINNERS = {
     leftovers: {
       key: "leftovers",
-      dinner: "Leftovers",
+      dinner: "Dinner leftovers",
       icon: "♻️",
       mealEmoji: "📦",
-      adultLunch: "adult lunch → leftovers (opt)",
+      adultLunch: "adult lunch → dinner leftovers (opt)",
       tedNote: "",
       recipe: {
-        title: "Leftovers",
+        title: "Dinner leftovers",
         have: "whatever’s already cooked",
         steps: ["Use what’s already cooked.", "Nothing new to buy for this night."],
         enjoy: "Clear the fridge. one less cook.",
@@ -1860,6 +1860,41 @@
     };
   }
 
+  function priorDinnerForLeftovers(dayId) {
+    const order = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+    const i = order.indexOf(String(dayId || "").toLowerCase());
+    if (i <= 0) return "";
+    const plan = currentPlan();
+    const prevId = order[i - 1];
+    const td = (plan.days || []).find((d) => d.id === prevId);
+    if (!td) return "";
+    // Use template prior dinner (not leftover-of-leftover)
+    return td.dinner || "";
+  }
+
+  function dishSpecificLeftoversShape(templateDay) {
+    const prior = priorDinnerForLeftovers(templateDay.id);
+    const WB = window.WeekBoard;
+    const probe = { dinner: prior || templateDay.dinner, title: prior || templateDay.dinner, tedNote: "" };
+    const label =
+      WB && typeof WB.dishLeftoverLabel === "function"
+        ? WB.dishLeftoverLabel(probe)
+        : prior
+          ? uiCopy((window.FoodArt && FoodArt.shortMealName ? FoodArt.shortMealName(prior, 2) : prior.split(/\s+/).slice(0, 2).join(" ")) + " leftovers")
+          : "Dinner leftovers";
+    const base = SPECIAL_DINNERS.leftovers;
+    return {
+      ...base,
+      dinner: label,
+      adultLunch: "adult lunch → " + label.toLowerCase() + " (opt)",
+      recipe: {
+        ...base.recipe,
+        title: label,
+        enjoy: label + ". clear the fridge.",
+      },
+    };
+  }
+
   function applySpecialShape(templateDay, special, overrideType, extra) {
     return {
       ...templateDay,
@@ -1892,7 +1927,7 @@
       return blankHolidayDay(templateDay, h);
     }
     if (ov.type === "leftovers") {
-      return applySpecialShape(templateDay, SPECIAL_DINNERS.leftovers, "leftovers", { blank: false, calories: 450, mealCalories: 450 });
+      return applySpecialShape(templateDay, dishSpecificLeftoversShape(templateDay), "leftovers", { blank: false, calories: 450, mealCalories: 450 });
     }
     if (ov.type === "eatout") {
       return applySpecialShape(templateDay, SPECIAL_DINNERS.eatout, "eatout", { blank: true, calories: 750, mealCalories: 750 });
@@ -2796,19 +2831,11 @@ function ensureSideOffers(dayId, day) {
     if (!offers.length && !liked.length && !added.length) return "";
     const SR = window.SideRegen;
     const locked = !!state.weekLocked;
+    // Quiet sides row: photos only; one circular regen sits under the whole row (not under meal photo).
     const offerSlots = offers
-      .map((id, slot) => {
+      .map((id) => {
         const tile = sideTileHTML(id, added.includes(id), dayId);
-        if (SR) {
-          return SR.slotHTML({
-            bodyHtml: tile,
-            dayKey: dayId,
-            slotIndex: slot,
-            selected: added.includes(id),
-            locked,
-          });
-        }
-        return tile;
+        return `<div class="side-slot${added.includes(id) ? " is-selected" : ""}"><div class="side-slot-body">${tile}</div></div>`;
       })
       .join("");
     const likedRow = liked.length
@@ -2816,9 +2843,14 @@ function ensureSideOffers(dayId, day) {
           .map((id) => sideTileHTML(id, added.includes(id), dayId))
           .join("")}</div>`
       : "";
+    const underSides =
+      SR && !locked
+        ? SR.sectionBtnHTML({ dayKey: dayId, kind: "sides" })
+        : "";
     return `<div class="sides-block" data-sides-day="${escapeAttr(dayId)}">
       <span class="sides-lbl">Suggested sides</span>
       <div class="sides-row">${offerSlots}</div>
+      ${underSides}
       ${likedRow}
     </div>`;
   }
@@ -2835,9 +2867,72 @@ function ensureSideOffers(dayId, day) {
       b.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
+        const section = b.dataset.regenSection;
+        if (section === "meal") {
+          regenerateMealDay(b.dataset.regenDay);
+          return;
+        }
+        if (section === "sides" || b.dataset.regenSlot == null) {
+          regenerateSidesSection(b.dataset.regenDay);
+          return;
+        }
         regenerateSideSlot(b.dataset.regenDay, b.dataset.regenSlot);
       });
     });
+  }
+
+  function regenerateSidesSection(dayId) {
+    if (state.weekLocked) {
+      showToast("Unlock the week to change sides.");
+      return;
+    }
+    if (!state.sideOffers) state.sideOffers = {};
+    const offers = (state.sideOffers[dayId] || []).slice();
+    if (!offers.length) return;
+    const pool = Object.keys(SIDE_ITEMS);
+    const SR = window.SideRegen;
+    const next = [];
+    offers.forEach((old) => {
+      const pick = SR
+        ? SR.pickReplacement(pool, next.concat(offers), old)
+        : pool.find((id) => id !== old && !next.includes(id) && !offers.includes(id));
+      next.push(pick || old);
+    });
+    state.sideOffers[dayId] = next;
+    persist();
+    renderAll();
+    showToast("Sides refreshed");
+  }
+
+  function regenerateMealDay(dayId) {
+    if (state.weekLocked) {
+      showToast("Unlock the week to change dinner.");
+      return;
+    }
+    const plan = currentPlan();
+    const td = plan.days.find((d) => d.id === dayId);
+    if (!td) return;
+    const cur = effectiveDay(td);
+    if (cur.holiday || cur.overrideType === "holiday") return;
+    const pool = Object.keys(EXTRA_DINNERS || {}).filter((k) => {
+      const ex = EXTRA_DINNERS[k];
+      if (!ex || !ex.dinner) return false;
+      if (ex.weekendOnly && !/^(sat|sun)$/i.test(dayId)) return false;
+      if (isDown(ex.dinner)) return false;
+      return true;
+    });
+    const curKey = (state.dayOverrides[dayId] && state.dayOverrides[dayId].key) || td.dinnerKey || "";
+    const candidates = pool.filter((k) => k !== curKey && EXTRA_DINNERS[k].dinner !== cur.dinner);
+    const pick = candidates[Math.floor(Math.random() * candidates.length)] || pool[Math.floor(Math.random() * pool.length)];
+    if (!pick) {
+      showToast("No other dinner right now");
+      return;
+    }
+    state.dayOverrides[dayId] = { type: "pick", key: pick };
+    if (state.sideOffers) delete state.sideOffers[dayId];
+    persist();
+    renderAll();
+    showToast("Dinner refreshed");
   }
 
   function sideGroceryItems() {
@@ -4128,6 +4223,7 @@ function ensureSideOffers(dayId, day) {
       els.weekGrid.innerHTML = `<p class="muted2">This week slot is empty. Pick Option A or B in the month plan.</p>`;
       return;
     }
+    const RECIPE_ICO = `<svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>`;
     plan.days.forEach((templateDay) => {
       const day = effectiveDay(templateDay);
       const card = document.createElement("article");
@@ -4139,38 +4235,63 @@ function ensureSideOffers(dayId, day) {
         (day.overrideType === "pickmeal" ? " day-card-pickmeal" : "");
       const holClass = day.holiday || day.overrideType === "holiday";
       const FA = window.FoodArt;
+      const WB = window.WeekBoard;
       const photo = FA ? FA.art(day.dinner || "default", "lg") : "";
       const mealName =
         FA && FA.shortMealName ? uiCopy(FA.shortMealName(day.dinner, 4)) : uiCopy(day.dinner);
+      const leftoverNote =
+        WB && typeof WB.dishLeftoverLabel === "function"
+          ? WB.dishLeftoverLabel(day)
+          : "Dinner leftovers";
       const oneNote = day.tedNote
-        ? uiCopy(String(day.tedNote).replace(/^Ted:\s*/i, "Ted: "))
-        : day.tag
-          ? uiCopy(day.tag)
-          : day.swapped
-            ? day.overrideType === "leftovers"
-              ? "Leftovers"
-              : day.overrideType === "eatout"
+        ? /leftover/i.test(day.tedNote)
+          ? leftoverNote
+          : uiCopy(String(day.tedNote).replace(/^Ted:\s*/i, "Ted: "))
+        : day.overrideType === "leftovers" || (day.tag && /leftover/i.test(day.tag))
+          ? leftoverNote
+          : day.tag
+            ? uiCopy(day.tag)
+            : day.swapped
+              ? day.overrideType === "eatout"
                 ? "Eat out"
                 : "Swapped"
-            : "On the board";
+              : "On the board";
+      const SR = window.SideRegen;
+      const mealRegen =
+        !holClass && SR && !state.weekLocked
+          ? SR.sectionBtnHTML({ dayKey: templateDay.id, kind: "meal" })
+          : "";
       // Quiet default day details: photo + name + one note. No rates / Made row / adult lunch / meat pill.
+      // Cooking-details icon beside Swap opens recipe; circular regen under meal + under sides.
       card.innerHTML = `
         <div class="day-head">
           <span>${day.short}</span>
           <div class="day-head-actions">
-            ${holClass ? "" : `<button type="button" class="swap-link" data-swap-day="${escapeAttr(templateDay.id)}" aria-label="Swap ${escapeAttr(day.day)} dinner"><span>Swap</span></button>`}
+            ${
+              holClass
+                ? ""
+                : `<button type="button" class="recipe-link icon-btn" data-recipe-day="${escapeAttr(templateDay.id)}" aria-label="Cooking details for ${escapeAttr(day.day)}">${RECIPE_ICO}</button>
+            <button type="button" class="swap-link" data-swap-day="${escapeAttr(templateDay.id)}" aria-label="Swap ${escapeAttr(day.day)} dinner"><span>Swap</span></button>`
+            }
           </div>
         </div>
-        <button type="button" class="day-body day-body-btn day-body-quiet${holClass ? " is-holiday" : ""}" aria-label="${escapeAttr(day.day)}: ${escapeAttr(mealName)}. Tap for recipe.">
+        <div class="day-body day-body-quiet${holClass ? " is-holiday" : ""}">
           <span class="day-photo" aria-hidden="true">${photo}</span>
           <p class="day-dinner">${escapeHtml(mealName)}</p>
           <p class="day-note">${escapeHtml(oneNote)}</p>
-        </button>
+        </div>
+        ${mealRegen}
         ${typeof sidesBlockHTML === "function" ? sidesBlockHTML(templateDay.id, day) : ""}
       `;
       day._sideDayId = templateDay.id;
-      card.querySelector(".day-body-btn").addEventListener("click", () => openRecipe(day));
       if (typeof bindSidesBlock === "function") bindSidesBlock(card);
+      const recipeBtn = card.querySelector("[data-recipe-day]");
+      if (recipeBtn) {
+        recipeBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openRecipe(day);
+        });
+      }
       const swapBtn = card.querySelector("[data-swap-day]");
       if (swapBtn) swapBtn.addEventListener("click", (e) => { e.stopPropagation(); openSwapPicker(templateDay.id); });
       const delBtn = card.querySelector("[data-del-day]");
@@ -4243,7 +4364,10 @@ function ensureSideOffers(dayId, day) {
           <span class="swap-option-sub">${escapeHtml(mealTitle(templateDay.dinner))}</span>
         </button>
         <button type="button" class="swap-option${ov && ov.type === "leftovers" ? " is-on" : ""}" data-swap-type="leftovers">
-          <span class="swap-option-title">Leftovers</span>
+          <span class="swap-option-title">${escapeHtml((() => {
+            const shape = dishSpecificLeftoversShape(templateDay);
+            return shape.dinner || "Dinner leftovers";
+          })())}</span>
           <span class="swap-option-sub">Clears this night’s grocery lines</span>
         </button>
         <button type="button" class="swap-option${ov && ov.type === "eatout" ? " is-on" : ""}" data-swap-type="eatout">
@@ -4290,7 +4414,9 @@ function ensureSideOffers(dayId, day) {
       showToast("Restored template dinner");
     } else if (type === "leftovers") {
       state.dayOverrides[dayId] = { type: "leftovers" };
-      showToast("Swapped to Leftovers. groceries updated");
+      const plan = currentPlan();
+      const td = (plan.days || []).find((d) => d.id === dayId) || { id: dayId, dinner: "" };
+      showToast("Swapped to " + dishSpecificLeftoversShape(td).dinner + ". groceries updated");
     } else if (type === "eatout") {
       state.dayOverrides[dayId] = { type: "eatout" };
       showToast("Swapped to Eat out. groceries updated");

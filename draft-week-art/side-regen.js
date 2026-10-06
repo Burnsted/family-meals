@@ -1,8 +1,10 @@
-/* Per-slot side Regenerate (Ted locked bar). Burns + Kathy. Label text required. */
+/* Per-slot side Regenerate (Ted locked bar). Burns + Kathy. Icon-only circular arrow. */
 (function (root) {
   "use strict";
 
   const LABEL = "Regenerate";
+  const ARROW_SVG =
+    '<svg class="side-regen-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.2"/><polyline points="21 3 21 9 15 9"/></svg>';
 
   function esc(s) {
     return String(s == null ? "" : s)
@@ -28,7 +30,7 @@
   }
 
   /**
-   * Slot shell: offered side body + Regenerate label button.
+   * Slot shell: offered side body + circular arrow regen (no text label).
    * @param {object} opts
    * @param {string} opts.bodyHtml
    * @param {string} opts.dayKey
@@ -65,16 +67,41 @@
           '" aria-label="' +
           LABEL +
           ' side option">' +
-          LABEL +
+          ARROW_SVG +
           "</button>") +
+      "</div>"
+    );
+  }
+
+  /** Standalone circular regen under a section (meal or sides row). */
+  function sectionBtnHTML(opts) {
+    opts = opts || {};
+    const day = esc(opts.dayKey);
+    const kind = esc(opts.kind || "meal");
+    if (opts.locked) return "";
+    return (
+      '<div class="regen-under">' +
+      '<button type="button" class="side-regen-btn meal-regen-btn" data-regen-section="' +
+      kind +
+      '" data-regen-day="' +
+      day +
+      '" aria-label="' +
+      LABEL +
+      " " +
+      kind +
+      '">' +
+      ARROW_SVG +
+      "</button>" +
       "</div>"
     );
   }
 
   root.SideRegen = {
     LABEL: LABEL,
+    ARROW_SVG: ARROW_SVG,
     pickReplacement: pickReplacement,
     slotHTML: slotHTML,
+    sectionBtnHTML: sectionBtnHTML,
     esc: esc,
   };
 })(typeof window !== "undefined" ? window : globalThis);

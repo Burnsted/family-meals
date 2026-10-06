@@ -533,6 +533,32 @@ button[hidden],
   outline: none;
 }
 
+.recipe-link {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: #fff;
+  border-radius: 0;
+  padding: 0;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: none;
+}
+.recipe-link .ico {
+  stroke: #fff;
+  width: 18px;
+  height: 18px;
+}
+.recipe-link:hover,
+.recipe-link:focus-visible {
+  opacity: 0.88;
+  outline: none;
+}
+
 .day-head .emoji {
   font-size: 1.25rem;
   letter-spacing: 0;
