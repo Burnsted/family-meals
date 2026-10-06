@@ -2927,7 +2927,7 @@ function sidesBlockHTML(dayId, day) {
       <label class="fld" for="bDays">How many days it covers</label><input class="inp" id="bDays" type="number" inputmode="numeric" min="1" max="366" value="${b.days}">
       <div class="dchips">${[3, 5, 7, 14].map((n) => `<button type="button" data-dd="${n}" class="${b.days === n ? "on" : ""}">${n} days</button>`).join("")}</div>
       <div class="sh-row2"><button type="button" class="sh-btn" id="bClr">Back to default band</button><button type="button" class="sh-btn p" id="bSave">Save</button></div>
-      <p class="muted2">Compared with the grocery total (Best split unless you tap another store total), scaled to the plan days (holidays skipped). Saved on this phone and in the share link.</p>`, "Budget");
+      <p class="muted2">Compared with this week’s est. total. Saved on this phone and in the share link.</p>`, "Budget");
     const sw = inn.querySelector("#bSw");
     const flip = () => {
       state.budget.on = !state.budget.on;
@@ -3200,11 +3200,16 @@ function sidesBlockHTML(dayId, day) {
     const grp = (r) => all.filter((x) => x.r === r).sort((a, b) => (b.d || "").localeCompare(a.d || ""));
     const row = (x, restore) => `<li><span>${escapeHtml(x.n || x.k)}${restore ? ` <small>${"👎 hidden from Swap"}</small>` : ""}</span><small>${x.d ? escapeHtml(x.d) : ""}</small>${restore ? `<button type="button" class="chip-btn" data-restore="${escapeAttr(x.k)}">Restore</button>` : `<button type="button" class="chip-btn" data-clear="${escapeAttr(x.k)}">Clear</button>`}</li>`;
     const fav = grp(2), good = grp(1), down = grp(-1);
-    box.innerHTML = all.length
-      ? `${fav.length ? `<h3>❤️ Favorites</h3><ul>${fav.map((x) => row(x)).join("")}</ul>` : ""}
+    const panel = box.closest(".ratings-panel");
+    if (!all.length) {
+      box.innerHTML = "";
+      if (panel) panel.hidden = true;
+      return;
+    }
+    if (panel) panel.hidden = false;
+    box.innerHTML = `${fav.length ? `<h3>❤️ Favorites</h3><ul>${fav.map((x) => row(x)).join("")}</ul>` : ""}
          ${good.length ? `<h3>👍 Good</h3><ul>${good.map((x) => row(x)).join("")}</ul>` : ""}
-         ${down.length ? `<h3>🗑 Removed meals</h3><p class="muted2" style="margin-top:0">Rated 👎 — hidden from suggestions and Swap. Tap Restore to bring one back. (Old “remove for good” entries live here too.)</p><ul>${down.map((x) => row(x, true)).join("")}</ul>` : ""}`
-      : `<p class="muted2">No ratings yet. After you make a dinner, tap 👎 / 👍 / ❤️ on its day card. ❤️ = favorite, suggested first.</p>`;
+         ${down.length ? `<h3>👎</h3><ul>${down.map((x) => row(x, true)).join("")}</ul>` : ""}`;
     box.querySelectorAll("[data-restore],[data-clear]").forEach((b) => b.addEventListener("click", () => {
       delete state.ratings[b.dataset.restore || b.dataset.clear];
       persist();
@@ -3326,20 +3331,39 @@ function sidesBlockHTML(dayId, day) {
     const hasAny = made + skipped + topRated.length > 0;
     panel.hidden = !hasAny && planned === 0;
     if (!hasAny && planned > 0) panel.hidden = false;
+    const ateOut = currentPlan().days.reduce((n, td) => n + (getLog(td.id).status === "ateout" ? 1 : 0), 0);
+    const items = allGroceryItems().filter((i) => !itemHaveIt(i.id) && !itemChecked(i.id));
+    const tots = storeTotals(items);
+    const est = state.store === "publix" ? tots.p : state.store === "best" ? tots.b : tots.a;
+    const bud = state.budget || {};
+    const budget = bud.on && bud.amt != null ? Math.round((bud.amt * 7) / (bud.days || 14) * 100) / 100 : null;
+    const tmKeys = Object.keys(times).sort((a,b)=>times[b]-times[a]);
+    const highlights = [];
+    if (topRated.length) highlights.push(`Top: ${topRated.slice(0,2).map((r)=>(r.r===2?"❤️":"👍")+" "+(r.n||"")).join(" · ")}`);
+    if (uniqSug[0]) highlights.push(uniqSug[0]);
+    if (made >= 5) highlights.push("Solid logging this week.");
     body.innerHTML = `
-      <div class="wr-stats">
-        <p><strong>${made}</strong> made · <strong>${planned}</strong> planned · <strong>${skipped}</strong> skipped</p>
+      <div class="wr-stats wst-row">
+        <div><b>$${est.toFixed(0)}</b>${budget!=null?` / $${budget.toFixed(0)}`:""}<small>est.${budget!=null?" vs budget":""}</small></div>
+        <div><b>${made}/${skipped}/${ateOut}</b><small>made / skip / out</small></div>
+        <div><b>${planned}</b><small>planned</small></div>
       </div>
-      ${topRated.length ? `<div class="wr-block"><h3>Top-rated</h3><ul>${topRated.map((r) => `<li>${r.r === 2 ? "❤️" : "👍"} ${escapeHtml(r.n || "")}</li>`).join("")}</ul></div>` : ""}
-      <div class="wr-block"><h3>All-time times made (from ratings + this week)</h3>
-        <ul>${Object.keys(times).length ? Object.keys(times).sort((a,b)=>times[b]-times[a]).slice(0,8).map((n)=>`<li>${escapeHtml(n)} · ${times[n]}×</li>`).join("") : "<li>No made dinners logged yet</li>"}</ul>
+      ${highlights.length ? `<ul class="wr-hi">${highlights.slice(0,3).map((s)=>`<li>${escapeHtml(s)}</li>`).join("")}</ul>` : ""}
+      <div class="wr-block"><h3>Times made (all time)</h3>
+        <ul>${tmKeys.length ? tmKeys.slice(0,5).map((n)=>`<li>${escapeHtml(n)} · ${times[n]}×</li>`).join("") : ""}</ul>
+        ${tmKeys.length > 5 ? `<button type="button" class="chip-btn" id="tm-see-all">See all (${tmKeys.length})</button>` : ""}
       </div>
-      ${uniqSug.length ? `<div class="wr-block"><h3>Suggestions</h3><ul>${uniqSug.map((s)=>`<li>${escapeHtml(s)}</li>`).join("")}</ul></div>` : `<p class="muted2">Log Made / Skipped on day cards for tips.</p>`}
     `;
+    const see = body.querySelector("#tm-see-all");
+    if (see) see.onclick = () => {
+      const inn = openSheet(shTop("Times made") + `<ul>${tmKeys.map((n)=>`<li>${escapeHtml(n)} · ${times[n]}×</li>`).join("")}</ul>`, "Times made");
+    };
   }
 
   function maybeGentleBanner() {
     const el = els.gentleBanner;
+    if (el) { el.hidden = true; el.innerHTML = ""; }
+    return;
     if (!el) return;
     const today = todayIso();
     const last = state.lastGentleAt;
@@ -4005,7 +4029,7 @@ function sidesBlockHTML(dayId, day) {
           <span>${day.short}</span>
           <div class="day-head-actions">
             ${holClass ? "" : `<button type="button" class="swap-link" data-swap-day="${escapeAttr(templateDay.id)}" aria-label="Swap ${escapeAttr(day.day)} dinner"><span>Swap</span></button>`}
-            ${holClass ? "" : `<button type="button" class="list-link" data-jump-day="${escapeAttr(templateDay.id)}" aria-label="Jump to groceries for ${escapeAttr(day.day)}"><svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg><span>list</span></button>`}
+
             <span class="emoji" aria-hidden="true">${day.icon}</span>
           </div>
         </div>
@@ -4369,6 +4393,7 @@ function sidesBlockHTML(dayId, day) {
     els.checkedCount.textContent = `${left} left · ${checked} checked`;
     const days = ["all", "mon", "tue", "wed", "thu", "fri", "sat", "sun"];
     const labels = { all: "All days", mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun" };
+    state.groceryDayFilter = "all";
     els.groceryControls.innerHTML = `
       <button type="button" class="chip-btn${state.hideChecked ? " is-on" : ""}" id="hide-checked-btn" aria-pressed="${state.hideChecked}">
         ${state.hideChecked ? "Show checked" : "Hide checked"}
@@ -4376,9 +4401,6 @@ function sidesBlockHTML(dayId, day) {
       <button type="button" class="chip-btn${state.showHiddenHave ? " is-on" : ""}" id="hidden-have-btn" aria-pressed="${state.showHiddenHave}" ${hiddenHave === 0 ? "disabled" : ""}>
         Hidden: ${hiddenHave}
       </button>
-      <label class="day-filter-label">By day
-        <select id="day-filter">${days.map((d) => `<option value="${d}" ${state.groceryDayFilter === d ? "selected" : ""}>${labels[d]}</option>`).join("")}</select>
-      </label>
     `;
     const hideBtn = document.getElementById("hide-checked-btn");
     const hiddenBtn = document.getElementById("hidden-have-btn");
@@ -4561,7 +4583,7 @@ function sidesBlockHTML(dayId, day) {
     const tuckerNote = document.createElement("p");
     tuckerNote.className = "tucker-note";
     tuckerNote.textContent =
-      "Tucker lunchbox: same kit every school day (Mon–Fri). Count packs Sun night; restock midweek. Not dinner leftovers. Tap Have it if stocked.";
+      "Tucker lunchbox — same kit Mon–Fri. Tap Have it if stocked.";
     els.groceryList.appendChild(tuckerNote);
 
     const tots = storeTotals(items.filter((i) => !itemHaveIt(i.id)));
@@ -4570,13 +4592,17 @@ function sidesBlockHTML(dayId, day) {
     const loc = state.location || "Vero Beach";
     const col = (id, label, val, left) =>
       `<button type="button" class="${id === "best" ? "best" : ""}" data-store="${id}" aria-pressed="${state.store === id}">${label}<b>${formatMoney2(val)}</b><small>est. · ${formatMoney2(left)} left</small></button>`;
+    // Prefer cheapest of Aldi/Publix for the single est. total display
+    const useStore = tots.a <= tots.p ? "aldi" : "publix";
+    state.store = useStore;
+    const estVal = useStore === "publix" ? tots.p : tots.a;
+    const estLeft = useStore === "publix" ? tots.pLeft : tots.aLeft;
+    const estLab = useStore === "publix" ? "Publix" : "Aldi";
     totalBar.innerHTML = `
-      <div class="tot" role="group" aria-label="Which store total to use">
-        ${col("aldi", "All Aldi", tots.a, tots.aLeft)}${col("publix", "All Publix", tots.p, tots.pLeft)}${col("best", "Best split", tots.b, tots.bLeft)}
+      <div class="tot" role="group" aria-label="Estimated total">
+        <div class="best">Est. total (${estLab})<b>${formatMoney2(estVal)}</b><small>est.${estLeft != null ? " · " + formatMoney2(estLeft) + " vs budget" : ""}</small></div>
       </div>
-      <p class="pchk">${escapeHtml(state.storeName || "Aldi")} · ${escapeHtml(loc)} · Prices last checked ${escapeHtml(fmtDateLong(PRICE_META.updated))}${PRICE_META.loaded ? "" : " (built-in estimates)"} · tap a total to use it · grey = older than 60 days</p>
-      <p class="gnote">Best split = Aldi for ${tots.na} item${tots.na === 1 ? "" : "s"}, Publix for ${tots.np}. When this location has no price, we show the store’s general estimate labeled est. (not this store yet).${tots.cu ? ` ${tots.cu} custom item${tots.cu > 1 ? "s" : ""} without a price (add your $).` : ""}${tots.own ? ` ${tots.own} line${tots.own > 1 ? "s" : ""} use your own $.` : ""}</p>
-      <p class="gnote rc">🧾 Send a receipt photo or Publix app Purchases screenshot to update prices.</p>`;
+      <p class="pchk">${escapeHtml(state.storeName || "Aldi")} · ${escapeHtml(loc)} · Prices ${escapeHtml(fmtDateLong(PRICE_META.updated))}${PRICE_META.loaded ? "" : " (estimates)"}</p>`;
     totalBar.querySelectorAll("[data-store]").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.store = normalizeStore(btn.dataset.store);
@@ -4844,13 +4870,12 @@ function sidesBlockHTML(dayId, day) {
       budgetLine(plan),
       (() => {
         const t = storeTotals(items);
-        return `Est. totals: All Aldi ${formatMoney2(t.a)} · All Publix ${formatMoney2(t.p)} · Best split ${formatMoney2(t.b)}`;
+        const use = t.a <= t.p ? "Aldi" : "Publix"; const v = use === "Publix" ? t.p : t.a; return `Est. total (${use}) ${formatMoney2(v)}`;
       })(),
       totals.pricedAll ? `Your own $ entered: ${formatMoney(totals.all)} on ${totals.pricedAll} line(s)` : "",
       "Dinners: " + dinnerLines.join(" · "),
-      "Tucker lunchbox = yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice",
-      "Restock midweek as packs deplete. Tucker does NOT eat dinner leftovers for school lunch.",
-      "Chili = weekend daytime only when on the plan (not midweek, not twice, not every week).",
+      "Tucker lunchbox = yogurt + cheese + pretzels/Pringles + fruit snack + beef stick + juice",
+      "Chili = weekend daytime only when on the plan.",
       "",
     ].filter((line, i, arr) => line !== "" || (i > 0 && arr[i - 1] !== ""));
     CATEGORIES.forEach((cat) => {
@@ -4970,6 +4995,20 @@ function sidesBlockHTML(dayId, day) {
     box.querySelector("[data-cpl]").textContent = `✓ ${label} Want to send a photo with it?`;
   }
 
+  function getFmTheme() {
+    try {
+      const t = localStorage.getItem("fm-theme");
+      return t === "light" || t === "dark" ? t : "dark";
+    } catch (_) { return "dark"; }
+  }
+  function applyFmTheme(theme) {
+    theme = theme === "light" ? "light" : "dark";
+    try { localStorage.setItem("fm-theme", theme); } catch (_) {}
+    document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.style.colorScheme = theme;
+    const meta = document.getElementById("theme-color-meta");
+    if (meta) meta.content = theme === "light" ? "#f4f7f6" : "#0b1220";
+  }
   function openSettings() {
     if (!els.settingsModal || !els.settingsBody) return;
     const draw = () => {
@@ -5005,6 +5044,22 @@ function sidesBlockHTML(dayId, day) {
           </div>
           <button type="button" class="sh-btn" id="set-hol-add" style="margin-top:0.5rem">Add holiday</button>
         </section>
+        <section class="set-block">
+          <h4>Theme</h4>
+          <div class="sh-row2">
+            <button type="button" class="sh-btn${getFmTheme()==="dark"?" p":""}" data-theme-set="dark">Dark</button>
+            <button type="button" class="sh-btn${getFmTheme()==="light"?" p":""}" data-theme-set="light">Light</button>
+          </div>
+        </section>
+        <section class="set-block">
+          <h4>Weekly grocery budget</h4>
+          <p class="muted2">Used for the list est. total compare. Edit anytime here.</p>
+          <label class="fld">Amount (USD)</label>
+          <input class="inp" id="set-bud-amt" type="number" min="0" step="1" value="${escapeAttr(state.budget && state.budget.on ? (state.budget.amt ?? "") : "")}" placeholder="e.g. 120" />
+          <label class="fld">Over days</label>
+          <input class="inp" id="set-bud-days" type="number" min="1" max="31" value="${escapeAttr((state.budget && state.budget.days) || 14)}" />
+          <label><input type="checkbox" id="set-bud-on" ${state.budget && state.budget.on ? "checked" : ""}/> Budget on</label>
+        </section>
         <button type="button" class="sh-btn" id="set-replay" style="margin-bottom:0.5rem">Replay welcome</button>
         <button type="button" class="sh-btn p wide" id="set-save">Save settings</button>
       `;
@@ -5037,12 +5092,19 @@ function sidesBlockHTML(dayId, day) {
         state.holidays.push({ id: `custom-${Date.now()}`, name: name.slice(0, 40), emoji: "🎉", kind: "custom", date, cook: false });
         draw();
       };
+      els.settingsBody.querySelectorAll("[data-theme-set]").forEach((b) => {
+        b.onclick = () => { applyFmTheme(b.dataset.themeSet); draw(); };
+      });
       els.settingsBody.querySelector("#set-replay").onclick = () => { closeSettings(); replayWelcome(); };
       els.settingsBody.querySelector("#set-save").onclick = () => {
         const raw = els.settingsBody.querySelector("#set-rules").value;
         state.houseRules = raw.split(/\n+/).map((s) => s.trim()).filter(Boolean).slice(0, 20);
         state.storeName = els.settingsBody.querySelector("#set-store").value || "Aldi";
         state.location = els.settingsBody.querySelector("#set-loc").value.trim() || "Vero Beach";
+        const budOn = !!els.settingsBody.querySelector("#set-bud-on")?.checked;
+        const budAmt = Number(els.settingsBody.querySelector("#set-bud-amt")?.value);
+        const budDays = Math.max(1, Math.round(Number(els.settingsBody.querySelector("#set-bud-days")?.value) || 14));
+        state.budget = { on: budOn, amt: budOn && Number.isFinite(budAmt) ? budAmt : null, days: budDays };
         persist();
         refreshLiveForLocation();
         closeSettings();
@@ -5834,6 +5896,7 @@ function sidesBlockHTML(dayId, day) {
   }
 
   function renderAll() {
+    try { applyFmTheme(getFmTheme()); } catch (_) {}
     try { renderStockPhotos(); } catch (_) {}
     els.weekLabel.value = state.weekTitle;
     renderTemplates();
