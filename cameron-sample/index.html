@@ -162,7 +162,7 @@
 
   /* ===== v3: receipt button, calendar, budget, week customizer, build extras, prep badges ===== */
   .rcpt-btn{border:0;border-radius:999px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#111;font:inherit;font-weight:800;font-size:15px;padding:10px 16px;min-height:44px;cursor:pointer;box-shadow:0 4px 0 rgba(146,64,14,.45)}
-  .rcpt-top{display:flex;justify-content:center;margin:0 0 12px}
+  .rcpt-top{display:flex;justify-content:center;align-items:center;gap:8px;margin:0 0 12px;flex-wrap:wrap}
   body.light .rcpt-btn{background:linear-gradient(135deg,var(--coral),var(--coralD));color:#fff;box-shadow:0 4px 0 rgba(185,68,28,.3)}
   .wl-row{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 4px}
   .wl-row .wlabel{margin:0}
@@ -220,8 +220,9 @@
   .edited{display:inline-block;margin-left:6px;background:var(--coral);color:#fff;border-radius:999px;padding:2px 8px;font-size:11px;letter-spacing:.04em;vertical-align:middle}
   .emo-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
   .emo-row .memo{margin:0}
-  .pc{display:flex;flex-direction:column;gap:2px;font-size:12px;font-weight:800;color:var(--wsoft);background:var(--wbg);border-radius:10px;padding:4px 8px;line-height:1.25}
-  .pc.dk{background:#0b1222;color:var(--mut);border:1px solid var(--chip)}
+  .pc{display:flex;flex-direction:column;gap:2px;font-size:12px;font-weight:800;color:var(--wsoft);background:transparent;border:0;border-radius:0;padding:0;line-height:1.25}
+  .pc.dk{background:transparent;color:var(--mut);border:0}
+  .pc .emo{font-size:20px;line-height:1;margin-right:4px;vertical-align:-2px}
   .mtop{display:flex;align-items:center;gap:8px}
   .meal .mrow{flex-wrap:wrap}.meal .yn{margin-left:auto}.meal .mt{order:3;flex-basis:100%;margin-top:6px}
   .xtra-btn{display:inline-block;border:2px dashed var(--gold);color:var(--gold);background:transparent;border-radius:999px;padding:10px 16px;font-size:16px;cursor:pointer;margin:0 0 14px}
@@ -251,9 +252,20 @@
   .nut{margin:6px 0 0;font-size:12px;font-weight:800;color:var(--tealD)}
 
   .rate{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px;font-size:12px;font-weight:800;color:var(--wsoft)}
-  .rate button{min-width:46px;min-height:40px;border-radius:12px;border:2px solid rgba(15,110,110,.25);background:var(--wbg);font-size:16px;cursor:pointer}
-  .rate button[aria-pressed="true"]{background:var(--tealS);border-color:var(--teal)}
-  .favb{display:inline-block;font-size:12px;font-weight:800;background:#ffe4e6;color:#9f1239;border-radius:999px;padding:2px 8px;vertical-align:middle}
+  .rate button{min-width:44px;min-height:44px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;font-size:20px;line-height:1;cursor:pointer;opacity:.4;transition:opacity .12s}
+  .rate button[aria-pressed="true"]{opacity:1;background:transparent;border:0;box-shadow:none}
+  .rate button:hover,.rate button:active{background:transparent;border:0;box-shadow:none}
+  .rate .rate-del{min-width:44px;min-height:44px;padding:4px;margin-left:auto;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--wsoft);flex-shrink:0;opacity:1;font-size:inherit}
+  .rate .rate-del:hover,.rate .rate-del:active,.rate .rate-del[aria-pressed]{background:transparent;border:0;box-shadow:none;opacity:1}
+  .rate .rate-del .ico{display:block}
+  .favb{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:800;color:var(--wsoft);vertical-align:middle;background:transparent;border:0;padding:0;border-radius:0}
+  .favb .emo,.emo{font-size:20px;line-height:1;display:inline-block;background:transparent;border:0;padding:0;border-radius:0;box-shadow:none}
+  .chip-row{display:inline-flex;align-items:center;gap:6px;margin:0 4px 8px 0}
+  .chip-row .chip{margin:0}
+  .lr button[data-ls]{min-width:44px;min-height:44px;padding:0 4px;border:0;border-radius:0;background:transparent;box-shadow:none;font-size:13px;font-weight:800;color:var(--wsoft);opacity:.4;gap:4px;display:inline-flex;align-items:center}
+  .lr button[data-ls] .emo{font-size:20px;line-height:1}
+  .lr button[data-ls][aria-pressed="true"]{opacity:1;background:transparent;border:0;color:var(--wink)}
+  .sheet .lr button[data-ls]{background:transparent;color:#3d5566}.sheet .lr button[data-ls][aria-pressed="true"]{background:transparent;border:0;color:#173042;opacity:1}
   .rpanel ul{list-style:none;margin:0;padding:0}.rpanel li{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed rgba(23,48,66,.12);font-weight:800}
   .rpanel li span{flex:1}.rpanel li small{color:var(--wsoft);font-weight:650}
   .etm{display:inline-block;margin-top:6px;font-size:13px;font-weight:800;color:var(--teal)}
@@ -261,8 +273,8 @@
   .nextwk{background:var(--white);border-radius:14px;padding:10px 14px;font-weight:700;font-size:14px;color:var(--wsoft);box-shadow:0 8px 22px rgba(23,48,66,.1);margin-bottom:12px}
   /* v4 */
   .dha{display:flex;align-items:center;gap:6px}
-  .dact{min-height:32px;min-width:40px;padding:3px 10px;border-radius:999px;border:1.5px solid rgba(255,255,255,.55);background:rgba(255,255,255,.14);color:#fff;font:inherit;font-size:11px;font-weight:800;letter-spacing:.04em;cursor:pointer}
-  .dact.del{font-size:14px;padding:3px 8px;letter-spacing:0}
+  .swap-link{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:44px;min-width:44px;padding:0 4px;border:0;border-radius:0;background:transparent;box-shadow:none;color:#fff;font:inherit;font-size:13px;font-weight:800;letter-spacing:0;text-decoration:underline;text-underline-offset:3px;cursor:pointer;opacity:.95}
+  .swap-link .ico{display:block;opacity:.95}
   .log{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(23,48,66,.14)}
   .lr{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:4px 0;font-size:12px;font-weight:800;color:var(--wsoft)}
   .lr button{min-height:36px;min-width:40px;padding:4px 10px;border-radius:999px;border:2px solid rgba(15,110,110,.22);background:var(--wbg);font:inherit;font-size:12px;font-weight:800;color:var(--wink);cursor:pointer}
@@ -302,7 +314,8 @@
   .hero .pills{justify-content:flex-start;margin-top:8px}
   .day.hol{opacity:.72;cursor:default}.day.hol .dh{background:linear-gradient(135deg,#9aa7b0,#7d8a94)}.day.hol .db{background:#f1f3f4}
   .day.grab .dh{background:linear-gradient(135deg,#0e7490,#155e75)}
-  .gtag{display:inline-block;margin:0 0 4px;background:#ecfeff;color:#155e75;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:800}
+  .gtag{display:inline-flex;align-items:center;gap:4px;margin:0 0 4px;background:transparent;color:var(--wsoft);border:0;border-radius:0;padding:0;font-size:12px;font-weight:800}
+  .gtag .emo{font-size:20px;line-height:1}
   .popt.chk{position:relative;padding-left:32px}.popt.chk::before{content:"☐";position:absolute;left:10px;top:50%;transform:translateY(-50%)}.popt.chk.sel::before{content:"☑"}
   .popt.other{border-style:dashed}
   .vchip.multi{max-width:100%;white-space:normal;line-height:1.3}
@@ -319,7 +332,8 @@
   .pc .calb,.pc span:last-child{color:inherit}
   .mtot{margin:10px 0 0;padding:10px 12px;border-radius:12px;background:rgba(14,165,233,.14);border:2px solid rgba(14,165,233,.45);font-weight:800;font-size:16px;color:#e0f2fe}
   body.light .mtot{background:#ecfeff;border-color:#0e7490;color:#155e75}
-  .shopjump{min-height:32px;min-width:36px;padding:3px 8px;border-radius:999px;border:1.5px solid rgba(255,255,255,.55);background:rgba(255,255,255,.14);color:#fff;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+  .shopjump{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:#fff;font:inherit;cursor:pointer}
+  .shopjump .ico{display:block}
   .byday{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
   .byday button{min-height:36px;padding:4px 10px;border-radius:999px;border:2px solid rgba(15,110,110,.28);background:#fff;font:inherit;font-weight:800;font-size:12px;color:var(--tealD);cursor:pointer}
   .byday button.on{background:var(--teal);color:#fff;border-color:var(--teal)}
@@ -332,7 +346,6 @@
   .rcpt-btn.ico-btn,.cpb.ico-btn{width:auto;flex:1 1 auto}
   .gear.ico-btn{width:44px;height:44px;border-radius:14px;border:2px solid rgba(15,110,110,.35);background:var(--white);box-shadow:0 3px 0 rgba(15,110,110,.12)}
   .cal-btn.ico-btn{min-width:44px;min-height:44px;border-radius:14px;border:2px solid rgba(15,110,110,.35);background:var(--white)}
-  .dact.ico-btn{min-height:32px;min-width:36px;padding:4px 8px;border-radius:999px;border:1.5px solid rgba(255,255,255,.55);background:rgba(255,255,255,.14);color:#fff}
   .memo-sm{font-size:20px;line-height:1}
   .sheet .sw.sm{display:inline-flex;align-items:center;width:52px;height:30px}
   .freezer-tip{margin:6px 0 8px;font-size:13px;font-weight:700;color:var(--wsoft);background:var(--wbg);border-radius:10px;padding:8px 10px}
@@ -341,7 +354,7 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="rcpt-top"><button class="rcpt-btn" data-rcpt="1">📷 Upload receipt</button></div>
+  <div class="rcpt-top"><span class="emo" aria-hidden="true">📷</span><button class="rcpt-btn" data-rcpt="1">Upload receipt</button></div>
   <div class="top"><span>Cameron's Meal Picker</span><span id="count"></span></div>
   <div class="bar"><i id="prog" style="width:0"></i></div>
   <div class="card" id="card"></div>
@@ -728,11 +741,11 @@ function render(){
       <div class="feat${fm?" on":""}" id="fm"><div class="fe">🔥</div><div><b>George Foreman grill</b><div class="dad">🎁 Dad got you this. Still your go-to?</div></div><div class="ck">${fm?"✓":""}</div></div>
       <p class="fnote">${fm?"✓ Yep. Meals and cook times are built around the Foreman.":"Tap the card if you still use it."}</p>
       <p class="lbl">Also have</p>
-      <div class="chips">${rest.map(e=>`<span class="chip${st.equip.has(e.id)?"":" off"}" data-e="${e.id}">${e.emoji} ${e.label}</span>`).join("")}${(st.custom.equip||[]).map(v=>`<span class="chip cust${st.equip.has("c:"+v)?"":" off"}" data-e="c:${esc(v)}">🔧 ${esc(v)}</span>`).join("")}${customChip("equip")}</div>${customRow("equip")}
+      <div class="chips">${rest.map(e=>`<span class="chip-row"><span class="emo">${e.emoji}</span><span class="chip${st.equip.has(e.id)?"":" off"}" data-e="${e.id}">${esc(e.label)}</span></span>`).join("")}${(st.custom.equip||[]).map(v=>`<span class="chip-row"><span class="emo">🔧</span><span class="chip cust${st.equip.has("c:"+v)?"":" off"}" data-e="c:${esc(v)}">${esc(v)}</span></span>`).join("")}${customChip("equip")}</div>${customRow("equip")}
       <p class="fnote">${(st.equip.has("lavazza")||st.equip.has("nespresso")||st.equip.has("espresso"))?"☕ Coffee machines are on. Next: Lavazza Oro, drinks per week, optional milk.":"No coffee machine? Fine — the coffee step is skipped."}</p>
       <div class="snap"><p class="lbl" style="margin-top:0">Anything else in your kitchen?</p>
         <p>Not sure if you have something? 📸 Snap a photo of your counters/cabinets and send it to your chef bot. It'll tell you what you've got.</p>
-        <button class="sbtn" id="kitSnap">📸 Snap a photo</button><input type="file" accept="image/*" capture="environment" id="kitIn" hidden>
+        <span class="emo">📸</span> <button class="sbtn" id="kitSnap">Snap a photo</button><input type="file" accept="image/*" capture="environment" id="kitIn" hidden>
         <div class="thumbs" id="kitThumbs"></div><div id="kitAct"></div>
         <p class="muted" style="margin-top:6px">This page can't see what's in the photo. Your chef bot reads it. Photos stay on your phone unless you share them.</p></div>
       ${btns("Next →")}`;
@@ -774,7 +787,7 @@ function meals(){
   const row=m=>{const a=st.meals[m.id]||"";const op=st.tip===m.id;const po=st.open==="m:"+m.id;const multi=!!m.protein;
      const opts=[...(m.v||[]),...(st.custom["prot:"+m.id]||[])];
      return `<div class="meal ${a}"><div class="mrow"><div class="mtop"><span class="me">${m.emoji}</span>${pcBadge(m.prep,m.cook||0,true,false,mealBaseCal(m.id))}</div><div class="mt"><b>${rateOf(m.id)===2?"❤️ ":""}${esc(m.name)}</b><br>
-       ${m.grab?`<span class="gtag">${esc(m.tag||"🛍 Grab & go")}</span> `:""}${m.v?`<span class="vchip${multi?" multi":""}" data-mv="${m.id}">${esc(multi?mvLabel(m.id):mv(m.id))} ▾</span> `:""}${!m.grab&&fm&&m.grill?`<span class="fb">🔥 ${esc((m.time||"").split(" (")[0])}</span>`:m.grab?`<span class="fb">⏱ ${esc(m.time||"0–5 min")}</span>`:""}</div>
+       ${m.grab?`<span class="gtag"><span class="emo">🛍</span> Grab & go</span> `:""}${m.v?`<span class="vchip${multi?" multi":""}" data-mv="${m.id}">${esc(multi?mvLabel(m.id):mv(m.id))} ▾</span> `:""}${!m.grab&&fm&&m.grill?`<span class="fb">🔥 ${esc((m.time||"").split(" (")[0])}</span>`:m.grab?`<span class="fb">⏱ ${esc(m.time||"0–5 min")}</span>`:""}</div>
        <div class="yn"><button class="y${a==="yes"?" sel":""}" data-m="${m.id}" data-a="yes">Yes</button><button class="n${a==="no"?" sel":""}" data-m="${m.id}" data-a="no">No</button></div></div>
        ${po?(multi?proteinPop(m.id,m.id==="steak"?"Which cuts? (pick several)":"Which kinds? (pick several)",opts,mvAll(m.id),true):popHTML(m.id==="steak"?"Which cut?":"Which kind?",opts,mv(m.id),false)):""}
        <button class="tipbtn" data-tip="${m.id}">${op?"▾":"▸"} ${m.grab?"How it works":"How to cook it"}</button>${op?tipHTML(m):""}</div>`};
@@ -1111,7 +1124,7 @@ function renderWeek(){
       <button type="button" class="pill c btn" id="bsP" aria-label="Best split estimate">Best split ~$${t.b.toFixed(0)} est.</button>
       <button type="button" class="pill btn bud${bud.on?"":" off"}" id="budP">${!bud.on?"Budget off":bud.amt==null?"Set budget":`Budget $${fmtAmt(bud.amt)} / ${bud.days}d`}</button>
     </div>
-    <div class="rcpt-top" style="margin-top:10px"><button type="button" class="rcpt-btn ico-btn" data-rcpt="1" aria-label="Upload receipt">${icons.rcpt} Upload receipt</button></div>
+    <div class="rcpt-top" style="margin-top:10px">${icons.rcpt}<button type="button" class="rcpt-btn" data-rcpt="1">Upload receipt</button></div>
   </section>
   ${guideBox()}
   <details class="lt"><summary>💰 Meat money tips</summary><ul>${C.TIPS.meat.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>
@@ -1121,16 +1134,15 @@ function renderWeek(){
   ${days.map((d,i)=>{const m=MN(d.meal);const cut=d.cut?` · ${esc(d.cut)}`:"";
     return `<div class="day${dayCls(d)}" data-d="${i}" style="animation-delay:${i*.04}s">
     <div class="dh"><span>${d.short}${d.cook?" · cook":""}${d.grab?" · grab":""}</span><span class="dha">${d.kind!=="hol"?shopBtn(i):""}
-      <button type="button" class="dact ico-btn" data-swapd="${i}" aria-label="Swap ${d.short} dinner">${icons.swap}</button>
-      <button type="button" class="dact del ico-btn" data-del="${i}" aria-label="Delete ${d.short} dinner">${icons.del}</button>
+      <button type="button" class="swap-link" data-swapd="${i}" aria-label="Swap ${d.short} dinner">${icons.swap} Swap</button>
       <span class="memo-sm">${d.e}</span></span></div>
     <div class="db"><div class="emo-row"><span class="memo">${d.e}</span>${dayBadge(d)}</div>
-    <p class="dinner">${d.meal&&rateOf(d.meal)===2?'<span class="favb">❤️ favorite</span> ':""}${cutTag(d)}${esc(d.dinner)}</p>${dayNut(d)}
+    <p class="dinner">${d.meal&&rateOf(d.meal)===2?'<span class="favb"><span class="emo">❤️</span> favorite</span> ':""}${cutTag(d)}${esc(d.dinner)}</p>${dayNut(d)}
     ${d.note?`<p class="dnote">${esc(d.note)}</p>`:""}
     <p class="dl">Lunch at Woody's: ${esc(d.lunch||"—")}</p>
     ${d.bf?`<p class="dl b">${bfLine(d.bf)}</p>`:""}
     ${W.open===i&&m?`<div class="rec"><h4>${m.emoji} ${esc(m.name)}</h4>${tipHTML(m).replace('class="tip"','')}</div>`:""}
-    <p class="hint">${W.open===i?"▾ tap to close":"▸ tap for how-to + temps"}</p>${d.meal&&M(d.meal)?rateRow(d.meal):""}${d.kind==="rm"||d.kind==="hol"?"":logRow(i,d)}</div></div>`}).join("")}
+    <p class="hint">${W.open===i?"▾ tap to close":"▸ tap for how-to + temps"}</p>${rateRow(d.meal&&M(d.meal)?d.meal:null,i,d.short)}${d.kind==="rm"||d.kind==="hol"?"":logRow(i,d)}</div></div>`}).join("")}
   ${weekReview(days)}
   ${ratingsPanel()}
   ${W.extra.length?`<div class="nextwk">🔄 Next week rotation: ${W.extra.map(g=>({pork:mv("pork"),brats:mv("brats"),chicken:"chicken",burger:"burgers",steak:"steak"}[g])).join(", ")}</div>`:""}
@@ -1143,12 +1155,12 @@ function renderWeek(){
       <button type="button" class="cpb ico-btn" data-copy="Aldi">${icons.copy} Aldi</button>
       <button type="button" class="cpb ico-btn" data-copy="Publix">${icons.copy} Publix</button></div>
     ${W.cph?`<div class="cph" id="cphBox"><p class="cph-t">✓ Copied. Want to send a photo with it?</p><button type="button" class="cpb p ico-btn" id="cphB">${icons.cam} Take a photo</button><input type="file" accept="image/*" capture="environment" hidden id="cphIn"><div class="thumbs" id="cphTh"></div><div id="cphAct"></div></div>`:""}
-    ${(st.equip.has("lavazza")||st.equip.has("nespresso")||st.equip.has("espresso"))?`<p class="gnote cof">☕ ${coffeeLine(false)}</p>`:""}
+    ${(st.equip.has("lavazza")||st.equip.has("nespresso")||st.equip.has("espresso"))?`<p class="emo" style="margin:8px 0 2px">☕</p><p class="gnote cof">${coffeeLine(false)}</p>`:""}
     <p class="pchk">Prices last checked ${fmtDateLong(PRICE_META.updated)}${PRICE_META.loaded?"":" (built-in estimates)"}</p>
     ${budCmp(t.b,7)}
-    <p class="gnote freezer-tip">🧊 Freezer tip: split family packs into single bags when you get home; date each bag.</p>
+    <p class="emo" style="margin:8px 0 2px">🧊</p><p class="gnote freezer-tip">Freezer tip: split family packs into single bags when you get home; date each bag.</p>
     ${renderListItems(byA,filt,days)}
-    <p class="gnote" style="margin-top:12px">🌡 One-time buy: instant-read thermometer (~$10–15; not in totals).</p>
+    <p class="emo" style="margin:12px 0 2px">🌡</p><p class="gnote">One-time buy: instant-read thermometer (~$10–15; not in totals).</p>
   </section>
   <a class="gh" href="${C.REPO.url}" target="_blank" rel="noopener"><b>🛠️ Your own repo, cameron-meals</b><span>Edit meals.js on GitHub to change your menu.</span></a>
   <button type="button" class="wbtn p ico-btn" id="bk">${icons.back} Back to my picks</button><button type="button" class="wbtn g" id="rs2">Start over</button>
@@ -1280,7 +1292,7 @@ function attachShare(o){
 function openReceipt(){
   const inn=openSheet(shTop("📷 Upload receipt")+`
     <p style="margin:0 0 10px;font-weight:700;font-size:15px">Snap your receipt (or a Publix app Purchases screenshot), then send it to Jarvis.</p>
-    <div class="sh-row2" style="margin-top:0"><button class="sh-btn p" data-pick="cam">📷 Take photo</button><button class="sh-btn" data-pick="lib">🖼 Choose photos</button></div>
+    <div class="sh-row2" style="margin-top:0;align-items:center"><span class="emo">📷</span><button class="sh-btn p" data-pick="cam">Take photo</button><span class="emo">🖼</span><button class="sh-btn" data-pick="lib">Choose photos</button></div>
     <input type="file" accept="image/*" capture="environment" hidden data-in="cam"><input type="file" accept="image/*" multiple hidden data-in="lib">
     <div class="thumbs" data-th></div><div data-act></div>
     <p class="muted2"><b>Prices update after Jarvis reads it.</b> This page is a static site: nothing is uploaded from here. "Send to Jarvis" just opens your phone's share sheet so you can send the photo into the chat.</p>`,"Upload receipt");
@@ -1313,7 +1325,7 @@ function effDays(ov){const s0=weekStartDate();return W.base.map((b,i)=>{const d=
   return {...b,short,...c}})}
 function recomputeList(){const days=effDays(W.ov).filter(d=>d.kind!=="hol");const gs=[...new Set(days.map(d=>d.g).filter(Boolean))];
   W.items=buildList(gs,[...new Set(days.map(d=>d.meal).filter(Boolean))])}
-function pcBadge(prep,cook,dark,reheat){return `<span class="pc${dark?" dk":""}"><span>🔪 Prep ~${prep} min</span><span>🔥 ${reheat?"Reheat":"Cook"} ~${cook} min</span></span>`}
+function pcBadge(prep,cook,dark,reheat){return `<span class="pc${dark?" dk":""}"><span><span class="emo">🔪</span> Prep ~${prep} min</span><span><span class="emo">🔥</span> ${reheat?"Reheat":"Cook"} ~${cook} min</span></span>`}
 function dayBadge(d){if(d.kind==="out"||d.kind==="rm")return "";if(d.kind==="left")return pcBadge(2,3,false,true);const m=d.meal&&M(d.meal);if(!m)return "";
   if(d.cook||["chixq","steakq","stkegg"].includes(d.meal))return pcBadge(m.prep,m.cook);return pcBadge(2,3,false,true)}
 /* budget (saved on this phone) */
@@ -1414,7 +1426,9 @@ function getRates(){try{const j=JSON.parse(localStorage.getItem(RKEY)||"{}");if(
 function rateOf(id){const r=getRates()[id];return r?r.r:0}
 function setRate(id,r){const all=getRates();if(!r||(all[id]&&all[id].r===r))delete all[id];else all[id]={r,d:isoD(new Date())};
   try{localStorage.setItem(RKEY,JSON.stringify(all))}catch(_){}}
-function rateRow(id){const r=rateOf(id);return `<div class="rate" onclick="event.stopPropagation()"><span>Made it? Rate it:</span>${[[-1,"👎","Tried it, no — never suggest again"],[1,"👍","Good"],[2,"❤️","Favorite"]].map(([v,e,t])=>`<button data-rate="${v}" data-m="${id}" aria-pressed="${r===v}" title="${t}">${e}</button>`).join("")}</div>`}
+function rateRow(id,i,short){const del=`<button type="button" class="rate-del ico-btn" data-del="${i}" aria-label="Delete ${esc(short||"")} dinner">${icons.del}</button>`;
+  if(!id)return `<div class="rate" onclick="event.stopPropagation()">${del}</div>`;
+  const r=rateOf(id);return `<div class="rate" onclick="event.stopPropagation()" role="group" aria-label="Rate this meal">${[[-1,"👎","Tried it, no — never suggest again"],[1,"👍","Good"],[2,"❤️","Favorite"]].map(([v,e,t])=>`<button type="button" data-rate="${v}" data-m="${id}" aria-pressed="${r===v}" aria-label="${t}" title="${t}">${e}</button>`).join("")}${del}</div>`}
 function ratingsPanel(){const all=getRates();const ids=Object.keys(all).filter(id=>M(id));
   const row=(id,restore)=>`<li><span>${M(id).emoji} ${esc(M(id).name)}${restore?` <small>👎 never suggest</small>`:""}${timesMade(id)?` <small>· made ${timesMade(id)}×</small>`:""}</span><small>${esc(all[id].d||"")}</small><button class="have" data-unrate="${id}">${restore?"Restore":"Clear"}</button></li>`;
   const g=r=>ids.filter(id=>all[id].r===r);
@@ -1477,10 +1491,10 @@ function coffeeStep(){const K=C.COFFEE,c=st.coffee;
     <p class="lbl">Coffee (default Oro)</p><div class="chips">${brands.map(b=>`<span class="chip${c.brand===b?"":" off"}" data-br="${esc(b)}">${esc(b)}</span>`).join("")}</div>
     ${c.brand==="Other"?`<div class="addrow cust"><input id="cbrand" placeholder="Type your coffee…" maxlength="40" value="${esc(c.brandOther||"")}"><button id="cbrandOk">Save</button></div>`:""}
     <p class="lbl">Machines</p><div class="chips">${K.machines.map(m=>`<span class="chip${(c.machines.has(m.id)||st.equip.has(m.id))?"":" off"}" data-cm="${m.id}">${esc(m.label)}</span>`).join("")}</div>
-    <p class="lbl">Drinks (tap all you make)</p><div class="chips">${K.drinks.map(d=>`<span class="chip${c.drinks.has(d.id)?"":" off"}" data-cd="${d.id}">${d.emoji} ${d.label}</span>`).join("")}</div>
+    <p class="lbl">Drinks (tap all you make)</p><div class="chips">${K.drinks.map(d=>`<span class="chip-row"><span class="emo">${d.emoji}</span><span class="chip${c.drinks.has(d.id)?"":" off"}" data-cd="${d.id}">${esc(d.label)}</span></span>`).join("")}</div>
     <p class="lbl">Milk (optional)</p><div class="chips">${K.milks.map(m=>`<span class="chip${c.milk===m?"":" off"}" data-cmk="${esc(m)}">${esc(m)}</span>`).join("")}</div>
     <p class="lbl">Drinks per week</p><div class="chips">${K.perWeek.map(n=>`<span class="chip${c.perWeek===n?"":" off"}" data-cw="${n}">${n}</span>`).join("")}</div>
-    <div class="cofbox">☕ ${coffeeLine(true)}<br><small>He reseals Oro into small refillable tin capsules (~${K.gPerShot} g each). Shopping list gets a Coffee section: large Oro can/bag sized to your drinks, plus capsule foil lids as a periodic restock. Prices are est. / add from receipt — no made-up shelf price.</small></div>
+    <p class="emo" style="margin:14px 0 4px">☕</p><div class="cofbox">${coffeeLine(true)}<br><small>He reseals Oro into small refillable tin capsules (~${K.gPerShot} g each). Shopping list gets a Coffee section: large Oro can/bag sized to your drinks, plus capsule foil lids as a periodic restock. Prices are est. / add from receipt — no made-up shelf price.</small></div>
     ${btns("Next →")}`;
   card.querySelectorAll("[data-br]").forEach(b=>b.onclick=()=>{c.brand=b.dataset.br;render()});
   const bok=$("cbrandOk");if(bok){const save=()=>{c.brandOther=$("cbrand").value.trim().slice(0,40);render()};bok.onclick=save;$("cbrand").onkeydown=e=>{if(e.key==="Enter")save()}}
@@ -1521,12 +1535,12 @@ function openDelete(i){const d=effDays(W.ov)[i];const prev=W.ov[i];
 const LKEY="cameron-meals-log-v1";
 function getLog(){try{const j=JSON.parse(localStorage.getItem(LKEY)||"null");if(j&&typeof j==="object"&&j.log)return j}catch(_){}return {log:{},prompt:null,seen:null}}
 function setLog(L){try{localStorage.setItem(LKEY,JSON.stringify(L))}catch(_){}}
-const LS=[["made","✅ Made"],["skip","⏭ Skipped"],["out","🍽 Ate out"]];
+const LS=[["made","✅","Made"],["skip","⏭","Skipped"],["out","🍽","Ate out"]];
 const logKey=e=>e.m||e.n;
 const mealName=k=>{const m=M(k);return m?m.emoji+" "+m.name:k};
 function timesMade(k){return Object.values(getLog().log).filter(e=>e.s==="made"&&logKey(e)===k).length}
 function logCtl(date){const iso=isoD(date),e=getLog().log[iso]||{};
-  return `<div class="lr"><span>Log it:</span>${LS.map(([v,l])=>`<button data-ls="${v}" data-ld="${iso}" aria-pressed="${e.s===v}">${l}</button>`).join("")}</div>
+  return `<div class="lr"><span>Log it:</span>${LS.map(([v,em,l])=>`<button type="button" data-ls="${v}" data-ld="${iso}" aria-pressed="${e.s===v}" aria-label="${l}"><span class="emo" aria-hidden="true">${em}</span> ${l}</button>`).join("")}</div>
   ${e.s==="made"?`<div class="lr"><span>Leftovers:</span>${[0,1,2,3].map(n=>`<button data-llo="${n}" data-ld="${iso}" aria-pressed="${e.lo===n}">${n}</button>`).join("")}</div><div class="lr"><span>Went bad?</span><button data-lbad="0" data-ld="${iso}" aria-pressed="${e.bad===false}">No</button><button data-lbad="1" data-ld="${iso}" aria-pressed="${e.bad===true}">Yes</button></div>`:""}`}
 function logRow(i,d){const date=addDays(weekStartDate(),i),k=d.meal||null,n=k?timesMade(k):0;
   return `<div class="log" onclick="event.stopPropagation()">${logCtl(date)}${n?`<p class="lct">Made ${n}× all-time${rateOf(k)===2?" · ❤️ favorite":""}</p>`:""}</div>`}
@@ -1544,7 +1558,7 @@ function last3(days){const t=new Date(),out=[];for(let k=3;k>=1;k--){const d=add
 function logBanner(days){const L=getLog(),today=isoD(new Date());if(!L.seen){L.seen=today;setLog(L)}
   const since=Math.floor((Date.now()-new Date((L.prompt||L.seen)+"T00:00:00").getTime())/864e5);
   if(since<3||!last3(days).some(x=>!L.log[x.iso]))return "";
-  return `<div class="logb"><b>📝 Quick check-in</b><span>How did the last 3 days go? A few taps keeps your suggestions smart.</span><div><button class="lb p" id="lgGo">Log last 3 days</button><button class="lb" id="lgLater">Later</button></div></div>`}
+  return `<p class="emo" style="margin:12px 0 4px">📝</p><div class="logb"><b>Quick check-in</b><span>How did the last 3 days go? A few taps keeps your suggestions smart.</span><div><button class="lb p" id="lgGo">Log last 3 days</button><button class="lb" id="lgLater">Later</button></div></div>`}
 function openLogSheet(days){const items=last3(days),map={};items.forEach(x=>map[x.iso]={m:x.m,n:x.n});const inn=openSheet("","Log the last 3 days");
   const fin=()=>{const L=getLog();L.prompt=isoD(new Date());setLog(L);closeSheet();renderWeek()};
   const draw=()=>{inn.innerHTML=shTop("📝 Log the last 3 days")+`<p class="muted2" style="margin:0 0 8px">Shown: what your plan has for that weekday. Tap what actually happened.</p>`+
