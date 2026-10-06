@@ -4183,7 +4183,7 @@ function ensureSideOffers(dayId, day) {
           const info = IA.meatAltsForDay(saved || day.dinner, day.dinner);
           if (info.alts && info.alts.length) {
             const cur = saved || info.current || info.key;
-            meatHost.innerHTML = `<span class="meat-label">${escapeHtml(cur)}</span>${IA.chevronHTML(cur, false)}`;
+            meatHost.innerHTML = `<span class="meat-label">${escapeHtml(uiCopy(cur))}</span>${IA.chevronHTML(uiCopy(cur), false)}`;
             const chip = meatHost.querySelector("[data-alt-open]");
             if (chip) {
               chip.addEventListener("click", (e) => {
