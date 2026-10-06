@@ -8,11 +8,15 @@ Live site (GitHub Pages): **https://burnsted.github.io/family-meals/**
 
 - **7-day week calendar** with day notes (Ted leftover substitute on fish nights)
 - **One-tap templates:** Week 1A / 1B / 2A / 2B
+- **Swap a night:** Leftovers, Eat out / takeout, or another dinner from the four templates — groceries update automatically
 - **Grocery checklist by aisle:** Produce, Dairy, Meat, Pantry, Frozen, Tucker lunchbox, Other
-- **Shop mode:** larger taps; checked items sort to the bottom of each aisle
+- **Have it** on staples (rice, tortillas, pasta/Alfredo, chili cans, Tucker kit) + **Hidden: N** to bring them back
+- **Qty + note** on each grocery line (in copy-as-text and share link)
+- **X items left** counter + hide-checked toggle (shop mode still sinks checked to the bottom when shown)
+- **Shop mode:** larger taps; checked items sort to the bottom; Screen Wake Lock keeps the phone awake when supported
 - **Optional $ estimates** per line + running “est. left” total
-- Checks, prices, custom items, and shop mode persist in `localStorage`
-- **Copy share link** encodes the full state in the URL hash
+- Checks, prices, qty/notes, Have it, day swaps, custom items, and shop mode persist in `localStorage`
+- **Copy share link** encodes the full state in the URL hash (old links still load)
 - **Copy grocery list as text** for iMessage/SMS
 - **House rules banner** always visible (sticky)
 - Budget band (~$100–130), editable week title

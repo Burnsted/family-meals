@@ -411,7 +411,6 @@ body::before {
 }
 
 .day-card {
-  appearance: none;
   width: 100%;
   text-align: left;
   border: none;
@@ -419,7 +418,6 @@ body::before {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
-  cursor: pointer;
   padding: 0;
   font: inherit;
   color: inherit;
@@ -459,6 +457,35 @@ body::before {
   font-size: 0.95rem;
 }
 
+.day-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.swap-btn {
+  appearance: none;
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.16);
+  color: white;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 0.28rem 0.65rem;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.swap-btn:hover,
+.swap-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.28);
+  outline: none;
+  transform: translateY(-1px);
+}
+
 .day-head .emoji {
   font-size: 1.25rem;
   letter-spacing: 0;
@@ -466,6 +493,39 @@ body::before {
 
 .day-body {
   padding: 0.9rem 1rem 1rem;
+}
+
+.day-body-btn {
+  appearance: none;
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 0.9rem 1rem 1rem;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.day-body-btn:focus-visible {
+  outline: 3px solid var(--coral);
+  outline-offset: -3px;
+}
+
+.day-card-swapped .day-head {
+  background: linear-gradient(135deg, var(--coral), var(--coral-deep));
+}
+
+.day-swap-badge {
+  margin: 0.35rem 0 0;
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--coral-deep);
+  background: var(--coral-soft);
+  border-radius: 8px;
+  padding: 0.2rem 0.45rem;
 }
 
 .meal-emoji {
@@ -564,6 +624,13 @@ body::before {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  margin-bottom: 0.55rem;
+}
+
+.grocery-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-bottom: 0.85rem;
 }
 
@@ -574,6 +641,35 @@ body::before {
   font-size: 0.85rem;
   padding: 0.35rem 0.7rem;
   border-radius: 10px;
+}
+
+.chip-btn {
+  appearance: none;
+  border: 2px solid rgba(15, 110, 110, 0.28);
+  background: var(--bg);
+  color: var(--teal-deep);
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 10px;
+  cursor: pointer;
+  min-height: 40px;
+}
+
+.chip-btn.is-on {
+  background: var(--teal-soft);
+  border-color: var(--teal);
+  color: var(--teal-deep);
+}
+
+.chip-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.chip-btn:focus-visible {
+  outline: 3px solid rgba(212, 87, 42, 0.3);
 }
 
 .category {
@@ -619,15 +715,25 @@ body::before {
   align-items: start;
 }
 
+.item-copy {
+  min-width: 0;
+}
+
 .item label {
   cursor: pointer;
   font-weight: 700;
 }
 
-.item.checked label {
+.item.checked .item-copy > label {
   text-decoration: line-through;
   color: var(--ink-soft);
   opacity: 0.75;
+}
+
+.item.have-it {
+  opacity: 0.72;
+  background: rgba(15, 110, 110, 0.05);
+  border-radius: 12px;
 }
 
 .item .hint {
@@ -636,6 +742,86 @@ body::before {
   font-size: 0.82rem;
   font-weight: 650;
   color: var(--teal-deep);
+}
+
+.item-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.meta-chip {
+  appearance: none;
+  border: 1.5px solid rgba(15, 110, 110, 0.28);
+  background: var(--bg);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 750;
+  padding: 0.22rem 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta-chip.is-on,
+.have-chip.is-on {
+  background: var(--teal-soft);
+  border-color: var(--teal);
+  color: var(--teal-deep);
+}
+
+.meta-chip:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 1px;
+}
+
+.meta-edit {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+  padding: 0.5rem;
+  background: var(--bg);
+  border-radius: 10px;
+}
+
+.meta-edit[hidden] {
+  display: none !important;
+}
+
+.meta-input {
+  width: 100%;
+  min-height: 42px;
+  border: 2px solid rgba(15, 110, 110, 0.28);
+  border-radius: 10px;
+  padding: 0.45rem 0.65rem;
+  font: inherit;
+  font-weight: 650;
+  background: var(--white);
+  color: var(--ink);
+}
+
+.meta-input:focus {
+  outline: 3px solid rgba(212, 87, 42, 0.25);
+  border-color: var(--coral);
+}
+
+.meta-save {
+  min-height: 42px;
+}
+
+.grocery-empty {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem;
+  background: var(--bg);
+  border-radius: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
 }
 
 .price-field {
@@ -731,6 +917,86 @@ body.shop-mode .grocery-panel {
 body.shop-mode .price-input {
   width: 4.8rem;
   font-size: 1.05rem;
+}
+
+/* Swap picker */
+.swap-current {
+  margin: 0 0 0.75rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.swap-section-title {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--teal-deep);
+}
+
+.swap-options {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.swap-options-scroll {
+  max-height: min(42vh, 320px);
+  overflow: auto;
+  padding-right: 0.15rem;
+}
+
+.swap-option {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  border: 2px solid rgba(15, 110, 110, 0.22);
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+}
+
+.swap-option:hover:not(:disabled),
+.swap-option:focus-visible:not(:disabled) {
+  border-color: var(--teal);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.swap-option.is-on {
+  background: var(--teal-soft);
+  border-color: var(--teal);
+}
+
+.swap-option:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.swap-option-title {
+  display: block;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.swap-option-sub {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: var(--ink-soft);
+}
+
+.swap-footnote {
+  margin: 0.85rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: var(--ink-soft);
+}
+
+.modal-swap {
+  max-height: min(88vh, 720px);
 }
 
 /* Modal */
