@@ -73,13 +73,14 @@
     <section class="howto" aria-labelledby="howto-title">
       <h2 id="howto-title">Share with Ted &amp; Samantha</h2>
       <ol>
-        <li>Tap a <strong>Week template</strong>, check groceries (add $ estimates if you want).</li>
-        <li>Tap <strong>Copy share link</strong> — the other phone loads the same week, checks, prices, and custom items.</li>
+        <li>Tap a <strong>Week template</strong>, then <strong>Swap</strong> any night if plans change.</li>
+        <li>Check groceries — tap <strong>Have it</strong> on staples, add qty/note, optional $.</li>
+        <li>Tap <strong>Copy share link</strong> — the other phone loads the same week, swaps, checks, prices, and custom items.</li>
         <li>Or <strong>Copy grocery list as text</strong> for iMessage/SMS.</li>
       </ol>
       <p class="sync-note">
-        v1 sync = share link (no login). Each phone also saves to localStorage.
-        Shop mode makes aisle taps bigger and drops checked items to the bottom.
+        Sync = share link (no login). Each phone also saves to localStorage.
+        Shop mode: bigger taps, checked sink to bottom, screen stays awake when supported.
       </p>
     </section>
 
@@ -93,7 +94,7 @@
     <section aria-labelledby="week-title">
       <div class="section-title">
         <h2 id="week-title">This week’s dinners</h2>
-        <span>7-day calendar · tap for recipe</span>
+        <span>7-day calendar · Swap night · tap for recipe</span>
       </div>
       <div class="week-grid" id="week-grid"></div>
     </section>
@@ -101,13 +102,14 @@
     <section class="grocery-panel" aria-labelledby="grocery-title">
       <div class="section-title">
         <h2 id="grocery-title">Grocery checklist</h2>
-        <span id="checked-count">0 checked</span>
+        <span id="checked-count">0 left · 0 checked</span>
       </div>
       <div class="grocery-meta">
         <span class="chip">By aisle</span>
-        <span class="chip">Checks + $ save on phone</span>
+        <span class="chip">Qty · note · Have it</span>
         <span class="chip">Share link encodes state</span>
       </div>
+      <div class="grocery-controls" id="grocery-controls" aria-label="List controls"></div>
       <div id="grocery-list"></div>
 
       <div class="custom-add">
@@ -149,6 +151,26 @@
         <button type="button" class="close-btn" id="modal-close" aria-label="Close recipe">×</button>
       </div>
       <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <div
+    class="modal-backdrop"
+    id="swap-modal"
+    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="swap-title"
+  >
+    <div class="modal modal-swap">
+      <div class="modal-top">
+        <div>
+          <h3 id="swap-title">Swap night</h3>
+          <p class="day-sub">Leftovers, eat out, or another dinner</p>
+        </div>
+        <button type="button" class="close-btn" id="swap-close" aria-label="Close swap">×</button>
+      </div>
+      <div id="swap-body"></div>
     </div>
   </div>
 

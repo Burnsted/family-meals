@@ -1,8 +1,8 @@
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "family-meals-state-v2";
-  const LEGACY_STORAGE_KEY = "family-meals-state-v1";
+  const STORAGE_KEY = "family-meals-state-v3";
+  const LEGACY_STORAGE_KEYS = ["family-meals-state-v2", "family-meals-state-v1"];
   /** Aisle order for grocery checklist */
   const CATEGORIES = [
     "Produce",
@@ -23,6 +23,7 @@
         name: "Yogurt cups ×5+ (Chobani multipack)",
         price: "",
         hint: "Count packs Sun night; restock midweek if depleting",
+        staple: true,
       },
       {
         id: `${prefix}-t-cheese`,
@@ -30,6 +31,7 @@
         name: "Cheese sticks ×5+ (Polly-O / Cheese Heads)",
         price: "",
         hint: "Buy if not enough for 5 school days",
+        staple: true,
       },
       {
         id: `${prefix}-t-pretzels`,
@@ -37,6 +39,7 @@
         name: "Pretzels and/or Pringles (if low)",
         price: "",
         hint: "Portion for 5 days; restock midweek",
+        staple: true,
       },
       {
         id: `${prefix}-t-fruit-snack`,
@@ -44,6 +47,7 @@
         name: "Fruit snacks ×5+",
         price: "",
         hint: "Restock midweek as packs deplete",
+        staple: true,
       },
       {
         id: `${prefix}-t-beef-stick`,
@@ -51,6 +55,7 @@
         name: "Natural beef sticks (red/white pack) ×5+",
         price: "",
         hint: "Likely need — buy ahead for the week",
+        staple: true,
       },
       {
         id: `${prefix}-t-juice`,
@@ -58,9 +63,43 @@
         name: "Apple juice boxes if Apple & Eve running low",
         price: "",
         hint: "Top up for 5 school days",
+        staple: true,
       },
     ];
   }
+
+  const SPECIAL_DINNERS = {
+    leftovers: {
+      key: "leftovers",
+      dinner: "Leftovers",
+      icon: "♻️",
+      mealEmoji: "📦",
+      adultLunch: "adult lunch → leftovers (opt)",
+      tedNote: "",
+      recipe: {
+        title: "Leftovers night",
+        have: "whatever’s already cooked",
+        steps: ["Pull leftovers from the fridge; reheat and plate.", "No new grocery run for this night."],
+        enjoy: "Clear the fridge — one less cook.",
+        buy: "none",
+      },
+    },
+    eatout: {
+      key: "eatout",
+      dinner: "Eat out / takeout",
+      icon: "🚗",
+      mealEmoji: "🥡",
+      adultLunch: "adult lunch → —",
+      tedNote: "",
+      recipe: {
+        title: "Eat out / takeout",
+        have: "appetite + a plan",
+        steps: ["Pick a spot or order takeout.", "Skip cooking — grocery lines for this night come off the list."],
+        enjoy: "Night off the kitchen.",
+        buy: "none",
+      },
+    },
+  };
 
   /**
    * Chili = weekend daytime cook only (football/company).
@@ -212,21 +251,21 @@
           ],
           groceries: [
             ...tuckerGroceries("w1"),
-            { id: "w1a-rotisserie", category: "Meat", name: "Rotisserie", price: "", hint: "" },
-            { id: "w1a-chicken", category: "Meat", name: "Chicken breasts ~2 lb (Alfredo)", price: "", hint: "" },
-            { id: "w1a-beef", category: "Meat", name: "Ground beef ~1–1.5 lb (chili +/or tacos)", price: "", hint: "" },
-            { id: "w1a-salmon", category: "Meat", name: "Salmon fillets (Fri — Samantha)", price: "", hint: "Ted skips fish — leftover sub that night" },
-            { id: "w1a-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "" },
-            { id: "w1a-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "" },
-            { id: "w1a-potatoes", category: "Produce", name: "Potatoes / rice sides", price: "", hint: "" },
-            { id: "w1a-onion", category: "Produce", name: "Onion", price: "", hint: "" },
-            { id: "w1a-salad", category: "Produce", name: "Salad / veg", price: "", hint: "" },
+            { id: "w1a-rotisserie", category: "Meat", name: "Rotisserie", price: "", hint: "", days: ["mon"] },
+            { id: "w1a-chicken", category: "Meat", name: "Chicken breasts ~2 lb (Alfredo)", price: "", hint: "", days: ["thu"] },
+            { id: "w1a-beef", category: "Meat", name: "Ground beef ~1–1.5 lb (chili +/or tacos)", price: "", hint: "", days: ["tue", "sat"] },
+            { id: "w1a-salmon", category: "Meat", name: "Salmon fillets (Fri — Samantha)", price: "", hint: "Ted skips fish — leftover sub that night", days: ["fri"] },
+            { id: "w1a-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "", days: ["sun"] },
+            { id: "w1a-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "", days: ["sun"], staple: true },
+            { id: "w1a-potatoes", category: "Produce", name: "Potatoes / rice sides", price: "", hint: "", days: ["mon", "fri"], staple: true },
+            { id: "w1a-onion", category: "Produce", name: "Onion", price: "", hint: "", days: ["sat"] },
+            { id: "w1a-salad", category: "Produce", name: "Salad / veg", price: "", hint: "", days: ["mon", "fri"] },
             { id: "w1a-fruit", category: "Produce", name: "Fruit for adults/snacks", price: "", hint: "" },
-            { id: "w1a-cheese", category: "Dairy", name: "Taco cheese if low", price: "", hint: "Skip if stocked" },
-            { id: "w1a-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "" },
-            { id: "w1a-tortillas", category: "Pantry", name: "Tortillas / salsa if low", price: "", hint: "Skip if stocked" },
-            { id: "w1a-alfredo", category: "Pantry", name: "Alfredo + pasta if low", price: "", hint: "Often already stocked — skip" },
-            { id: "w1a-chili-cans", category: "Pantry", name: "Chili beans/tomatoes if pantry empty", price: "", hint: "Weekend chili only this plan" },
+            { id: "w1a-cheese", category: "Dairy", name: "Taco cheese if low", price: "", hint: "Skip if stocked", days: ["tue"], staple: true },
+            { id: "w1a-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "", staple: true },
+            { id: "w1a-tortillas", category: "Pantry", name: "Tortillas / salsa if low", price: "", hint: "Skip if stocked", days: ["tue", "wed"], staple: true },
+            { id: "w1a-alfredo", category: "Pantry", name: "Alfredo + pasta if low", price: "", hint: "Often already stocked — skip", days: ["thu"], staple: true },
+            { id: "w1a-chili-cans", category: "Pantry", name: "Chili beans/tomatoes if pantry empty", price: "", hint: "Weekend chili only this plan", days: ["sat"], staple: true },
           ],
         },
         B: {
@@ -358,21 +397,21 @@
           ],
           groceries: [
             ...tuckerGroceries("w1"),
-            { id: "w1b-chicken", category: "Meat", name: "Chicken breasts (enough Mon + Wed)", price: "", hint: "" },
-            { id: "w1b-tilapia", category: "Meat", name: "Tilapia (Thu — Samantha)", price: "", hint: "Ted skips fish — leftover chicken/quesadilla" },
-            { id: "w1b-rotisserie", category: "Meat", name: "Rotisserie if no leftover chicken (Fri)", price: "", hint: "" },
-            { id: "w1b-beef", category: "Meat", name: "Burger beef (Sat)", price: "", hint: "Skip chili ingredients this week" },
-            { id: "w1b-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "" },
-            { id: "w1b-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "" },
-            { id: "w1b-potatoes", category: "Produce", name: "Potatoes", price: "", hint: "" },
-            { id: "w1b-peppers", category: "Produce", name: "Peppers", price: "", hint: "" },
-            { id: "w1b-salad", category: "Produce", name: "Salad refresh", price: "", hint: "" },
+            { id: "w1b-chicken", category: "Meat", name: "Chicken breasts (enough Mon + Wed)", price: "", hint: "", days: ["mon", "wed"] },
+            { id: "w1b-tilapia", category: "Meat", name: "Tilapia (Thu — Samantha)", price: "", hint: "Ted skips fish — leftover chicken/quesadilla", days: ["thu"] },
+            { id: "w1b-rotisserie", category: "Meat", name: "Rotisserie if no leftover chicken (Fri)", price: "", hint: "", days: ["fri"] },
+            { id: "w1b-beef", category: "Meat", name: "Burger beef (Sat)", price: "", hint: "Skip chili ingredients this week", days: ["sat"] },
+            { id: "w1b-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "", days: ["sun"] },
+            { id: "w1b-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "", days: ["sun"], staple: true },
+            { id: "w1b-potatoes", category: "Produce", name: "Potatoes", price: "", hint: "", days: ["mon"] },
+            { id: "w1b-peppers", category: "Produce", name: "Peppers", price: "", hint: "", days: ["mon"] },
+            { id: "w1b-salad", category: "Produce", name: "Salad refresh", price: "", hint: "", days: ["wed", "fri"] },
             { id: "w1b-fruit", category: "Produce", name: "Fruit for adults/snacks", price: "", hint: "" },
-            { id: "w1b-cheese", category: "Dairy", name: "Cheese for quesadillas if low", price: "", hint: "" },
-            { id: "w1b-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "" },
-            { id: "w1b-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "Skip if stocked" },
-            { id: "w1b-tortillas", category: "Pantry", name: "Tortillas if low", price: "", hint: "" },
-            { id: "w1b-buns", category: "Pantry", name: "Burger buns (optional)", price: "", hint: "" },
+            { id: "w1b-cheese", category: "Dairy", name: "Cheese for quesadillas if low", price: "", hint: "Skip if stocked", days: ["tue"], staple: true },
+            { id: "w1b-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "", staple: true },
+            { id: "w1b-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "Skip if stocked", days: ["wed", "thu"], staple: true },
+            { id: "w1b-tortillas", category: "Pantry", name: "Tortillas if low", price: "", hint: "Skip if stocked", days: ["tue"], staple: true },
+            { id: "w1b-buns", category: "Pantry", name: "Burger buns (optional)", price: "", hint: "", days: ["sat"] },
           ],
         },
       },
@@ -515,20 +554,20 @@
           ],
           groceries: [
             ...tuckerGroceries("w2"),
-            { id: "w2a-chicken", category: "Meat", name: "Chicken breasts", price: "", hint: "" },
-            { id: "w2a-beef", category: "Meat", name: "Taco beef/chicken if needed", price: "", hint: "" },
-            { id: "w2a-salmon", category: "Meat", name: "Salmon (Fri — Samantha)", price: "", hint: "Ted = Alfredo leftover" },
-            { id: "w2a-sausage", category: "Meat", name: "Sausage (Sat sheet-pan)", price: "", hint: "" },
-            { id: "w2a-potatoes", category: "Produce", name: "Potatoes (Mon + Sun bar)", price: "", hint: "" },
-            { id: "w2a-broccoli", category: "Produce", name: "Broccoli", price: "", hint: "" },
-            { id: "w2a-peppers", category: "Produce", name: "Peppers (Sat)", price: "", hint: "" },
-            { id: "w2a-salad", category: "Produce", name: "Salad if needed", price: "", hint: "" },
+            { id: "w2a-chicken", category: "Meat", name: "Chicken breasts", price: "", hint: "", days: ["mon", "thu"] },
+            { id: "w2a-beef", category: "Meat", name: "Taco beef/chicken if needed", price: "", hint: "", days: ["tue"] },
+            { id: "w2a-salmon", category: "Meat", name: "Salmon (Fri — Samantha)", price: "", hint: "Ted = Alfredo leftover", days: ["fri"] },
+            { id: "w2a-sausage", category: "Meat", name: "Sausage (Sat sheet-pan)", price: "", hint: "", days: ["sat"] },
+            { id: "w2a-potatoes", category: "Produce", name: "Potatoes (Mon + Sun bar)", price: "", hint: "", days: ["mon", "sun"] },
+            { id: "w2a-broccoli", category: "Produce", name: "Broccoli", price: "", hint: "", days: ["mon"] },
+            { id: "w2a-peppers", category: "Produce", name: "Peppers (Sat)", price: "", hint: "", days: ["sat"] },
+            { id: "w2a-salad", category: "Produce", name: "Salad if needed", price: "", hint: "", days: ["fri"] },
             { id: "w2a-fruit", category: "Produce", name: "Fruit for adults/snacks", price: "", hint: "" },
-            { id: "w2a-cheese", category: "Dairy", name: "Cheese if low", price: "", hint: "" },
-            { id: "w2a-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "" },
-            { id: "w2a-tortillas", category: "Pantry", name: "Tortillas if low", price: "", hint: "" },
-            { id: "w2a-alfredo", category: "Pantry", name: "Alfredo + pasta if low", price: "", hint: "Skip if stocked" },
-            { id: "w2a-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "Skip chili ingredients this week" },
+            { id: "w2a-cheese", category: "Dairy", name: "Cheese if low", price: "", hint: "Skip if stocked", days: ["tue", "sun"], staple: true },
+            { id: "w2a-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "", staple: true },
+            { id: "w2a-tortillas", category: "Pantry", name: "Tortillas if low", price: "", hint: "Skip if stocked", days: ["tue", "wed"], staple: true },
+            { id: "w2a-alfredo", category: "Pantry", name: "Alfredo + pasta if low", price: "", hint: "Skip if stocked", days: ["thu"], staple: true },
+            { id: "w2a-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "Skip if stocked", days: ["fri"], staple: true },
           ],
         },
         B: {
@@ -663,21 +702,21 @@
           ],
           groceries: [
             ...tuckerGroceries("w2"),
-            { id: "w2b-chicken", category: "Meat", name: "Chicken (Mon/Thu pasta)", price: "", hint: "" },
-            { id: "w2b-tilapia", category: "Meat", name: "Tilapia (Wed — Samantha)", price: "", hint: "Ted = leftover chicken/quesadilla" },
-            { id: "w2b-rotisserie", category: "Meat", name: "Rotisserie (Fri)", price: "", hint: "" },
-            { id: "w2b-beef", category: "Meat", name: "Chili beef (Sat weekend pot)", price: "", hint: "Weekend chili only — not midweek" },
-            { id: "w2b-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "" },
-            { id: "w2b-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "" },
-            { id: "w2b-salad", category: "Produce", name: "Salad", price: "", hint: "" },
-            { id: "w2b-veg", category: "Produce", name: "Veg for fish night / sides", price: "", hint: "" },
-            { id: "w2b-onion", category: "Produce", name: "Onion (chili)", price: "", hint: "" },
+            { id: "w2b-chicken", category: "Meat", name: "Chicken (Mon/Thu pasta)", price: "", hint: "", days: ["mon", "thu"] },
+            { id: "w2b-tilapia", category: "Meat", name: "Tilapia (Wed — Samantha)", price: "", hint: "Ted = leftover chicken/quesadilla", days: ["wed"] },
+            { id: "w2b-rotisserie", category: "Meat", name: "Rotisserie (Fri)", price: "", hint: "", days: ["fri"] },
+            { id: "w2b-beef", category: "Meat", name: "Chili beef (Sat weekend pot)", price: "", hint: "Weekend chili only — not midweek", days: ["sat"] },
+            { id: "w2b-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "", days: ["sun"] },
+            { id: "w2b-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "", days: ["sun"], staple: true },
+            { id: "w2b-salad", category: "Produce", name: "Salad", price: "", hint: "", days: ["mon"] },
+            { id: "w2b-veg", category: "Produce", name: "Veg for fish night / sides", price: "", hint: "", days: ["wed"] },
+            { id: "w2b-onion", category: "Produce", name: "Onion (chili)", price: "", hint: "", days: ["sat"] },
             { id: "w2b-fruit", category: "Produce", name: "Fruit for adults/snacks", price: "", hint: "" },
-            { id: "w2b-cheese", category: "Dairy", name: "Cheese if low", price: "", hint: "" },
-            { id: "w2b-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "" },
-            { id: "w2b-alfredo", category: "Pantry", name: "Alfredo if doing Thu pasta", price: "", hint: "" },
-            { id: "w2b-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "" },
-            { id: "w2b-chili-cans", category: "Pantry", name: "Chili beans/tomatoes if pantry empty", price: "", hint: "Sat daytime chili only" },
+            { id: "w2b-cheese", category: "Dairy", name: "Cheese if low", price: "", hint: "Skip if stocked", days: ["tue"], staple: true },
+            { id: "w2b-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "", staple: true },
+            { id: "w2b-alfredo", category: "Pantry", name: "Alfredo if doing Thu pasta", price: "", hint: "Skip if stocked", days: ["thu"], staple: true },
+            { id: "w2b-rice", category: "Pantry", name: "Rice if pantry thin", price: "", hint: "Skip if stocked", days: ["mon", "wed"], staple: true },
+            { id: "w2b-chili-cans", category: "Pantry", name: "Chili beans/tomatoes if pantry empty", price: "", hint: "Sat daytime chili only", days: ["sat"], staple: true },
           ],
         },
       },
@@ -690,11 +729,19 @@
     weekTitle: WEEKS["1"].title,
     checked: {},
     prices: {},
+    qty: {},
+    notes: {},
+    haveIt: {},
     custom: [],
+    dayOverrides: {},
     shopMode: false,
+    hideChecked: false,
+    showHiddenHave: false,
   });
 
   let state = defaultState();
+  let wakeLock = null;
+  let swapTargetDayId = null;
 
   const els = {
     weekLabel: document.getElementById("week-label"),
@@ -709,6 +756,7 @@
     weekGrid: document.getElementById("week-grid"),
     groceryList: document.getElementById("grocery-list"),
     checkedCount: document.getElementById("checked-count"),
+    groceryControls: document.getElementById("grocery-controls"),
     customName: document.getElementById("custom-name"),
     customCategory: document.getElementById("custom-category"),
     customPrice: document.getElementById("custom-price"),
@@ -723,6 +771,10 @@
     modalTitle: document.getElementById("modal-title"),
     modalLunch: document.getElementById("modal-lunch"),
     modalBody: document.getElementById("modal-body"),
+    swapModal: document.getElementById("swap-modal"),
+    swapClose: document.getElementById("swap-close"),
+    swapTitle: document.getElementById("swap-title"),
+    swapBody: document.getElementById("swap-body"),
   };
 
   function currentWeek() {
@@ -732,6 +784,125 @@
   function currentPlan() {
     const week = currentWeek();
     return week.plans[state.plan] || week.plans.A;
+  }
+
+  function dinnerKey(weekId, planId, dayId) {
+    return `${weekId}-${planId}-${dayId}`;
+  }
+
+  function parseDinnerKey(key) {
+    if (!key || typeof key !== "string") return null;
+    const parts = key.split("-");
+    if (parts.length < 3) return null;
+    const [weekId, planId, dayId] = parts;
+    const week = WEEKS[weekId];
+    if (!week || !week.plans[planId]) return null;
+    const day = week.plans[planId].days.find((d) => d.id === dayId);
+    if (!day) return null;
+    return { weekId, planId, dayId, week, plan: week.plans[planId], day };
+  }
+
+  function allTemplateDinners() {
+    const list = [];
+    Object.keys(WEEKS).forEach((weekId) => {
+      const week = WEEKS[weekId];
+      Object.keys(week.plans).forEach((planId) => {
+        const plan = week.plans[planId];
+        plan.days.forEach((day) => {
+          list.push({
+            key: dinnerKey(weekId, planId, day.id),
+            weekId,
+            planId,
+            label: `${week.label} ${planId} · ${day.short}`,
+            day,
+          });
+        });
+      });
+    });
+    return list;
+  }
+
+  function groceriesForDinnerKey(key) {
+    const parsed = parseDinnerKey(key);
+    if (!parsed) return [];
+    return parsed.plan.groceries
+      .filter((g) => Array.isArray(g.days) && g.days.includes(parsed.dayId))
+      .map((g) => ({
+        ...g,
+        category: normalizeCategory(g.category),
+        custom: false,
+        fromSwap: true,
+        sourceKey: key,
+      }));
+  }
+
+  function dayOverride(dayId) {
+    const ov = state.dayOverrides[dayId];
+    return ov && typeof ov === "object" ? ov : null;
+  }
+
+  function effectiveDay(templateDay) {
+    const ov = dayOverride(templateDay.id);
+    if (!ov) {
+      return { ...templateDay, overrideType: null, swapped: false };
+    }
+    if (ov.type === "leftovers") {
+      const special = SPECIAL_DINNERS.leftovers;
+      return {
+        ...templateDay,
+        dinner: special.dinner,
+        icon: special.icon,
+        mealEmoji: special.mealEmoji,
+        adultLunch: special.adultLunch,
+        tedNote: "",
+        recipe: special.recipe,
+        overrideType: "leftovers",
+        swapped: true,
+      };
+    }
+    if (ov.type === "eatout") {
+      const special = SPECIAL_DINNERS.eatout;
+      return {
+        ...templateDay,
+        dinner: special.dinner,
+        icon: special.icon,
+        mealEmoji: special.mealEmoji,
+        adultLunch: special.adultLunch,
+        tedNote: "",
+        recipe: special.recipe,
+        overrideType: "eatout",
+        swapped: true,
+      };
+    }
+    if (ov.type === "pick" && ov.key) {
+      const parsed = parseDinnerKey(ov.key);
+      if (!parsed) return { ...templateDay, overrideType: null, swapped: false };
+      const src = parsed.day;
+      return {
+        ...templateDay,
+        dinner: src.dinner,
+        icon: src.icon,
+        mealEmoji: src.mealEmoji,
+        adultLunch: src.adultLunch,
+        tedNote: src.tedNote || "",
+        recipe: src.recipe,
+        overrideType: "pick",
+        swapKey: ov.key,
+        swapped: true,
+        swapLabel: `${parsed.week.label} ${parsed.planId} · ${src.short}`,
+      };
+    }
+    return { ...templateDay, overrideType: null, swapped: false };
+  }
+
+  function activeOriginalDayIds() {
+    const plan = currentPlan();
+    const active = new Set();
+    plan.days.forEach((day) => {
+      const ov = dayOverride(day.id);
+      if (!ov) active.add(day.id);
+    });
+    return active;
   }
 
   function normalizeCategory(cat) {
@@ -747,6 +918,37 @@
   function setChecked(id, value) {
     if (value) state.checked[id] = true;
     else delete state.checked[id];
+  }
+
+  function itemHaveIt(id) {
+    return Boolean(state.haveIt[id]);
+  }
+
+  function setHaveIt(id, value) {
+    if (value) state.haveIt[id] = true;
+    else delete state.haveIt[id];
+  }
+
+  function itemQty(id) {
+    const v = state.qty[id];
+    return typeof v === "string" ? v : "";
+  }
+
+  function itemNote(id) {
+    const v = state.notes[id];
+    return typeof v === "string" ? v : "";
+  }
+
+  function setQty(id, raw) {
+    const trimmed = String(raw ?? "").trim().slice(0, 40);
+    if (!trimmed) delete state.qty[id];
+    else state.qty[id] = trimmed;
+  }
+
+  function setNote(id, raw) {
+    const trimmed = String(raw ?? "").trim().slice(0, 80);
+    if (!trimmed) delete state.notes[id];
+    else state.notes[id] = trimmed;
   }
 
   function itemPrice(id, fallback) {
@@ -793,12 +995,63 @@
   function loadFromStorage() {
     try {
       let raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (!raw) {
+        for (const key of LEGACY_STORAGE_KEYS) {
+          raw = localStorage.getItem(key);
+          if (raw) break;
+        }
+      }
       if (!raw) return null;
       return normalizeState(JSON.parse(raw));
     } catch (_) {
       return null;
     }
+  }
+
+  function normalizeStringMap(src, maxLen) {
+    const out = {};
+    if (!src || typeof src !== "object" || Array.isArray(src)) return out;
+    Object.keys(src).forEach((id) => {
+      if (typeof id !== "string") return;
+      const v = src[id];
+      if (typeof v === "string" && v.trim()) out[id] = v.trim().slice(0, maxLen);
+    });
+    return out;
+  }
+
+  function normalizeIdFlags(src) {
+    const out = {};
+    if (!src) return out;
+    if (Array.isArray(src)) {
+      src.forEach((id) => {
+        if (typeof id === "string") out[id] = true;
+      });
+      return out;
+    }
+    if (typeof src === "object") {
+      Object.keys(src).forEach((id) => {
+        if (src[id]) out[id] = true;
+      });
+    }
+    return out;
+  }
+
+  function normalizeDayOverrides(src) {
+    const out = {};
+    if (!src || typeof src !== "object" || Array.isArray(src)) return out;
+    Object.keys(src).forEach((dayId) => {
+      const ov = src[dayId];
+      if (!ov || typeof ov !== "object") return;
+      if (ov.type === "leftovers" || ov.t === "l") {
+        out[dayId] = { type: "leftovers" };
+      } else if (ov.type === "eatout" || ov.t === "e") {
+        out[dayId] = { type: "eatout" };
+      } else if ((ov.type === "pick" || ov.t === "p") && (ov.key || ov.k)) {
+        const key = ov.key || ov.k;
+        if (parseDinnerKey(key)) out[dayId] = { type: "pick", key };
+      }
+    });
+    return out;
   }
 
   function normalizeState(parsed) {
@@ -807,22 +1060,18 @@
     base.week = parsed.week === "2" || parsed.week === 2 ? "2" : "1";
     base.plan = parsed.plan === "B" ? "B" : "A";
     base.shopMode = Boolean(parsed.shopMode);
+    base.hideChecked = Boolean(parsed.hideChecked);
+    base.showHiddenHave = Boolean(parsed.showHiddenHave);
     if (typeof parsed.weekTitle === "string" && parsed.weekTitle.trim()) {
       base.weekTitle = parsed.weekTitle.trim().slice(0, 80);
     } else {
       base.weekTitle = WEEKS[base.week].title;
     }
-    if (parsed.checked && typeof parsed.checked === "object") {
-      if (Array.isArray(parsed.checked)) {
-        parsed.checked.forEach((id) => {
-          if (typeof id === "string") base.checked[id] = true;
-        });
-      } else {
-        Object.keys(parsed.checked).forEach((id) => {
-          if (parsed.checked[id]) base.checked[id] = true;
-        });
-      }
-    }
+    base.checked = normalizeIdFlags(parsed.checked);
+    base.haveIt = normalizeIdFlags(parsed.haveIt);
+    base.qty = normalizeStringMap(parsed.qty, 40);
+    base.notes = normalizeStringMap(parsed.notes, 80);
+    base.dayOverrides = normalizeDayOverrides(parsed.dayOverrides);
     if (parsed.prices && typeof parsed.prices === "object" && !Array.isArray(parsed.prices)) {
       Object.keys(parsed.prices).forEach((id) => {
         const n = Number(parsed.prices[id]);
@@ -836,6 +1085,8 @@
           const id = typeof c.id === "string" ? c.id : `custom-${i}-${Date.now()}`;
           const price = itemPriceFromAny(c.price);
           if (price !== null) base.prices[id] = price;
+          if (typeof c.qty === "string" && c.qty.trim()) base.qty[id] = c.qty.trim().slice(0, 40);
+          if (typeof c.note === "string" && c.note.trim()) base.notes[id] = c.note.trim().slice(0, 80);
           return {
             id,
             name: c.name.trim().slice(0, 80),
@@ -858,7 +1109,19 @@
       p: state.plan,
       w: state.weekTitle,
       sm: state.shopMode ? 1 : 0,
+      hc: state.hideChecked ? 1 : 0,
       c: Object.keys(state.checked).filter((k) => state.checked[k]),
+      h: Object.keys(state.haveIt).filter((k) => state.haveIt[k]),
+      q: { ...state.qty },
+      n: { ...state.notes },
+      o: Object.keys(state.dayOverrides).reduce((acc, dayId) => {
+        const ov = state.dayOverrides[dayId];
+        if (!ov) return acc;
+        if (ov.type === "leftovers") acc[dayId] = { t: "l" };
+        else if (ov.type === "eatout") acc[dayId] = { t: "e" };
+        else if (ov.type === "pick" && ov.key) acc[dayId] = { t: "p", k: ov.key };
+        return acc;
+      }, {}),
       $: Object.keys(state.prices).reduce((acc, id) => {
         const n = Number(state.prices[id]);
         if (Number.isFinite(n) && n >= 0) acc[id] = n;
@@ -870,6 +1133,8 @@
         k: item.category,
         d: itemChecked(item.id) ? 1 : 0,
         $: itemPrice(item.id),
+        q: itemQty(item.id) || undefined,
+        note: itemNote(item.id) || undefined,
       })),
     };
     const json = JSON.stringify(payload);
@@ -887,17 +1152,17 @@
       next.week = payload.wk === "2" || payload.wk === 2 ? "2" : "1";
       next.plan = payload.p === "B" ? "B" : "A";
       next.shopMode = Boolean(payload.sm);
+      next.hideChecked = Boolean(payload.hc);
       if (typeof payload.w === "string" && payload.w.trim()) {
         next.weekTitle = payload.w.trim().slice(0, 80);
       } else {
         next.weekTitle = WEEKS[next.week].title;
       }
-      const checked = {};
-      if (Array.isArray(payload.c)) {
-        payload.c.forEach((id) => {
-          if (typeof id === "string") checked[id] = true;
-        });
-      }
+      const checked = normalizeIdFlags(payload.c);
+      next.haveIt = normalizeIdFlags(payload.h);
+      next.qty = normalizeStringMap(payload.q, 40);
+      next.notes = normalizeStringMap(payload.n, 80);
+      next.dayOverrides = normalizeDayOverrides(payload.o);
       if (payload.$ && typeof payload.$ === "object") {
         Object.keys(payload.$).forEach((id) => {
           const n = Number(payload.$[id]);
@@ -917,12 +1182,36 @@
           if (item.d) checked[id] = true;
           const price = itemPriceFromAny(item.$);
           if (price !== null) next.prices[id] = price;
+          if (typeof item.q === "string" && item.q.trim()) next.qty[id] = item.q.trim().slice(0, 40);
+          if (typeof item.note === "string" && item.note.trim()) next.notes[id] = item.note.trim().slice(0, 80);
         });
       }
       next.checked = checked;
       return next;
     } catch (_) {
       return null;
+    }
+  }
+
+  async function updateWakeLock() {
+    if (!state.shopMode) {
+      if (wakeLock) {
+        try {
+          await wakeLock.release();
+        } catch (_) {}
+        wakeLock = null;
+      }
+      return;
+    }
+    if (!("wakeLock" in navigator) || typeof navigator.wakeLock.request !== "function") return;
+    if (document.visibilityState !== "visible") return;
+    try {
+      wakeLock = await navigator.wakeLock.request("screen");
+      wakeLock.addEventListener("release", () => {
+        wakeLock = null;
+      });
+    } catch (_) {
+      wakeLock = null;
     }
   }
 
@@ -976,11 +1265,13 @@
   function renderCalendar() {
     const plan = currentPlan();
     els.weekGrid.innerHTML = "";
-    plan.days.forEach((day) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "day-card" + (day.tedNote ? " day-card-fish" : "");
-      btn.setAttribute("aria-label", `${day.day}: ${day.dinner}. Tap for recipe.`);
+    plan.days.forEach((templateDay) => {
+      const day = effectiveDay(templateDay);
+      const card = document.createElement("article");
+      card.className =
+        "day-card" +
+        (day.tedNote ? " day-card-fish" : "") +
+        (day.swapped ? " day-card-swapped" : "");
       const adultLine =
         day.adultLunch && day.adultLunch !== "—" && !/adult lunch → —/.test(day.adultLunch)
           ? `<p class="day-lunch">${escapeHtml(day.adultLunch)}</p>`
@@ -988,31 +1279,173 @@
       const tedLine = day.tedNote
         ? `<p class="day-ted">${escapeHtml(day.tedNote)}</p>`
         : "";
-      btn.innerHTML = `
+      const swapBadge = day.swapped
+        ? `<p class="day-swap-badge">${
+            day.overrideType === "leftovers"
+              ? "Swapped → Leftovers"
+              : day.overrideType === "eatout"
+                ? "Swapped → Eat out"
+                : `Swapped → ${escapeHtml(day.swapLabel || "dinner")}`
+          }</p>`
+        : "";
+      card.innerHTML = `
         <div class="day-head">
           <span>${day.short}</span>
-          <span class="emoji" aria-hidden="true">${day.icon}</span>
+          <div class="day-head-actions">
+            <button type="button" class="swap-btn" data-swap-day="${escapeAttr(templateDay.id)}" aria-label="Swap ${escapeAttr(day.day)} dinner">Swap</button>
+            <span class="emoji" aria-hidden="true">${day.icon}</span>
+          </div>
         </div>
-        <div class="day-body">
+        <button type="button" class="day-body day-body-btn" aria-label="${escapeAttr(day.day)}: ${escapeAttr(day.dinner)}. Tap for recipe.">
           <span class="meal-emoji" aria-hidden="true">${day.mealEmoji}</span>
           <p class="day-dinner">${escapeHtml(day.dinner)}</p>
+          ${swapBadge}
           ${tedLine}
           ${adultLine}
           <p class="tap-hint">Day note · tap for recipe</p>
-        </div>
+        </button>
       `;
-      btn.addEventListener("click", () => openRecipe(day));
-      els.weekGrid.appendChild(btn);
+      card.querySelector(".day-body-btn").addEventListener("click", () => openRecipe(day));
+      card.querySelector(".swap-btn").addEventListener("click", (e) => {
+        e.stopPropagation();
+        openSwapPicker(templateDay.id);
+      });
+      els.weekGrid.appendChild(card);
     });
+  }
+
+  function openSwapPicker(dayId) {
+    const plan = currentPlan();
+    const templateDay = plan.days.find((d) => d.id === dayId);
+    if (!templateDay || !els.swapModal) return;
+    swapTargetDayId = dayId;
+    const current = effectiveDay(templateDay);
+    els.swapTitle.textContent = `Swap ${templateDay.day}`;
+    const dinners = allTemplateDinners().filter((d) => {
+      // Skip the night already on this template day (same week/plan/day)
+      return !(d.weekId === state.week && d.planId === state.plan && d.day.id === dayId);
+    });
+    const currentKey = dinnerKey(state.week, state.plan, dayId);
+    const ov = dayOverride(dayId);
+    els.swapBody.innerHTML = `
+      <p class="swap-current">Now: <strong>${escapeHtml(current.dinner)}</strong></p>
+      <div class="swap-options" role="list">
+        <button type="button" class="swap-option" data-swap-type="reset" ${!ov ? "disabled" : ""}>
+          <span class="swap-option-title">Restore template</span>
+          <span class="swap-option-sub">${escapeHtml(templateDay.dinner)}</span>
+        </button>
+        <button type="button" class="swap-option${ov && ov.type === "leftovers" ? " is-on" : ""}" data-swap-type="leftovers">
+          <span class="swap-option-title">Leftovers</span>
+          <span class="swap-option-sub">Clears this night’s grocery lines</span>
+        </button>
+        <button type="button" class="swap-option${ov && ov.type === "eatout" ? " is-on" : ""}" data-swap-type="eatout">
+          <span class="swap-option-title">Eat out / takeout</span>
+          <span class="swap-option-sub">Clears this night’s grocery lines</span>
+        </button>
+      </div>
+      <h4 class="swap-section-title">Dinners from templates</h4>
+      <div class="swap-options swap-options-scroll" role="list">
+        ${dinners
+          .map((d) => {
+            const on = ov && ov.type === "pick" && ov.key === d.key;
+            return `<button type="button" class="swap-option${on ? " is-on" : ""}" data-swap-type="pick" data-swap-key="${escapeAttr(d.key)}">
+              <span class="swap-option-title">${escapeHtml(d.day.dinner)}</span>
+              <span class="swap-option-sub">${escapeHtml(d.label)}${d.day.tedNote ? " · Ted leftover sub" : ""}</span>
+            </button>`;
+          })
+          .join("")}
+      </div>
+      <p class="swap-footnote">Grocery lines for this night update automatically. Share link + this phone save the swap.</p>
+    `;
+    els.swapBody.querySelectorAll("[data-swap-type]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        applyDaySwap(dayId, btn.dataset.swapType, btn.dataset.swapKey || null);
+      });
+    });
+    // silence unused
+    void currentKey;
+    els.swapModal.classList.add("open");
+    els.swapModal.setAttribute("aria-hidden", "false");
+    if (els.swapClose) els.swapClose.focus();
+  }
+
+  function closeSwapPicker() {
+    if (!els.swapModal) return;
+    els.swapModal.classList.remove("open");
+    els.swapModal.setAttribute("aria-hidden", "true");
+    swapTargetDayId = null;
+  }
+
+  function applyDaySwap(dayId, type, key) {
+    if (type === "reset") {
+      delete state.dayOverrides[dayId];
+      showToast("Restored template dinner");
+    } else if (type === "leftovers") {
+      state.dayOverrides[dayId] = { type: "leftovers" };
+      showToast("Swapped to Leftovers — groceries updated");
+    } else if (type === "eatout") {
+      state.dayOverrides[dayId] = { type: "eatout" };
+      showToast("Swapped to Eat out — groceries updated");
+    } else if (type === "pick" && key && parseDinnerKey(key)) {
+      state.dayOverrides[dayId] = { type: "pick", key };
+      showToast("Dinner swapped — groceries updated");
+    } else {
+      return;
+    }
+    persist();
+    closeSwapPicker();
+    renderAll();
+  }
+
+  function isStapleItem(item) {
+    if (item.staple) return true;
+    if (item.category === "Tucker lunchbox") return true;
+    const name = String(item.name || "").toLowerCase();
+    return (
+      /\brice\b/.test(name) ||
+      /tortilla/.test(name) ||
+      /alfredo/.test(name) ||
+      /\bpasta\b/.test(name) ||
+      /chili beans|chili cans|tomatoes if pantry/.test(name)
+    );
   }
 
   function allGroceryItems() {
     const plan = currentPlan();
-    const seeded = plan.groceries.map((g) => ({
-      ...g,
-      category: normalizeCategory(g.category),
-      custom: false,
-    }));
+    const activeDays = activeOriginalDayIds();
+    const seeded = plan.groceries
+      .filter((g) => {
+        if (!Array.isArray(g.days) || g.days.length === 0) return true;
+        return g.days.some((d) => activeDays.has(d));
+      })
+      .map((g) => ({
+        ...g,
+        category: normalizeCategory(g.category),
+        custom: false,
+        staple: Boolean(g.staple) || g.category === "Tucker lunchbox",
+      }));
+
+    const seenNames = new Set(seeded.map((g) => `${g.category}::${g.name.toLowerCase()}`));
+    const injected = [];
+    plan.days.forEach((day) => {
+      const ov = dayOverride(day.id);
+      if (!ov || ov.type !== "pick" || !ov.key) return;
+      groceriesForDinnerKey(ov.key).forEach((g) => {
+        const dedupe = `${g.category}::${g.name.toLowerCase()}`;
+        if (seenNames.has(dedupe)) return;
+        seenNames.add(dedupe);
+        injected.push({
+          ...g,
+          id: `swap-${day.id}-${g.id}`,
+          category: normalizeCategory(g.category),
+          custom: false,
+          staple: Boolean(g.staple) || isStapleItem(g),
+          hint: g.hint || `for ${day.short} swap`,
+          fromSwap: true,
+        });
+      });
+    });
+
     const custom = state.custom.map((c) => ({
       id: c.id,
       category: normalizeCategory(c.category),
@@ -1020,8 +1453,17 @@
       price: "",
       hint: "custom item",
       custom: true,
+      staple: false,
     }));
-    return [...seeded, ...custom];
+    return [...seeded, ...injected, ...custom];
+  }
+
+  function visibleGroceryItems(items) {
+    return items.filter((item) => {
+      if (itemHaveIt(item.id) && !state.showHiddenHave) return false;
+      if (state.hideChecked && itemChecked(item.id)) return false;
+      return true;
+    });
   }
 
   function estimateTotals(items) {
@@ -1054,12 +1496,48 @@
     els.estimateBand.title = `${pricedLeft} unchecked priced · trip total if all priced ${formatMoney(all)} (${pricedAll} lines)`;
   }
 
+  function renderGroceryControls(items) {
+    if (!els.groceryControls) return;
+    const hiddenHave = items.filter((i) => itemHaveIt(i.id)).length;
+    const checked = items.filter((i) => itemChecked(i.id)).length;
+    const left = items.length - checked;
+    els.checkedCount.textContent = `${left} left · ${checked} checked`;
+    els.groceryControls.innerHTML = `
+      <button type="button" class="chip-btn${state.hideChecked ? " is-on" : ""}" id="hide-checked-btn" aria-pressed="${state.hideChecked}">
+        ${state.hideChecked ? "Show checked" : "Hide checked"}
+      </button>
+      <button type="button" class="chip-btn${state.showHiddenHave ? " is-on" : ""}" id="hidden-have-btn" aria-pressed="${state.showHiddenHave}" ${hiddenHave === 0 ? "disabled" : ""}>
+        Hidden: ${hiddenHave}
+      </button>
+    `;
+    const hideBtn = document.getElementById("hide-checked-btn");
+    const hiddenBtn = document.getElementById("hidden-have-btn");
+    if (hideBtn) {
+      hideBtn.addEventListener("click", () => {
+        state.hideChecked = !state.hideChecked;
+        persist();
+        renderGrocery();
+        showToast(state.hideChecked ? "Checked items hidden" : "Checked items shown");
+      });
+    }
+    if (hiddenBtn) {
+      hiddenBtn.addEventListener("click", () => {
+        if (hiddenHave === 0) return;
+        state.showHiddenHave = !state.showHiddenHave;
+        persist();
+        renderGrocery();
+        showToast(state.showHiddenHave ? "Showing Have-it items" : "Have-it items hidden again");
+      });
+    }
+  }
+
   function renderGrocery() {
     const items = allGroceryItems();
-    let checked = 0;
+    const visible = visibleGroceryItems(items);
+    let checkedVisible = 0;
     const byCat = CATEGORIES.map((cat) => {
-      let groupItems = items.filter((i) => i.category === cat);
-      if (state.shopMode) {
+      let groupItems = visible.filter((i) => i.category === cat);
+      if (state.shopMode && !state.hideChecked) {
         groupItems = [...groupItems].sort((a, b) => Number(itemChecked(a.id)) - Number(itemChecked(b.id)));
       }
       return { cat, items: groupItems };
@@ -1070,12 +1548,12 @@
     const tuckerNote = document.createElement("p");
     tuckerNote.className = "tucker-note";
     tuckerNote.textContent =
-      "Tucker lunchbox: same kit every school day (Mon–Fri). Count packs Sun night; restock midweek. Not dinner leftovers.";
+      "Tucker lunchbox: same kit every school day (Mon–Fri). Count packs Sun night; restock midweek. Not dinner leftovers. Tap Have it if stocked.";
     els.groceryList.appendChild(tuckerNote);
 
     const totalBar = document.createElement("div");
     totalBar.className = "estimate-bar";
-    const totals = estimateTotals(items);
+    const totals = estimateTotals(items.filter((i) => !itemHaveIt(i.id)));
     totalBar.innerHTML =
       totals.pricedAll === 0
         ? `<strong>Running $ estimate:</strong> optional — tap a line’s $ box while you shop.`
@@ -1093,19 +1571,49 @@
       ul.className = "item-list";
       group.items.forEach((item) => {
         const isOn = itemChecked(item.id);
-        if (isOn) checked += 1;
+        if (isOn) checkedVisible += 1;
         const price = itemPrice(item.id, item.price);
+        const qty = itemQty(item.id);
+        const note = itemNote(item.id);
+        const have = itemHaveIt(item.id);
+        const staple = isStapleItem(item);
         const li = document.createElement("li");
-        li.className = `item${isOn ? " checked" : ""}`;
+        li.className = `item${isOn ? " checked" : ""}${have ? " have-it" : ""}`;
         const inputId = `g-${item.id}`;
         const priceId = `p-${item.id}`;
+        const qtyId = `q-${item.id}`;
+        const noteId = `n-${item.id}`;
         li.innerHTML = `
           <input type="checkbox" id="${escapeAttr(inputId)}" ${isOn ? "checked" : ""} />
           <div class="item-main">
-            <label for="${escapeAttr(inputId)}">
-              ${escapeHtml(item.name)}
-              ${item.hint ? `<span class="hint">${escapeHtml(item.hint)}</span>` : ""}
-            </label>
+            <div class="item-copy">
+              <label for="${escapeAttr(inputId)}">
+                ${escapeHtml(item.name)}
+                ${item.hint ? `<span class="hint">${escapeHtml(item.hint)}</span>` : ""}
+              </label>
+              <div class="item-meta-row">
+                <button type="button" class="meta-chip qty-chip" data-edit="qty" aria-label="Quantity for ${escapeAttr(item.name)}">
+                  ${qty ? escapeHtml(qty) : "Qty"}
+                </button>
+                <button type="button" class="meta-chip note-chip" data-edit="note" aria-label="Note for ${escapeAttr(item.name)}">
+                  ${note ? escapeHtml(note) : "Note"}
+                </button>
+                ${
+                  staple
+                    ? `<button type="button" class="meta-chip have-chip${have ? " is-on" : ""}" data-edit="have" aria-pressed="${have}">
+                        ${have ? "Have it ✓" : "Have it"}
+                      </button>`
+                    : ""
+                }
+              </div>
+              <div class="meta-edit" hidden>
+                <label class="visually-hidden" for="${escapeAttr(qtyId)}">Quantity</label>
+                <input id="${escapeAttr(qtyId)}" class="meta-input qty-input" type="text" maxlength="40" placeholder="e.g. 2 lb" value="${escapeAttr(qty)}" />
+                <label class="visually-hidden" for="${escapeAttr(noteId)}">Note</label>
+                <input id="${escapeAttr(noteId)}" class="meta-input note-input" type="text" maxlength="80" placeholder="e.g. family pack" value="${escapeAttr(note)}" />
+                <button type="button" class="btn btn-secondary meta-save">Save</button>
+              </div>
+            </div>
             <label class="price-field" for="${escapeAttr(priceId)}">
               <span>$</span>
               <input
@@ -1126,7 +1634,6 @@
           setChecked(item.id, e.target.checked);
           persist();
           renderGrocery();
-          renderEstimate(allGroceryItems());
         });
         const priceInput = li.querySelector(".price-input");
         priceInput.addEventListener("change", (e) => {
@@ -1135,13 +1642,56 @@
           renderGrocery();
         });
         priceInput.addEventListener("click", (e) => e.stopPropagation());
+
+        const metaEdit = li.querySelector(".meta-edit");
+        const openMeta = (focusSel) => {
+          metaEdit.hidden = false;
+          const focusEl = li.querySelector(focusSel);
+          if (focusEl) focusEl.focus();
+        };
+        li.querySelector('.meta-chip[data-edit="qty"]').addEventListener("click", (e) => {
+          e.preventDefault();
+          openMeta(".qty-input");
+        });
+        li.querySelector('.meta-chip[data-edit="note"]').addEventListener("click", (e) => {
+          e.preventDefault();
+          openMeta(".note-input");
+        });
+        const haveBtn = li.querySelector('.meta-chip[data-edit="have"]');
+        if (haveBtn) {
+          haveBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            setHaveIt(item.id, !itemHaveIt(item.id));
+            if (!Object.keys(state.haveIt).length) state.showHiddenHave = false;
+            persist();
+            renderGrocery();
+            showToast(itemHaveIt(item.id) ? "Marked Have it — hidden from list" : "Back on the list");
+          });
+        }
+        li.querySelector(".meta-save").addEventListener("click", () => {
+          setQty(item.id, li.querySelector(".qty-input").value);
+          setNote(item.id, li.querySelector(".note-input").value);
+          persist();
+          renderGrocery();
+          showToast("Saved qty / note");
+        });
         ul.appendChild(li);
       });
       els.groceryList.appendChild(ul);
     });
 
-    els.checkedCount.textContent = `${checked} checked · ${items.length} items`;
-    renderEstimate(items);
+    if (!byCat.length) {
+      const empty = document.createElement("p");
+      empty.className = "grocery-empty";
+      empty.textContent = state.hideChecked
+        ? "All visible items are checked (or Have-it hidden). Toggle Show checked / Hidden to review."
+        : "No grocery lines for this view.";
+      els.groceryList.appendChild(empty);
+    }
+
+    void checkedVisible;
+    renderGroceryControls(items);
+    renderEstimate(items.filter((i) => !itemHaveIt(i.id)));
   }
 
   function openRecipe(day) {
@@ -1191,8 +1741,12 @@
   function groceryText() {
     const week = currentWeek();
     const plan = currentPlan();
-    const items = allGroceryItems();
+    const items = allGroceryItems().filter((i) => !itemHaveIt(i.id));
     const totals = estimateTotals(items);
+    const dinnerLines = plan.days.map((d) => {
+      const day = effectiveDay(d);
+      return `${day.short}: ${day.dinner}${day.tedNote ? ` (${day.tedNote})` : ""}`;
+    });
     const lines = [
       `Burns Family grocery — ${state.weekTitle} (${week.label} · ${plan.label})`,
       `Budget band ${plan.budget}`,
@@ -1200,6 +1754,7 @@
         ? `Running $ estimate: ${formatMoney(totals.left)} left · ${formatMoney(totals.all)} all priced`
         : "",
       plan.houseNote || "",
+      "Dinners: " + dinnerLines.join(" · "),
       "Tucker lunchbox = yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice",
       "Restock midweek as packs deplete. Tucker does NOT eat dinner leftovers for school lunch.",
       "Chili = weekend daytime only when on the plan (not midweek, not twice, not every week).",
@@ -1207,7 +1762,7 @@
     ].filter((line, i, arr) => line !== "" || (i > 0 && arr[i - 1] !== ""));
     CATEGORIES.forEach((cat) => {
       let catItems = items.filter((i) => i.category === cat);
-      if (state.shopMode) {
+      if (state.shopMode && !state.hideChecked) {
         catItems = [...catItems].sort((a, b) => Number(itemChecked(a.id)) - Number(itemChecked(b.id)));
       }
       if (!catItems.length) return;
@@ -1216,8 +1771,12 @@
         const mark = itemChecked(item.id) ? "[x]" : "[ ]";
         const price = itemPrice(item.id, item.price);
         const priceBit = price === null ? "" : ` ${formatMoney(price)}`;
-        const hint = item.hint ? ` (${item.hint})` : "";
-        lines.push(`${mark} ${item.name}${priceBit}${hint}`);
+        const qty = itemQty(item.id);
+        const note = itemNote(item.id);
+        const qtyBit = qty ? ` — ${qty}` : "";
+        const noteBit = note ? ` (${note})` : "";
+        const hint = item.hint ? ` [${item.hint}]` : "";
+        lines.push(`${mark} ${item.name}${qtyBit}${noteBit}${priceBit}${hint}`);
       });
       lines.push("");
     });
@@ -1271,6 +1830,9 @@
     state.week = nextWeek;
     state.plan = nextPlan;
     state.weekTitle = WEEKS[nextWeek].title;
+    if (changed) {
+      state.dayOverrides = {};
+    }
     persist();
     renderAll();
     if (announce && changed) {
@@ -1349,7 +1911,12 @@
       state.shopMode = !state.shopMode;
       persist();
       renderAll();
-      showToast(state.shopMode ? "Shop mode on — big taps, checked sink to bottom" : "Shop mode off");
+      updateWakeLock();
+      showToast(
+        state.shopMode
+          ? "Shop mode on — big taps, checked sink to bottom, screen stays awake"
+          : "Shop mode off"
+      );
     });
     els.resetChecks.addEventListener("click", () => {
       state.checked = {};
@@ -1362,8 +1929,20 @@
     els.modal.addEventListener("click", (e) => {
       if (e.target === els.modal) closeRecipe();
     });
+    if (els.swapClose) els.swapClose.addEventListener("click", closeSwapPicker);
+    if (els.swapModal) {
+      els.swapModal.addEventListener("click", (e) => {
+        if (e.target === els.swapModal) closeSwapPicker();
+      });
+    }
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && els.modal.classList.contains("open")) closeRecipe();
+      if (e.key !== "Escape") return;
+      if (els.swapModal && els.swapModal.classList.contains("open")) closeSwapPicker();
+      else if (els.modal.classList.contains("open")) closeRecipe();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && state.shopMode) updateWakeLock();
     });
 
     window.addEventListener("hashchange", () => {
@@ -1374,12 +1953,14 @@
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         } catch (_) {}
         renderAll();
+        updateWakeLock();
         showToast("Loaded shared plan from link");
       }
     });
 
     renderAll();
     writeShareToUrl(false);
+    updateWakeLock();
   }
 
   if (document.readyState === "loading") {
