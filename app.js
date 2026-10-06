@@ -15,6 +15,63 @@
   ];
   const LEGACY_CATEGORY = { Protein: "Meat" };
 
+  const CUSTOM_CATS_KEY = "fm-custom-cats-v1";
+  const AISLE_OPEN_KEY = "fm-aisle-open-v1";
+  const AISLE_CHEV = `<svg class="aisle-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
+  const DEL_ICO = `<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>`;
+  const NEW_CAT_VAL = "__new__";
+
+  function getCustomCategories() {
+    try {
+      const j = JSON.parse(localStorage.getItem(CUSTOM_CATS_KEY) || "[]");
+      if (!Array.isArray(j)) return [];
+      return j.filter((x) => typeof x === "string" && x.trim()).map((x) => x.trim().slice(0, 40));
+    } catch (_) {
+      return [];
+    }
+  }
+  function setCustomCategories(arr) {
+    try {
+      localStorage.setItem(CUSTOM_CATS_KEY, JSON.stringify(arr.slice(0, 40)));
+    } catch (_) {}
+  }
+  function ensureCustomCategory(name) {
+    const n = String(name || "").trim().slice(0, 40);
+    if (!n || CATEGORIES.includes(n)) return n;
+    const cats = getCustomCategories();
+    if (!cats.includes(n)) {
+      cats.push(n);
+      setCustomCategories(cats);
+    }
+    return n;
+  }
+  function allCategories() {
+    const extra = getCustomCategories().filter((c) => !CATEGORIES.includes(c));
+    return [...CATEGORIES, ...extra];
+  }
+  function isCustomCategory(cat) {
+    return Boolean(cat) && !CATEGORIES.includes(cat) && !LEGACY_CATEGORY[cat];
+  }
+  function getAisleOpenMap() {
+    try {
+      const j = JSON.parse(localStorage.getItem(AISLE_OPEN_KEY) || "{}");
+      return j && typeof j === "object" && !Array.isArray(j) ? j : {};
+    } catch (_) {
+      return {};
+    }
+  }
+  function setAisleOpen(id, open) {
+    const m = getAisleOpenMap();
+    if (open) m[id] = 1;
+    else delete m[id];
+    try {
+      localStorage.setItem(AISLE_OPEN_KEY, JSON.stringify(m));
+    } catch (_) {}
+  }
+  function isAisleOpen(id) {
+    return Boolean(getAisleOpenMap()[id]);
+  }
+
   function tuckerGroceries(prefix) {
     return [
       {
@@ -271,7 +328,7 @@
               id: "wed",
               day: "Wednesday",
               short: "Wed",
-              icon: "⭐",
+              icon: "🌮",
               mealEmoji: "🧀",
               dinner: "Taco rebuild (nachos / bowls / quesadillas)",
               adultLunch: "adult lunch → —",
@@ -408,7 +465,7 @@
               id: "tue",
               day: "Tuesday",
               short: "Tue",
-              icon: "⭐",
+              icon: "🫓",
               mealEmoji: "🫓",
               dinner: "Quesadilla night (chicken/cheese)",
               adultLunch: "adult lunch → extra quesadilla (opt)",
@@ -578,7 +635,7 @@
               id: "wed",
               day: "Wednesday",
               short: "Wed",
-              icon: "⭐",
+              icon: "🌮",
               mealEmoji: "🧀",
               dinner: "Taco rebuild",
               adultLunch: "adult lunch → —",
@@ -710,7 +767,7 @@
               id: "tue",
               day: "Tuesday",
               short: "Tue",
-              icon: "⭐",
+              icon: "🫓",
               mealEmoji: "🫓",
               dinner: "Quesadilla night",
               adultLunch: "adult lunch → —",
@@ -883,7 +940,7 @@
               id: "wed",
               day: "Wednesday",
               short: "Wed",
-              icon: "⭐",
+              icon: "🌮",
               mealEmoji: "🧀",
               dinner: "Taco rebuild (nachos / bowls / quesadillas)",
               adultLunch: "adult lunch → —",
@@ -1178,7 +1235,7 @@
               id: "tue",
               day: "Tuesday",
               short: "Tue",
-              icon: "⭐",
+              icon: "🫓",
               mealEmoji: "🫓",
               dinner: "Quesadilla night (chicken/cheese)",
               adultLunch: "adult lunch → extra quesadilla (opt)",
@@ -1343,7 +1400,7 @@
               id: "wed",
               day: "Wednesday",
               short: "Wed",
-              icon: "⭐",
+              icon: "🌮",
               mealEmoji: "🧀",
               dinner: "Taco rebuild",
               adultLunch: "adult lunch → —",
@@ -1480,6 +1537,7 @@
     showHiddenHave: false,
     groceryDayFilter: "all",
     lastGentleAt: null,
+    daySides: {},
   });
 
   let state;
@@ -1497,6 +1555,7 @@
     budgetProgress: document.getElementById("budget-progress"),
     budgetProgressFill: document.getElementById("budget-progress-fill"),
     calBtn: document.getElementById("cal-btn"),
+    backBtn: document.getElementById("back-btn"),
     rcptBtn: document.getElementById("rcpt-btn"),
     settingsBtn: document.getElementById("settings-btn"),
     settingsModal: document.getElementById("settings-modal"),
@@ -1522,6 +1581,8 @@
     customCategory: document.getElementById("custom-category"),
     customPrice: document.getElementById("custom-price"),
     addCustom: document.getElementById("add-custom"),
+    customNewCat: document.getElementById("custom-new-cat"),
+    delCustomCat: document.getElementById("del-custom-cat"),
     copyShare: document.getElementById("copy-share"),
     copyGrocery: document.getElementById("copy-grocery"),
     shopMode: document.getElementById("shop-mode"),
@@ -1735,6 +1796,17 @@
         days: [],
       }));
     }
+    if (typeof EXTRA_DINNERS !== "undefined" && EXTRA_DINNERS[key]) {
+      return (EXTRA_DINNERS[key].groceries || []).map((g) => ({
+        ...g,
+        category: normalizeCategory(g.category),
+        custom: false,
+        fromSwap: true,
+        sourceKey: key,
+        days: [],
+        hint: g.hint || "est.",
+      }));
+    }
     const parsed = parseDinnerKey(key);
     if (!parsed) return [];
     return parsed.plan.groceries
@@ -1847,6 +1919,16 @@
       if (GRAB_GO[ov.key]) {
         return applySpecialShape(templateDay, GRAB_GO[ov.key], "grabgo", { swapKey: ov.key, blank: false, grabGo: true });
       }
+      if (typeof EXTRA_DINNERS !== "undefined" && EXTRA_DINNERS[ov.key]) {
+        const ex = EXTRA_DINNERS[ov.key];
+        return applySpecialShape(templateDay, ex, "pick", {
+          swapKey: ov.key,
+          blank: false,
+          swapLabel: ex.kindLabel || "More ideas",
+          calories: ex.calories,
+          mealCalories: ex.mealCalories,
+        });
+      }
       const parsed = parseDinnerKey(ov.key);
       if (!parsed) return { ...templateDay, overrideType: null, swapped: false };
       const src = parsed.day;
@@ -1896,7 +1978,10 @@
   function normalizeCategory(cat) {
     if (!cat || typeof cat !== "string") return "Other";
     if (LEGACY_CATEGORY[cat]) return LEGACY_CATEGORY[cat];
-    return CATEGORIES.includes(cat) ? cat : "Other";
+    const c = cat.trim().slice(0, 40);
+    if (CATEGORIES.includes(c)) return c;
+    if (getCustomCategories().includes(c)) return c;
+    return "Other";
   }
 
   function itemChecked(id) {
@@ -1985,8 +2070,8 @@
     if(!m)return null;const sm=MO3.indexOf(m[1]);const em=m[3]?MO3.indexOf(m[3]):sm;if(sm<0||em<0)return null;
     let y=+m[5];const sy=em<sm?y-1:y;const d=new Date(sy,sm,+m[2]);return isNaN(d)?null:mondayOf(d)}
   function shEl(){return document.getElementById("sheet")}
-  function openSheet(html,label){const bg=shEl(),inn=document.getElementById("sheetIn");inn.innerHTML=html;if(label)inn.setAttribute("aria-label",label);bg.classList.add("open");bg.setAttribute("aria-hidden","false");const x=inn.querySelector("[data-x]");if(x)x.focus();return inn}
-  function closeSheet(){const bg=shEl();if(!bg)return;bg.classList.remove("open");bg.setAttribute("aria-hidden","true");const inn=document.getElementById("sheetIn");if(inn)inn.innerHTML=""}
+  function openSheet(html,label){const bg=shEl(),inn=document.getElementById("sheetIn");inn.innerHTML=html;if(label)inn.setAttribute("aria-label",label);bg.classList.add("open");bg.setAttribute("aria-hidden","false");const x=inn.querySelector("[data-x]");if(x)x.focus();if(typeof updateBackBtn==="function")updateBackBtn();return inn}
+  function closeSheet(){const bg=shEl();if(!bg)return;bg.classList.remove("open");bg.setAttribute("aria-hidden","true");const inn=document.getElementById("sheetIn");if(inn)inn.innerHTML="";if(typeof updateBackBtn==="function")updateBackBtn()}
   function sheetOpen(){const bg=shEl();return bg&&bg.classList.contains("open")}
   function initSheet(){const bg=shEl();if(!bg||bg._init)return;bg._init=1;
     bg.addEventListener("click",e=>{if(e.target===bg||e.target.closest("[data-x]"))closeSheet()});
@@ -2003,6 +2088,7 @@
       inn.innerHTML=shTop("📅 Pick a week")+`
         <p class="cal-sel">${sel?"Selected: "+fmtWeek(sel):"Tap any day to pick its Mon–Sun week"}</p>
         <div class="cal-nav"><button data-cm="-1" aria-label="Previous month">‹</button><b>${MOFULL[view.getMonth()]} ${view.getFullYear()}</b><button data-cm="1" aria-label="Next month">›</button></div>
+        <p class="month-hold-hint">Hold a week to customize</p>
         <div class="cal-dow"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
         ${rows.map(rm=>`<div class="cal-row${sel&&sameDay(rm,sel)?" sel":""}">${[0,1,2,3,4,5,6].map(i=>{const d=addDays(rm,i);
           const hol=holidayOnDate(d);
@@ -2042,7 +2128,7 @@
   function openReceipt(){
     const inn=openSheet(shTop("📷 Upload receipt")+`
       <p style="margin:0 0 10px;font-weight:700;font-size:15px">Snap your receipt (or a Publix app Purchases screenshot), then send it to Jarvis.</p>
-      <div class="sh-row2" style="margin-top:0"><button class="sh-btn p" data-pick="cam">📷 Take photo</button><button class="sh-btn" data-pick="lib">🖼 Choose photos</button></div>
+      <div class="sh-row2" style="margin-top:0"><button class="sh-btn p" data-pick="cam">📷 Take photo</button><button class="sh-btn" data-pick="lib">🖼 Upload receipt</button></div>
       <input type="file" accept="image/*" capture="environment" hidden data-in="cam"><input type="file" accept="image/*" multiple hidden data-in="lib">
       <div class="thumbs" data-th></div><div data-act></div>
       <p class="muted2"><b>Prices update after Jarvis reads it.</b> This page is a static site: nothing is uploaded from here. "Send to Jarvis" just opens your phone's share sheet so you can send the photo into the chat.</p>`,"Upload receipt");
@@ -2167,12 +2253,543 @@
     });
   }
 
+
+  /* ---- Suggested sides (fixed pairings + from liked meals) ---- */
+  const SIDE_ITEMS = {
+    broccoli: { name: "Broccoli", priceKey: "broccoli", category: "Produce", kcal: 50 },
+    "baked-potato": { name: "Baked potato", priceKey: "potatoes", category: "Produce", kcal: 160 },
+    fries: { name: "Fries / chips", priceKey: "fries", category: "Frozen", kcal: 250 },
+    salad: { name: "Side salad", priceKey: "salad", category: "Produce", kcal: 180 },
+    rice: { name: "Rice", priceKey: "rice", category: "Pantry", kcal: 210 },
+    "green-beans": { name: "Green beans", priceKey: "beans", category: "Produce", kcal: 40 },
+    asparagus: { name: "Asparagus", priceKey: "asparagus", category: "Produce", kcal: 40 },
+    beans: { name: "Rice and beans", priceKey: "black-beans", category: "Pantry", kcal: 160 },
+    "black-beans": { name: "Black beans", priceKey: "black-beans", category: "Pantry", kcal: 110 },
+    "garlic-bread": { name: "Garlic bread", priceKey: "garlic-bread", category: "Frozen", kcal: 180 },
+    corn: { name: "Corn", priceKey: "veg", category: "Produce", kcal: 90 },
+    fruit: { name: "Fruit", priceKey: "fruit", category: "Produce", kcal: 100 },
+    chips: { name: "Chips", priceKey: "chips", category: "Other", kcal: 160 },
+    potatoes: { name: "Potatoes", priceKey: "potatoes", category: "Produce", kcal: 160 },
+    "sweet-potato": { name: "Sweet potato", priceKey: "sweet-potatoes", category: "Produce", kcal: 110 },
+  };
+  // Extend estimate catalog for sides not already in FAM_PRICES
+  Object.assign(FAM_PRICES, {
+    asparagus: { n: "Asparagus", q: "1 bunch", a: 2.99, p: 4.49 },
+    "garlic-bread": { n: "Garlic bread / Texas toast", q: "1 box", a: 2.49, p: 3.99 },
+    fries: { n: "Frozen fries / tots", q: "1 bag", a: 2.49, p: 3.99 },
+    "black-beans": { n: "Black beans (can)", q: "2 cans", a: 1.58, p: 2.38 },
+    chips: { n: "Potato chips", q: "1 bag", a: 2.19, p: 5.49 },
+    "sweet-potatoes": FAM_PRICES["sweet-potatoes"] || { n: "Sweet potatoes", q: "3 lb", a: 2.49, p: 3.99 },
+  });
+  Object.keys(FAM_PRICES).forEach((k) => {
+    if (!LIVE_PRICES[k]) LIVE_PRICES[k] = { ...FAM_PRICES[k], sA: { source: "estimate", checked: "2026-10-05" }, sP: { source: "estimate", checked: "2026-10-05" }, locA: false, locP: false };
+  });
+
+  /* ---- Extra swap ideas (More batches) — est. prices via FAM_PRICES keys only ---- */
+  function exLine(pk, category, name) {
+    const meta = FAM_PRICES[pk] || LIVE_PRICES[pk];
+    return {
+      id: "ex-" + pk,
+      priceKey: pk,
+      category: normalizeCategory(category || "Other"),
+      name: name || (meta && meta.n) || pk,
+      price: "",
+      hint: "est.",
+    };
+  }
+  function makeExtra(key, opts) {
+    const kind = opts.kind || "dinner";
+    const kindLabel = kind === "breakfast" ? "Family breakfast" : kind === "adult-lunch" ? "Adult lunch idea" : "Dinner idea";
+    const dinner = opts.dinner;
+    return {
+      key,
+      kind,
+      kindLabel,
+      weekendOnly: Boolean(opts.weekendOnly),
+      dinner,
+      icon: opts.icon || "🍽️",
+      mealEmoji: opts.mealEmoji || "🍽️",
+      adultLunch: opts.adultLunch || "adult lunch → leftovers OK",
+      tedNote: opts.tedNote || "",
+      calories: opts.calories || 500,
+      mealCalories: opts.mealCalories || 650,
+      tag: kindLabel,
+      recipe: opts.recipe || {
+        title: dinner,
+        have: opts.have || "pantry basics",
+        steps: opts.steps || ["Shop the grocery lines for this night.", "Cook simply — low time, family of 4."],
+        enjoy: opts.enjoy || "Easy night.",
+        buy: opts.buy || "see grocery lines (est.)",
+      },
+      groceries: opts.groceries || [],
+    };
+  }
+
+  const EXTRA_DINNERS = {
+    "extra-bbq-chicken": makeExtra("extra-bbq-chicken", {
+      dinner: "BBQ chicken breasts + corn + baked potato",
+      calories: 520, mealCalories: 680,
+      steps: ["Season chicken breasts; bake or skillet ~20 min.", "Microwave/bake potatoes; warm corn.", "Brush BBQ if you have it at home."],
+      groceries: [exLine("chicken", "Meat"), exLine("potatoes", "Produce"), exLine("veg", "Produce", "Corn (fresh or frozen)")],
+    }),
+    "extra-lemon-chicken": makeExtra("extra-lemon-chicken", {
+      dinner: "Lemon pepper chicken breasts + rice + broccoli",
+      calories: 480, mealCalories: 640,
+      groceries: [exLine("chicken", "Meat"), exLine("rice", "Pantry"), exLine("broccoli", "Produce")],
+    }),
+    "extra-ranch-chicken": makeExtra("extra-ranch-chicken", {
+      dinner: "Ranch chicken breasts + potatoes + salad",
+      calories: 500, mealCalories: 660,
+      groceries: [exLine("chicken", "Meat"), exLine("potatoes", "Produce"), exLine("salad", "Produce")],
+    }),
+    "extra-honey-garlic": makeExtra("extra-honey-garlic", {
+      dinner: "Honey garlic chicken breasts + rice + green beans",
+      calories: 510, mealCalories: 670,
+      groceries: [exLine("chicken", "Meat"), exLine("rice", "Pantry"), exLine("beans", "Produce")],
+    }),
+    "extra-teriyaki-chicken": makeExtra("extra-teriyaki-chicken", {
+      dinner: "Teriyaki chicken breasts + rice + veg",
+      calories: 520, mealCalories: 680,
+      groceries: [exLine("chicken", "Meat"), exLine("rice", "Pantry"), exLine("veg", "Produce")],
+    }),
+    "extra-fajita-bowls": makeExtra("extra-fajita-bowls", {
+      dinner: "Chicken fajita bowls + peppers + rice",
+      calories: 540, mealCalories: 700,
+      groceries: [exLine("chicken", "Meat"), exLine("peppers", "Produce"), exLine("rice", "Pantry"), exLine("onion", "Produce")],
+    }),
+    "extra-chicken-fried-rice": makeExtra("extra-chicken-fried-rice", {
+      dinner: "Chicken fried rice (eggs + leftover rice)",
+      calories: 530, mealCalories: 680,
+      have: "day-old rice if you have it",
+      groceries: [exLine("chicken", "Meat"), exLine("eggs", "Meat"), exLine("rice", "Pantry"), exLine("veg", "Produce")],
+    }),
+    "extra-cheesy-chicken-rice": makeExtra("extra-cheesy-chicken-rice", {
+      dinner: "Cheesy chicken and rice skillet",
+      calories: 560, mealCalories: 720,
+      groceries: [exLine("chicken", "Meat"), exLine("rice", "Pantry"), exLine("cheese", "Dairy")],
+    }),
+    "extra-chicken-caesar": makeExtra("extra-chicken-caesar", {
+      dinner: "Chicken Caesar salad dinner",
+      calories: 480, mealCalories: 620,
+      groceries: [exLine("chicken", "Meat"), exLine("salad", "Produce"), exLine("cheese", "Dairy")],
+    }),
+    "extra-chicken-taco-salad": makeExtra("extra-chicken-taco-salad", {
+      dinner: "Chicken taco salad",
+      calories: 520, mealCalories: 680,
+      groceries: [exLine("chicken", "Meat"), exLine("salad", "Produce"), exLine("cheese", "Dairy"), exLine("tortillas", "Pantry", "Tortilla chips if low")],
+    }),
+    "extra-philly-chicken": makeExtra("extra-philly-chicken", {
+      dinner: "Philly chicken sandwiches + peppers + buns",
+      calories: 580, mealCalories: 740,
+      groceries: [exLine("chicken", "Meat"), exLine("peppers", "Produce"), exLine("onion", "Produce"), exLine("cheese", "Dairy"), exLine("buns", "Pantry")],
+    }),
+    "extra-rotisserie-soup": makeExtra("extra-rotisserie-soup", {
+      dinner: "Rotisserie chicken tortilla soup + salad",
+      calories: 460, mealCalories: 620,
+      groceries: [exLine("rotisserie", "Meat"), exLine("tortillas", "Pantry"), exLine("onion", "Produce"), exLine("salad", "Produce")],
+    }),
+    "extra-black-bean-quesadilla": makeExtra("extra-black-bean-quesadilla", {
+      dinner: "Black bean quesadillas + rice + salad",
+      calories: 520, mealCalories: 680,
+      groceries: [exLine("black-beans", "Pantry"), exLine("cheese", "Dairy"), exLine("tortillas", "Pantry"), exLine("rice", "Pantry"), exLine("salad", "Produce")],
+    }),
+    "extra-chicken-burritos": makeExtra("extra-chicken-burritos", {
+      dinner: "Chicken + black bean burritos",
+      calories: 560, mealCalories: 720,
+      groceries: [exLine("chicken", "Meat"), exLine("black-beans", "Pantry"), exLine("tortillas", "Pantry"), exLine("cheese", "Dairy"), exLine("rice", "Pantry")],
+    }),
+    "extra-sausage-peppers-rice": makeExtra("extra-sausage-peppers-rice", {
+      dinner: "Sausage + peppers + rice",
+      calories: 540, mealCalories: 700,
+      groceries: [exLine("sausage", "Meat"), exLine("peppers", "Produce"), exLine("onion", "Produce"), exLine("rice", "Pantry")],
+    }),
+    "extra-sausage-broccoli": makeExtra("extra-sausage-broccoli", {
+      dinner: "Sheet-pan sausage + broccoli + potatoes",
+      calories: 520, mealCalories: 690,
+      groceries: [exLine("sausage-sheet", "Meat", "Smoked sausage"), exLine("broccoli", "Produce"), exLine("potatoes", "Produce")],
+    }),
+    "extra-beef-potato-skillet": makeExtra("extra-beef-potato-skillet", {
+      dinner: "Ground beef + potato skillet + salad",
+      calories: 560, mealCalories: 720,
+      groceries: [exLine("beef", "Meat"), exLine("potatoes", "Produce"), exLine("onion", "Produce"), exLine("salad", "Produce")],
+    }),
+    "extra-sloppy-joe-bowls": makeExtra("extra-sloppy-joe-bowls", {
+      dinner: "Sloppy joe bowls over rice (no spaghetti)",
+      calories: 550, mealCalories: 710,
+      steps: ["Brown beef with onion.", "Simmer with pantry sauce — serve over rice, not spaghetti.", "Side salad."],
+      groceries: [exLine("beef", "Meat"), exLine("onion", "Produce"), exLine("rice", "Pantry"), exLine("salad", "Produce")],
+    }),
+    "extra-loaded-nachos": makeExtra("extra-loaded-nachos", {
+      dinner: "Loaded nachos (beef) + fruit",
+      calories: 600, mealCalories: 760,
+      groceries: [exLine("beef", "Meat"), exLine("cheese", "Dairy"), exLine("tortillas", "Pantry", "Tortilla chips"), exLine("fruit", "Produce")],
+    }),
+    "extra-turkey-burgers": makeExtra("extra-turkey-burgers", {
+      dinner: "Turkey-style burgers (beef) + salad",
+      calories: 560, mealCalories: 720,
+      groceries: [exLine("beef", "Meat", "Ground beef for burgers"), exLine("buns", "Pantry"), exLine("salad", "Produce")],
+    }),
+    "extra-hot-dogs": makeExtra("extra-hot-dogs", {
+      dinner: "Hot dog night + chips + fruit",
+      calories: 520, mealCalories: 680,
+      groceries: [exLine("sausage", "Meat", "Hot dogs / sausage pack"), exLine("buns", "Pantry"), exLine("chips", "Other"), exLine("fruit", "Produce")],
+    }),
+    "extra-egg-roll-bowl": makeExtra("extra-egg-roll-bowl", {
+      dinner: "Egg-roll-in-a-bowl (beef + veg)",
+      calories: 480, mealCalories: 640,
+      groceries: [exLine("beef", "Meat"), exLine("veg", "Produce", "Coleslaw mix / veg"), exLine("onion", "Produce"), exLine("rice", "Pantry")],
+    }),
+    "extra-pork-sweet-potato": makeExtra("extra-pork-sweet-potato", {
+      dinner: "Pork chops + sweet potato + green beans",
+      calories: 500, mealCalories: 660,
+      groceries: [exLine("pork", "Meat"), exLine("sweet-potatoes", "Produce"), exLine("beans", "Produce")],
+    }),
+    "extra-caprese-chicken": makeExtra("extra-caprese-chicken", {
+      dinner: "Caprese chicken breasts + salad + fruit",
+      calories: 490, mealCalories: 640,
+      groceries: [exLine("chicken", "Meat"), exLine("cheese", "Dairy"), exLine("salad", "Produce"), exLine("fruit", "Produce")],
+    }),
+    "extra-nugget-night": makeExtra("extra-nugget-night", {
+      dinner: "Chicken nugget night + fruit + salad",
+      calories: 540, mealCalories: 700,
+      groceries: [exLine("chicken", "Meat", "Frozen chicken nuggets / tenders"), exLine("fruit", "Produce"), exLine("salad", "Produce"), exLine("fries", "Frozen")],
+    }),
+    "extra-tilapia-broccoli": makeExtra("extra-tilapia-broccoli", {
+      dinner: "Tilapia (Samantha) + rice + broccoli",
+      tedNote: "Ted: leftover chicken or quesadilla — not fish",
+      calories: 340, mealCalories: 520,
+      groceries: [exLine("tilapia", "Meat"), exLine("rice", "Pantry"), exLine("broccoli", "Produce"), exLine("chicken", "Meat", "Leftover sub for Ted (optional)")],
+    }),
+    "extra-salmon-asparagus": makeExtra("extra-salmon-asparagus", {
+      dinner: "Salmon (Samantha) + rice + asparagus",
+      tedNote: "Ted: leftover sub — not fish",
+      calories: 400, mealCalories: 580,
+      groceries: [exLine("salmon", "Meat"), exLine("rice", "Pantry"), exLine("asparagus", "Produce")],
+    }),
+    "extra-chili-weekend": makeExtra("extra-chili-weekend", {
+      kind: "dinner",
+      weekendOnly: true,
+      dinner: "Weekend chili pot (daytime) + salad + corn",
+      calories: 480, mealCalories: 640,
+      steps: ["Weekend daytime only — football/company.", "Brown beef; simmer beans/tomatoes.", "Tucker lunch kit stays fixed — chili is dinner, not lunchbox."],
+      groceries: [exLine("beef", "Meat"), exLine("chili-cans", "Pantry"), exLine("onion", "Produce"), exLine("salad", "Produce"), exLine("veg", "Produce", "Corn")],
+    }),
+    "extra-white-chili-weekend": makeExtra("extra-white-chili-weekend", {
+      weekendOnly: true,
+      dinner: "Weekend white chicken chili + salad",
+      calories: 460, mealCalories: 620,
+      groceries: [exLine("chicken", "Meat"), exLine("black-beans", "Pantry"), exLine("onion", "Produce"), exLine("salad", "Produce"), exLine("cheese", "Dairy")],
+    }),
+    "extra-grilled-cheese-soup": makeExtra("extra-grilled-cheese-soup", {
+      dinner: "Grilled cheese + simple tomato soup night",
+      calories: 520, mealCalories: 680,
+      groceries: [exLine("cheese", "Dairy"), exLine("buns", "Pantry", "Bread / buns"), exLine("chili-cans", "Pantry", "Canned tomatoes for soup"), exLine("milk", "Dairy")],
+    }),
+    "extra-chicken-wraps-dinner": makeExtra("extra-chicken-wraps-dinner", {
+      dinner: "Chicken wrap night + fruit",
+      calories: 500, mealCalories: 660,
+      groceries: [exLine("chicken", "Meat"), exLine("tortillas", "Pantry"), exLine("salad", "Produce", "Lettuce / wrap veg"), exLine("cheese", "Dairy"), exLine("fruit", "Produce")],
+    }),
+    "extra-beef-soft-tacos": makeExtra("extra-beef-soft-tacos", {
+      dinner: "Soft tacos (beef) + rice",
+      calories: 540, mealCalories: 700,
+      groceries: [exLine("beef", "Meat"), exLine("tortillas", "Pantry"), exLine("cheese", "Dairy"), exLine("rice", "Pantry")],
+    }),
+    "extra-oven-chicken-asparagus": makeExtra("extra-oven-chicken-asparagus", {
+      dinner: "Oven chicken breasts + asparagus + potatoes",
+      calories: 480, mealCalories: 640,
+      groceries: [exLine("chicken", "Meat"), exLine("asparagus", "Produce"), exLine("potatoes", "Produce")],
+    }),
+    "extra-garlic-chicken-beans": makeExtra("extra-garlic-chicken-beans", {
+      dinner: "Garlic chicken breasts + black beans + rice",
+      calories: 510, mealCalories: 670,
+      groceries: [exLine("chicken", "Meat"), exLine("black-beans", "Pantry"), exLine("rice", "Pantry")],
+    }),
+    /* Family breakfast ideas (swappable onto a night) */
+    "extra-bf-pancakes": makeExtra("extra-bf-pancakes", {
+      kind: "breakfast",
+      dinner: "Family pancake breakfast-for-dinner + sausage + fruit",
+      adultLunch: "adult lunch → leftover pancakes optional",
+      calories: 520, mealCalories: 680,
+      groceries: [exLine("eggs", "Meat"), exLine("sausage", "Meat"), exLine("milk", "Dairy"), exLine("fruit", "Produce")],
+    }),
+    "extra-bf-french-toast": makeExtra("extra-bf-french-toast", {
+      kind: "breakfast",
+      dinner: "French toast + sausage + fruit",
+      calories: 500, mealCalories: 660,
+      groceries: [exLine("eggs", "Meat"), exLine("sausage", "Meat"), exLine("milk", "Dairy"), exLine("fruit", "Produce"), exLine("buns", "Pantry", "Bread")],
+    }),
+    "extra-bf-omelets": makeExtra("extra-bf-omelets", {
+      kind: "breakfast",
+      dinner: "Omelet night + potatoes + fruit",
+      calories: 480, mealCalories: 640,
+      groceries: [exLine("eggs", "Meat"), exLine("cheese", "Dairy"), exLine("potatoes", "Produce"), exLine("fruit", "Produce"), exLine("peppers", "Produce")],
+    }),
+    "extra-bf-burrito": makeExtra("extra-bf-burrito", {
+      kind: "breakfast",
+      dinner: "Breakfast burritos (eggs + sausage + tortillas)",
+      calories: 540, mealCalories: 700,
+      groceries: [exLine("eggs", "Meat"), exLine("sausage", "Meat"), exLine("tortillas", "Pantry"), exLine("cheese", "Dairy")],
+    }),
+    "extra-bf-hash": makeExtra("extra-bf-hash", {
+      kind: "breakfast",
+      dinner: "Potato hash + eggs + sausage",
+      calories: 520, mealCalories: 680,
+      groceries: [exLine("potatoes", "Produce"), exLine("eggs", "Meat"), exLine("sausage", "Meat"), exLine("onion", "Produce")],
+    }),
+    "extra-bf-yogurt-bar": makeExtra("extra-bf-yogurt-bar", {
+      kind: "breakfast",
+      dinner: "Yogurt parfait bar + scrambled eggs",
+      calories: 420, mealCalories: 560,
+      groceries: [exLine("t-yogurt", "Dairy", "Yogurt cups / tub"), exLine("fruit", "Produce"), exLine("eggs", "Meat")],
+    }),
+    "extra-bf-biscuit-eggs": makeExtra("extra-bf-biscuit-eggs", {
+      kind: "breakfast",
+      dinner: "Egg + cheese biscuit sandwiches + fruit",
+      calories: 500, mealCalories: 660,
+      groceries: [exLine("eggs", "Meat"), exLine("cheese", "Dairy"), exLine("buns", "Pantry", "Biscuits / buns"), exLine("fruit", "Produce")],
+    }),
+    "extra-bf-sweet-potato-hash": makeExtra("extra-bf-sweet-potato-hash", {
+      kind: "breakfast",
+      dinner: "Sweet potato hash + eggs",
+      calories: 460, mealCalories: 600,
+      groceries: [exLine("sweet-potatoes", "Produce"), exLine("eggs", "Meat"), exLine("onion", "Produce"), exLine("peppers", "Produce")],
+    }),
+    /* Adult lunch ideas (swappable onto a day; Tucker lunch kit stays fixed) */
+    "extra-al-chicken-wraps": makeExtra("extra-al-chicken-wraps", {
+      kind: "adult-lunch",
+      dinner: "Adult lunch: chicken wraps + fruit",
+      adultLunch: "adult lunch → this is the plan (Tucker kit unchanged)",
+      calories: 450, mealCalories: 450,
+      groceries: [exLine("chicken", "Meat"), exLine("tortillas", "Pantry"), exLine("salad", "Produce"), exLine("fruit", "Produce")],
+    }),
+    "extra-al-chef-salad": makeExtra("extra-al-chef-salad", {
+      kind: "adult-lunch",
+      dinner: "Adult lunch: chef salad + leftover protein",
+      adultLunch: "adult lunch → chef salad",
+      calories: 420, mealCalories: 420,
+      groceries: [exLine("salad", "Produce"), exLine("cheese", "Dairy"), exLine("eggs", "Meat"), exLine("chicken", "Meat", "Leftover chicken if needed")],
+    }),
+    "extra-al-quesadilla": makeExtra("extra-al-quesadilla", {
+      kind: "adult-lunch",
+      dinner: "Adult lunch: cheese quesadillas + fruit",
+      calories: 480, mealCalories: 480,
+      groceries: [exLine("cheese", "Dairy"), exLine("tortillas", "Pantry"), exLine("fruit", "Produce")],
+    }),
+    "extra-al-rice-bowl": makeExtra("extra-al-rice-bowl", {
+      kind: "adult-lunch",
+      dinner: "Adult lunch: rice bowls + leftover chicken/beef",
+      calories: 460, mealCalories: 460,
+      groceries: [exLine("rice", "Pantry"), exLine("black-beans", "Pantry"), exLine("cheese", "Dairy"), exLine("veg", "Produce")],
+    }),
+    "extra-al-rotisserie-plate": makeExtra("extra-al-rotisserie-plate", {
+      kind: "adult-lunch",
+      dinner: "Adult lunch: rotisserie plate + salad",
+      calories: 440, mealCalories: 440,
+      groceries: [exLine("rotisserie", "Meat"), exLine("salad", "Produce"), exLine("fruit", "Produce")],
+    }),
+    "extra-al-sandwich": makeExtra("extra-al-sandwich", {
+      kind: "adult-lunch",
+      dinner: "Adult lunch: turkey-style deli sandwiches + chips",
+      calories: 480, mealCalories: 480,
+      groceries: [exLine("buns", "Pantry", "Bread / buns"), exLine("cheese", "Dairy"), exLine("chips", "Other"), exLine("fruit", "Produce")],
+    }),
+    "extra-al-baked-potato": makeExtra("extra-al-baked-potato", {
+      kind: "adult-lunch",
+      dinner: "Adult lunch: baked potato + broccoli + cheese",
+      calories: 430, mealCalories: 430,
+      groceries: [exLine("potatoes", "Produce"), exLine("broccoli", "Produce"), exLine("cheese", "Dairy")],
+    }),
+    "extra-al-leftover-taco": makeExtra("extra-al-leftover-taco", {
+      kind: "adult-lunch",
+      dinner: "Adult lunch: leftover taco bowls",
+      calories: 450, mealCalories: 450,
+      groceries: [exLine("rice", "Pantry"), exLine("cheese", "Dairy"), exLine("salad", "Produce")],
+    }),
+  };
+
+  const SIDE_DEFAULTS = [
+    [/steak/, ["broccoli", "baked-potato"]],
+    [/burger/, ["fries", "salad"]],
+    [/alfredo|pasta bake/, ["garlic-bread", "salad"]],
+    [/taco/, ["rice", "black-beans"]],
+    [/salmon|tilapia/, ["rice", "asparagus"]],
+    [/pork chop/, ["potatoes", "salad"]],
+    [/chili/, ["salad", "corn"]],
+    [/sausage sheet|smoked sausage/, ["broccoli", "potatoes"]],
+    [/potato bar|baked potato/, ["broccoli", "salad"]],
+    [/breakfast-for-dinner/, ["fruit", "salad"]],
+    [/quesadilla/, ["rice", "salad"]],
+    [/sheet-pan oven chicken|oven chicken|sheet-pan chicken/, ["rice", "green-beans"]],
+    [/rotisserie/, ["rice", "salad"]],
+    [/sandwich/, ["salad", "chips"]],
+    [/pizza/, ["salad"]],
+    [/sub/, ["chips", "fruit"]],
+    [/grab/, ["salad", "fruit"]],
+    [/chicken/, ["rice", "green-beans"]],
+  ];
+
+  function fixedSidesForDinner(dinner) {
+    const d = String(dinner || "").toLowerCase();
+    if (!d || /leftovers|eat out|pick a meal|removed|holiday/.test(d)) return [];
+    for (const [re, ids] of SIDE_DEFAULTS) {
+      if (re.test(d)) return ids.filter((id) => SIDE_ITEMS[id]);
+    }
+    return ["salad", "rice"].filter((id) => SIDE_ITEMS[id]);
+  }
+
+  function getDaySides(dayId) {
+    const arr = (state.daySides || {})[dayId];
+    return Array.isArray(arr) ? arr.filter((id) => SIDE_ITEMS[id]) : [];
+  }
+
+  function setDaySides(dayId, ids) {
+    if (!state.daySides) state.daySides = {};
+    const clean = [...new Set(ids)].filter((id) => SIDE_ITEMS[id]).slice(0, 6);
+    if (!clean.length) delete state.daySides[dayId];
+    else state.daySides[dayId] = clean;
+  }
+
+  function toggleDaySide(dayId, sideId) {
+    if (!SIDE_ITEMS[sideId]) return;
+    const cur = getDaySides(dayId);
+    if (cur.includes(sideId)) setDaySides(dayId, cur.filter((x) => x !== sideId));
+    else setDaySides(dayId, [...cur, sideId]);
+    // remember with ratings for liked-sides recall
+    const dinner = (() => {
+      try {
+        const td = currentPlan().days.find((d) => d.id === dayId);
+        return td ? effectiveDay(td).dinner : "";
+      } catch (_) { return ""; }
+    })();
+    if (dinner && ratingOf(dinner) >= 1) {
+      const k = rateKey(dinner);
+      if (state.ratings[k]) state.ratings[k].sides = getDaySides(dayId).slice();
+    }
+    persist();
+    renderAll();
+    showToast(getDaySides(dayId).includes(sideId) ? `Added ${SIDE_ITEMS[sideId].name}` : `Removed ${SIDE_ITEMS[sideId].name}`);
+  }
+
+  function likedSideIds(exclude) {
+    const ex = new Set(exclude || []);
+    const out = [];
+    const seen = new Set();
+    Object.keys(state.ratings || {}).forEach((k) => {
+      const r = state.ratings[k];
+      if (!r || (r.r !== 1 && r.r !== 2)) return;
+      (Array.isArray(r.sides) ? r.sides : []).forEach((id) => {
+        if (SIDE_ITEMS[id] && !ex.has(id) && !seen.has(id)) { seen.add(id); out.push(id); }
+      });
+      // parse common side words from liked dinner names
+      const n = String(r.n || "").toLowerCase();
+      const map = [
+        [/broccoli/, "broccoli"], [/baked potato|potato/, "baked-potato"], [/fries|chips/, "fries"],
+        [/salad/, "salad"], [/\brice\b/, "rice"], [/green beans/, "green-beans"],
+        [/asparagus/, "asparagus"], [/garlic bread/, "garlic-bread"], [/\bbeans\b/, "black-beans"],
+        [/\bcorn\b/, "corn"], [/fruit/, "fruit"],
+      ];
+      map.forEach(([re, id]) => {
+        if (re.test(n) && SIDE_ITEMS[id] && !ex.has(id) && !seen.has(id)) { seen.add(id); out.push(id); }
+      });
+    });
+    return out.slice(0, 6);
+  }
+
+  
+  const SIDE_PHOTO_MAP = {"broccoli":"broccoli","baked-potato":"baked-potato","fries":"fries","salad":"side-salad","rice":"rice","green-beans":"green-beans","asparagus":"asparagus","beans":"black-beans","garlic-bread":"garlic-bread","corn":"corn","fruit":"banana-fruit","chips":"potato-chips","potatoes":"potatoes","sweet-potato":"sweet-potato"};
+  const SIDE_EMOJI_MAP = {"broccoli":"🥦","green-beans":"🥦","asparagus":"🌿","salad":"🥗","side-salad":"🥗","rice":"🍚","baked-potato":"🥔","potatoes":"🥔","fries":"🍟","potato-chips":"🥔","fruit":"🍌","banana-fruit":"🍌","corn":"🌽","garlic-bread":"🍞","beans":"🫘","black-beans":"🫘","sweet-potato":"🍠"};
+  function sidePhotoSlug(id) {
+    return SIDE_PHOTO_MAP[id] || id;
+  }
+  function sideTileHTML(id, on, dayId) {
+    const meta = SIDE_ITEMS[id]; if (!meta) return "";
+    const slug = sidePhotoSlug(id);
+    const emo = SIDE_EMOJI_MAP[slug] || SIDE_EMOJI_MAP[id] || "🍽";
+    const src = "img/sides/" + slug + ".webp";
+    return `<button type="button" class="side-tile${on ? " is-on" : ""}" data-side="${escapeAttr(id)}" data-day="${escapeAttr(dayId)}" aria-pressed="${on}" aria-label="${escapeAttr(meta.name)}">` +
+      `<img src="${src}" alt="" width="64" height="64" loading="lazy" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">` +
+      `<span class="emo-fb" style="display:none" aria-hidden="true">${emo}</span>` +
+      `<span class="sn">${escapeHtml(meta.name)}</span></button>`;
+  }
+function sidesBlockHTML(dayId, day) {
+    if (day.overrideType === "holiday" || day.overrideType === "removed" || day.overrideType === "pickmeal" || day.overrideType === "eatout") return "";
+    const added = getDaySides(dayId);
+    const fixed = fixedSidesForDinner(day.dinner).filter((id) => !added.includes(id));
+    const liked = likedSideIds([...fixed, ...added]);
+    if (!fixed.length && !liked.length && !added.length) {
+      // still show fixed defaults even if empty filter somehow
+      const fb = fixedSidesForDinner(day.dinner);
+      if (!fb.length) return "";
+    }
+    const btn = (id, on) => sideTileHTML(id, on, dayId);
+    const fixedShow = fixedSidesForDinner(day.dinner);
+    if (!fixedShow.length && !liked.length && !added.length) return "";
+    return `<div class="sides-block" data-sides-day="${escapeAttr(dayId)}">
+      <span class="sides-lbl">Suggested sides</span>
+      <div class="sides-row">${fixedShow.map((id) => btn(id, added.includes(id))).join("")}</div>
+      ${liked.length ? `<span class="sides-lbl">From meals you liked</span><div class="sides-row">${liked.map((id) => btn(id, added.includes(id))).join("")}</div>` : ""}
+    </div>`;
+  }
+
+  function bindSidesBlock(card) {
+    card.querySelectorAll("[data-side]").forEach((b) => {
+      b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleDaySide(b.dataset.day, b.dataset.side);
+      });
+    });
+  }
+
+  function sideGroceryItems() {
+    const plan = currentPlan();
+    const byKey = {};
+    plan.days.forEach((td) => {
+      const eff = effectiveDay(td);
+      if (skipsGrocery(eff) && eff.overrideType !== "grabgo") return;
+      getDaySides(td.id).forEach((sid) => {
+        const meta = SIDE_ITEMS[sid];
+        if (!meta) return;
+        const pk = meta.priceKey || sid;
+        if (!byKey[pk]) {
+          byKey[pk] = {
+            id: "side-" + pk,
+            category: normalizeCategory(meta.category || "Produce"),
+            name: meta.name,
+            price: "",
+            hint: "side",
+            custom: false,
+            staple: isStapleItem({ name: meta.name, category: meta.category }),
+            days: [],
+            fromSide: true,
+          };
+        }
+        if (!byKey[pk].days.includes(td.id)) byKey[pk].days.push(td.id);
+      });
+    });
+    Object.values(byKey).forEach((it) => {
+      const shorts = it.days.map((id) => {
+        const d = plan.days.find((x) => x.id === id);
+        return d ? d.short : id;
+      });
+      it.hint = "side · " + shorts.join(", ");
+    });
+    return Object.values(byKey);
+  }
+
+  function sideKcalForDay(dayId) {
+    return getDaySides(dayId).reduce((s, id) => s + (SIDE_ITEMS[id] && SIDE_ITEMS[id].kcal ? SIDE_ITEMS[id].kcal : 0), 0);
+  }
+
   function priceKeyFor(item) {
     if (!item || item.custom) return null;
+    if (item.priceKey && LIVE_PRICES[item.priceKey]) return item.priceKey;
     return String(item.id)
       .replace(/^swap-[a-z]+-/, "")
       .replace(/^gg-/, "")
-      .replace(/^w\d[ab]?-/, "");
+      .replace(/^ex-/, "")
+      .replace(/^w\d[ab]?-/, "")
+      .replace(/^side-/, "");
   }
   function storePriceFor(item) {
     const k = priceKeyFor(item);
@@ -2393,7 +3010,7 @@
           const lunch = day.adultLunch && day.adultLunch !== "—" && !/adult lunch → —/.test(day.adultLunch) ? day.adultLunch : "";
           return `<div class="cz${o ? " ch" : ""}${moveFrom === td.id ? " mv" : ""}">
             <div class="cz-h"><span>${escapeHtml(td.day)}</span><span>${o ? "changed" : ""}</span></div>
-            <div class="cz-d">${day.mealEmoji} ${isFav(day.dinner) ? "⭐ " : ""}${escapeHtml(day.dinner)}</div>
+            <div class="cz-d">${day.mealEmoji} ${isFav(day.dinner) ? "❤️ " : ""}${escapeHtml(day.dinner)}</div>
             ${lunch ? `<div class="cz-l">${escapeHtml(lunch)}</div>` : ""}
             <div class="cz-o">
               <button type="button" data-a="keep" data-d="${td.id}" class="${!o ? "on" : ""}">Keep</button>
@@ -2402,7 +3019,7 @@
               <button type="button" data-a="eatout" data-d="${td.id}" class="${t === "eatout" ? "on" : ""}">Eat out</button>
               <button type="button" data-a="move" data-d="${td.id}" class="mvb${moveFrom === td.id ? " on" : ""}">${moveFrom === null ? "⇅ Move" : moveFrom === td.id ? "Cancel" : "⇅ Swap w/ " + escapeHtml(plan.days.find((x) => x.id === moveFrom).short)}</button>
             </div>
-            ${swapOpen === td.id ? `<div class="cz-list">${options.map((d) => `<button type="button" data-pick="${escapeAttr(d.key)}" data-d="${td.id}">${isFav(d.day.dinner) ? "⭐ " : ""}${escapeHtml(d.day.dinner)}<small>${escapeHtml(d.label)}</small></button>`).join("")}</div>` : ""}
+            ${swapOpen === td.id ? `<div class="cz-list">${options.map((d) => `<button type="button" data-pick="${escapeAttr(d.key)}" data-d="${td.id}">${isFav(d.day.dinner) ? "❤️ " : ""}${escapeHtml(d.day.dinner)}<small>${escapeHtml(d.label)}</small></button>`).join("")}</div>` : ""}
           </div>`;
         }).join("")}
         <div class="sh-row2"><button type="button" class="sh-btn" id="czR">Reset this week</button><button type="button" class="sh-btn p" id="czS">Save</button></div>`;
@@ -2463,6 +3080,10 @@
       const g = day.swapKey && GRAB_GO[day.swapKey];
       if (g) return { main: round10(g.calories), meal: round10(g.mealCalories) };
       return { main: 650, meal: 720 };
+    }
+    if (day.swapKey && typeof EXTRA_DINNERS !== "undefined" && EXTRA_DINNERS[day.swapKey]) {
+      const ex = EXTRA_DINNERS[day.swapKey];
+      return { main: round10(ex.calories || 500), meal: round10(ex.mealCalories || ex.calories || 600) };
     }
     const d = String(day.dinner || "").toLowerCase();
     const rules = [
@@ -2526,7 +3147,7 @@
     Object.keys(src).forEach((k) => {
       const v = src[k];
       const r = Number(v && v.r);
-      if (r === -1 || r === 1 || r === 2) { out[rateKey(k)] = { r, d: typeof v.d === "string" ? v.d.slice(0, 10) : "", n: typeof v.n === "string" ? v.n.slice(0, 80) : k }; if (r === -1 && v.x) out[rateKey(k)].x = 1; }
+      if (r === -1 || r === 1 || r === 2) { out[rateKey(k)] = { r, d: typeof v.d === "string" ? v.d.slice(0, 10) : "", n: typeof v.n === "string" ? v.n.slice(0, 80) : k }; if (r === -1 && v.x) out[rateKey(k)].x = 1; if (Array.isArray(v.sides)) out[rateKey(k)].sides = v.sides.map(String).slice(0, 6); }
     });
     return out;
   }
@@ -2624,14 +3245,6 @@
         ${[["made","Made"],["skipped","Skipped"],["ateout","Ate out"]].map(([v,l]) =>
           `<button type="button" class="log-chip${log.status===v?" on":""}" data-log-status="${v}" aria-pressed="${log.status===v}">${l}</button>`).join("")}
       </div>
-      <label class="log-left">Leftovers
-        <select data-log-left>${[0,1,2,3].map((n)=>`<option value="${n}" ${log.leftovers===n?"selected":""}>${n}</option>`).join("")}</select>
-      </label>
-      <div class="log-bad" role="group" aria-label="Did leftovers go bad">
-        <span>Went bad?</span>
-        <button type="button" class="log-chip${log.wentBad===true?" on":""}" data-log-bad="1" aria-pressed="${log.wentBad===true}">Yes</button>
-        <button type="button" class="log-chip${log.wentBad===false?" on":""}" data-log-bad="0" aria-pressed="${log.wentBad===false}">No</button>
-      </div>
     </div>`;
   }
   function bindMealLog(card, dayId) {
@@ -2649,20 +3262,6 @@
           /* nudge only via gentle banner / review — don't auto-rate */
         }
       }
-      persist();
-      renderAll();
-    }));
-    root.querySelector("[data-log-left]")?.addEventListener("change", (e) => {
-      e.stopPropagation();
-      setLog(dayId, { leftovers: Number(e.target.value) });
-      persist();
-      renderWeekReview();
-    });
-    root.querySelectorAll("[data-log-bad]").forEach((b) => b.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const val = b.dataset.logBad === "1";
-      const cur = getLog(dayId).wentBad;
-      setLog(dayId, { wentBad: cur === val ? null : val });
       persist();
       renderAll();
     }));
@@ -2691,7 +3290,7 @@
     const body = els.weekReviewBody;
     if (!panel || !body) return;
     const plan = currentPlan();
-    let made = 0, planned = 0, skipped = 0, wasted = 0;
+    let made = 0, planned = 0, skipped = 0;
     const skipNames = [];
     plan.days.forEach((td) => {
       const day = effectiveDay(td);
@@ -2700,7 +3299,6 @@
       const log = getLog(td.id);
       if (log.status === "made") made += 1;
       if (log.status === "skipped") { skipped += 1; skipNames.push(day.dinner); }
-      if (log.wentBad === true) wasted += Math.max(1, log.leftovers || 1);
     });
     const times = timesMadeMap();
     const topRated = Object.keys(state.ratings || {})
@@ -2725,13 +3323,12 @@
       if (r && r.r === -1) suggestions.push(`Skipped / disliked: ${r.n || k} — swap it?`);
     });
     const uniqSug = [...new Set(suggestions)].slice(0, 4);
-    const hasAny = made + skipped + wasted + topRated.length > 0;
+    const hasAny = made + skipped + topRated.length > 0;
     panel.hidden = !hasAny && planned === 0;
     if (!hasAny && planned > 0) panel.hidden = false;
     body.innerHTML = `
       <div class="wr-stats">
         <p><strong>${made}</strong> made · <strong>${planned}</strong> planned · <strong>${skipped}</strong> skipped</p>
-        <p>Leftovers wasted (went bad): <strong>${wasted}</strong></p>
       </div>
       ${topRated.length ? `<div class="wr-block"><h3>Top-rated</h3><ul>${topRated.map((r) => `<li>${r.r === 2 ? "❤️" : "👍"} ${escapeHtml(r.n || "")}</li>`).join("")}</ul></div>` : ""}
       <div class="wr-block"><h3>All-time times made (from ratings + this week)</h3>
@@ -2949,6 +3546,13 @@
     base.months = normalizeMonths(parsed.months);
     base.monthKey = typeof parsed.monthKey === "string" && /^\d{4}-\d{2}$/.test(parsed.monthKey) ? parsed.monthKey : currentMonthKey();
     base.lastGentleAt = typeof parsed.lastGentleAt === "string" ? parsed.lastGentleAt.slice(0, 10) : null;
+    base.daySides = {};
+    if (parsed.daySides && typeof parsed.daySides === "object") {
+      Object.keys(parsed.daySides).forEach((d) => {
+        const arr = parsed.daySides[d];
+        if (Array.isArray(arr)) base.daySides[d] = arr.map(String).filter(Boolean).slice(0, 6);
+      });
+    }
     linkWeekEdits(base);
     if (parsed.prices && typeof parsed.prices === "object" && !Array.isArray(parsed.prices)) {
       Object.keys(parsed.prices).forEach((id) => {
@@ -2965,10 +3569,14 @@
           if (price !== null) base.prices[id] = price;
           if (typeof c.qty === "string" && c.qty.trim()) base.qty[id] = c.qty.trim().slice(0, 40);
           if (typeof c.note === "string" && c.note.trim()) base.notes[id] = c.note.trim().slice(0, 80);
+          const rawCat = typeof c.category === "string" ? c.category.trim().slice(0, 40) : "Other";
+          const category = CATEGORIES.includes(rawCat) || LEGACY_CATEGORY[rawCat]
+            ? normalizeCategory(rawCat)
+            : ensureCustomCategory(rawCat || "Other");
           return {
             id,
             name: c.name.trim().slice(0, 80),
-            category: normalizeCategory(c.category),
+            category,
           };
         });
     }
@@ -3200,10 +3808,8 @@
         grid.parentNode.insertBefore(strip, grid);
       }
       const hols = holidaysInMonthKey(state.monthKey);
-      strip.textContent = hols.length
-        ? `Holidays this month (blank nights): ${hols.map((h) => `${h.emoji || ""} ${h.name}`.trim()).join(" · ")}`
-        : "";
-      strip.hidden = !hols.length;
+      strip.textContent = "";
+      strip.hidden = true;
     }
   }
 
@@ -3398,26 +4004,30 @@
         <div class="day-head">
           <span>${day.short}</span>
           <div class="day-head-actions">
-            ${holClass ? "" : `<button type="button" class="swap-link" data-swap-day="${escapeAttr(templateDay.id)}" aria-label="Swap ${escapeAttr(day.day)} dinner">${typeof ICO !== "undefined" ? ICO.swap : ""}<span>Swap</span></button>`}
-            ${holClass ? "" : `<button type="button" class="cart-btn icon-btn" data-jump-day="${escapeAttr(templateDay.id)}" aria-label="Jump to groceries for ${escapeAttr(day.day)}">${typeof ICO !== "undefined" ? ICO.cart : "🛒"}</button>`}
+            ${holClass ? "" : `<button type="button" class="swap-link" data-swap-day="${escapeAttr(templateDay.id)}" aria-label="Swap ${escapeAttr(day.day)} dinner"><span>Swap</span></button>`}
+            ${holClass ? "" : `<button type="button" class="list-link" data-jump-day="${escapeAttr(templateDay.id)}" aria-label="Jump to groceries for ${escapeAttr(day.day)}"><svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg><span>list</span></button>`}
             <span class="emoji" aria-hidden="true">${day.icon}</span>
           </div>
         </div>
         <button type="button" class="day-body day-body-btn${holClass ? " is-holiday" : ""}" aria-label="${escapeAttr(day.day)}: ${escapeAttr(day.dinner)}. Tap for recipe.">
           <span class="emo-row"><span class="meal-emoji" aria-hidden="true">${day.mealEmoji}</span>${prepCookBadge(day)}</span>
-          ${typeof calorieBadges === "function" ? calorieBadges(day) : ""}
+          ${typeof calorieBadges === "function" ? calorieBadges(Object.assign({}, day, { _sideDayId: templateDay.id })) : ""}
           <p class="day-dinner">${isFav(day.dinner) ? '<span class="fav-badge">❤️</span> ' : ""}${escapeHtml(day.dinner)}</p>
           ${day.tag ? `<p class="day-tag">${escapeHtml(day.tag)}</p>` : ""}
           ${swapBadge}
           ${tedLine}
           ${adultLine}
-          <p class="tap-hint">${holClass ? "Holiday · no plan" : "Day note · tap for recipe"}</p>
+          <p class="tap-hint">${holClass ? "" : "Day note · tap for recipe"}</p>
         </button>
+        ${typeof sidesBlockHTML === "function" ? sidesBlockHTML(templateDay.id, day) : ""}
         ${rateRowHTML(day.dinner, templateDay.id, { hideRates })}
         ${typeof mealLogHTML === "function" ? mealLogHTML(templateDay.id, day) : ""}
       `;
+      day._sideDayId = templateDay.id;
+      // re-render calorie badges with side id (already in HTML — patch cal line)
       card.querySelector(".day-body-btn").addEventListener("click", () => openRecipe(day));
       bindRateRow(card, day.dinner);
+      if (typeof bindSidesBlock === "function") bindSidesBlock(card);
       if (typeof bindMealLog === "function") bindMealLog(card, templateDay.id);
       const swapBtn = card.querySelector("[data-swap-day]");
       if (swapBtn) swapBtn.addEventListener("click", (e) => { e.stopPropagation(); openSwapPicker(templateDay.id); });
@@ -3458,7 +4068,9 @@
     const dinners = sortBySuggest(allTemplateDinners().filter((d) => {
       return !(d.weekId === state.week && d.planId === state.plan && d.day.id === dayId) && !isDown(d.day.dinner);
     }));
+    const listedNames = new Set(dinners.map((d) => String(d.day.dinner || "").toLowerCase()));
     const ov = dayOverride(dayId);
+    const weekendDay = /^(sat|sun)$/.test(dayId);
     const ggButtons = Object.keys(GRAB_GO).map((key) => {
       const g = GRAB_GO[key];
       const on = ov && (ov.type === "grabgo" || ov.type === "pick") && ov.key === key;
@@ -3483,7 +4095,7 @@
           <span class="swap-option-sub">Clears this night’s grocery lines</span>
         </button>
       </div>
-      <h4 class="swap-section-title">🛍 Grab & go</h4>
+      <h4 class="swap-section-title">Grab & go</h4>
       <div class="swap-options" role="list">${ggButtons}</div>
       <h4 class="swap-section-title">Dinners from templates</h4>
       <div class="swap-options swap-options-scroll" role="list">
@@ -3491,22 +4103,101 @@
           .map((d) => {
             const on = ov && ov.type === "pick" && ov.key === d.key;
             return `<button type="button" class="swap-option${on ? " is-on" : ""}" data-swap-type="pick" data-swap-key="${escapeAttr(d.key)}">
-              <span class="swap-option-title">${isFav(d.day.dinner) ? "⭐ " : ""}${escapeHtml(d.day.dinner)}</span>
+              <span class="swap-option-title">${isFav(d.day.dinner) ? "❤️ " : ""}${escapeHtml(d.day.dinner)}</span>
               <span class="swap-option-sub">${escapeHtml(d.label)}${d.day.tedNote ? " · Ted leftover sub" : ""}</span>
             </button>`;
           })
           .join("")}
       </div>
-      <p class="swap-footnote">Grocery lines for this night update automatically. Share link + this phone save the swap.</p>
+      <h4 class="swap-section-title">More ideas</h4>
+      <div class="swap-more-wrap">
+        <div class="swap-options" id="swap-more-list" role="list"></div>
+        <button type="button" class="swap-more-btn" id="swap-more-btn">More</button>
+      </div>
+      <p class="swap-footnote">Grocery lines for this night update automatically. Share link + this phone save the swap. Estimates only (est.).</p>
     `;
-    els.swapBody.querySelectorAll("[data-swap-type]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        applyDaySwap(dayId, btn.dataset.swapType, btn.dataset.swapKey || null);
+    const moreList = els.swapBody.querySelector("#swap-more-list");
+    const moreBtn = els.swapBody.querySelector("#swap-more-btn");
+    const shownExtra = new Set();
+    function extraPool() {
+      return Object.keys(EXTRA_DINNERS).filter((key) => {
+        const ex = EXTRA_DINNERS[key];
+        if (!ex) return false;
+        if (shownExtra.has(key)) return false;
+        if (isDown(ex.dinner)) return false;
+        if (listedNames.has(String(ex.dinner || "").toLowerCase())) return false;
+        if (ex.weekendOnly && !weekendDay) return false;
+        return true;
       });
-    });
+    }
+    function renderExtraBtn(key) {
+      const ex = EXTRA_DINNERS[key];
+      const on = ov && ov.type === "pick" && ov.key === key;
+      const sub = [
+        ex.kindLabel || "More ideas",
+        "est. prices",
+        ex.weekendOnly ? "weekend only" : "",
+        ex.tedNote ? "Ted leftover sub" : "",
+      ].filter(Boolean).join(" · ");
+      return `<button type="button" class="swap-option${on ? " is-on" : ""}" data-swap-type="pick" data-swap-key="${escapeAttr(key)}">
+        <span class="swap-option-title">${isFav(ex.dinner) ? "❤️ " : ""}${escapeHtml(ex.dinner)}</span>
+        <span class="swap-option-sub">${escapeHtml(sub)}</span>
+      </button>`;
+    }
+    function bindSwapClicks(root) {
+      (root || els.swapBody).querySelectorAll("[data-swap-type]").forEach((btn) => {
+        if (btn.dataset.boundSwap) return;
+        btn.dataset.boundSwap = "1";
+        btn.addEventListener("click", () => {
+          applyDaySwap(dayId, btn.dataset.swapType, btn.dataset.swapKey || null);
+        });
+      });
+    }
+    function appendMoreBatch() {
+      const pool = extraPool();
+      if (!pool.length) {
+        if (moreBtn) {
+          moreBtn.disabled = true;
+          moreBtn.textContent = "No more ideas";
+        }
+        return;
+      }
+      const dinnersLeft = pool.filter((k) => EXTRA_DINNERS[k].kind === "dinner");
+      const breakfasts = pool.filter((k) => EXTRA_DINNERS[k].kind === "breakfast");
+      const lunches = pool.filter((k) => EXTRA_DINNERS[k].kind === "adult-lunch");
+      const batch = [];
+      const take = (arr, n) => {
+        while (arr.length && batch.length < n) batch.push(arr.shift());
+      };
+      // 10–15 items: mostly dinners, plus breakfast + adult lunch each tap
+      const target = 12 + Math.floor(Math.random() * 4); // 12–15
+      take(dinnersLeft, Math.min(9, target - 3));
+      take(breakfasts, 2);
+      take(lunches, 2);
+      take(dinnersLeft, target);
+      take(breakfasts, target);
+      take(lunches, target);
+      take(pool.filter((k) => !batch.includes(k)), target);
+      const html = batch.map((key) => {
+        shownExtra.add(key);
+        listedNames.add(String(EXTRA_DINNERS[key].dinner || "").toLowerCase());
+        return renderExtraBtn(key);
+      }).join("");
+      if (moreList) {
+        moreList.insertAdjacentHTML("beforeend", html);
+        bindSwapClicks(moreList);
+      }
+      if (moreBtn && !extraPool().length) {
+        moreBtn.disabled = true;
+        moreBtn.textContent = "No more ideas";
+      }
+    }
+    if (moreBtn) moreBtn.addEventListener("click", appendMoreBatch);
+    bindSwapClicks(els.swapBody);
     els.swapModal.classList.add("open");
     els.swapModal.setAttribute("aria-hidden", "false");
     if (els.swapClose) els.swapClose.focus();
+    updateBackBtn();
   }
 
   function closeSwapPicker() {
@@ -3514,6 +4205,7 @@
     els.swapModal.classList.remove("open");
     els.swapModal.setAttribute("aria-hidden", "true");
     swapTargetDayId = null;
+    updateBackBtn();
   }
 
   function applyDaySwap(dayId, type, key) {
@@ -3529,9 +4221,16 @@
     } else if (type === "grabgo" && key && GRAB_GO[key]) {
       state.dayOverrides[dayId] = { type: "grabgo", key };
       showToast("Grab & go — groceries updated");
-    } else if (type === "pick" && key && (parseDinnerKey(key) || GRAB_GO[key])) {
+    } else if (type === "pick" && key && (parseDinnerKey(key) || GRAB_GO[key] || (typeof EXTRA_DINNERS !== "undefined" && EXTRA_DINNERS[key]))) {
       if (GRAB_GO[key]) state.dayOverrides[dayId] = { type: "grabgo", key };
-      else state.dayOverrides[dayId] = { type: "pick", key };
+      else {
+        const ex = typeof EXTRA_DINNERS !== "undefined" ? EXTRA_DINNERS[key] : null;
+        if (ex && ex.weekendOnly && !/^(sat|sun)$/.test(dayId)) {
+          showToast("Chili stays weekend-only — pick Sat or Sun");
+          return;
+        }
+        state.dayOverrides[dayId] = { type: "pick", key };
+      }
       showToast("Dinner swapped — groceries updated");
     } else {
       return;
@@ -3612,15 +4311,21 @@
       });
     });
 
-    const custom = state.custom.map((c) => ({
-      id: c.id,
-      category: normalizeCategory(c.category),
-      name: c.name,
-      price: "",
-      hint: "custom item",
-      custom: true,
-      staple: false,
-    }));
+    const custom = state.custom.map((c) => {
+      const rawCat = typeof c.category === "string" ? c.category.trim().slice(0, 40) : "Other";
+      const category = CATEGORIES.includes(rawCat) || LEGACY_CATEGORY[rawCat]
+        ? normalizeCategory(rawCat)
+        : ensureCustomCategory(rawCat || "Other");
+      return {
+        id: c.id,
+        category,
+        name: c.name,
+        price: "",
+        hint: "custom item",
+        custom: true,
+        staple: false,
+      };
+    });
     return [...seeded, ...injected, ...custom];
   }
 
@@ -3704,20 +4409,154 @@
     }
   }
 
+  function refreshCategoryPicker(selected) {
+    const sel = els.customCategory;
+    if (!sel) return;
+    const cur = selected != null ? selected : sel.value;
+    const opts = allCategories().map(
+      (c) => `<option value="${escapeAttr(c)}" ${c === cur ? "selected" : ""}>${escapeHtml(c)}</option>`
+    );
+    opts.push(`<option value="${NEW_CAT_VAL}" ${cur === NEW_CAT_VAL ? "selected" : ""}>+ New category…</option>`);
+    sel.innerHTML = opts.join("");
+    updateNewCatFieldVisibility();
+  }
+  function updateNewCatFieldVisibility() {
+    const sel = els.customCategory;
+    const neu = els.customNewCat;
+    const del = els.delCustomCat;
+    if (!sel || !neu) return;
+    const isNew = sel.value === NEW_CAT_VAL;
+    neu.hidden = !isNew;
+    if (isNew) neu.focus();
+    if (del) {
+      const cat = sel.value;
+      const emptyCustom = isCustomCategory(cat) && !(state.custom || []).some((c) => c.category === cat);
+      del.hidden = !emptyCustom;
+    }
+  }
+  function resolveCategoryFromForm() {
+    const sel = els.customCategory;
+    if (!sel) return "Other";
+    if (sel.value === NEW_CAT_VAL) {
+      const name = ((els.customNewCat && els.customNewCat.value) || "").trim().slice(0, 40);
+      if (!name) {
+        showToast("Name the new category");
+        if (els.customNewCat) els.customNewCat.focus();
+        return null;
+      }
+      ensureCustomCategory(name);
+      if (els.customNewCat) els.customNewCat.value = "";
+      refreshCategoryPicker(name);
+      return name;
+    }
+    return normalizeCategory(sel.value) || ensureCustomCategory(sel.value);
+  }
+  function grocerySearchQuery() {
+    const el = document.getElementById("grocery-search");
+    return el ? String(el.value || "").trim().toLowerCase() : "";
+  }
+  function buildShareListText() {
+    const items = allGroceryItems().filter((i) => !itemHaveIt(i.id) && !itemChecked(i.id));
+    const cats = allCategories();
+    const week = currentWeek();
+    const lines = [`Shopping list · week of ${week.title || state.weekTitle || ""}`];
+    let total = 0;
+    cats.forEach((cat) => {
+      const group = items.filter((i) => i.category === cat);
+      if (!group.length) return;
+      lines.push("", cat.toUpperCase());
+      group.forEach((it) => {
+        const p = itemPrice(it.id, it.price);
+        if (p != null) total += p;
+        lines.push(`- ${it.name}${p != null ? ` · est. ${formatMoney2(p)}` : ""}`);
+      });
+    });
+    lines.push("", `Est. total: ${formatMoney2(total)}`);
+    return lines.join("\n");
+  }
+  async function shareGroceryList() {
+    const text = buildShareListText();
+    const title = "Shopping list";
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text });
+        return;
+      }
+    } catch (err) {
+      if (err && err.name === "AbortError") return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("List copied");
+    } catch (_) {
+      copyText(text, "List copied");
+    }
+    const sms = document.getElementById("grocery-sms");
+    if (sms) {
+      sms.href = "sms:?&body=" + encodeURIComponent(text.slice(0, 1500));
+      sms.hidden = false;
+    }
+  }
+
   function renderGrocery() {
     refreshLiveForLocation();
     const items = allGroceryItems();
     const visible = visibleGroceryItems(items);
     let checkedVisible = 0;
-    const byCat = CATEGORIES.map((cat) => {
-      let groupItems = visible.filter((i) => i.category === cat);
-      if (state.shopMode && !state.hideChecked) {
-        groupItems = [...groupItems].sort((a, b) => Number(itemChecked(a.id)) - Number(itemChecked(b.id)));
-      }
-      return { cat, items: groupItems };
-    }).filter((group) => group.items.length);
+    const q = grocerySearchQuery();
+    const byCat = allCategories()
+      .map((cat) => {
+        let groupItems = visible.filter((i) => i.category === cat);
+        if (q) {
+          groupItems = groupItems.filter(
+            (i) =>
+              String(i.name || "")
+                .toLowerCase()
+                .includes(q) ||
+              String(i.category || "")
+                .toLowerCase()
+                .includes(q) ||
+              String(i.hint || "")
+                .toLowerCase()
+                .includes(q)
+          );
+        }
+        if (state.shopMode && !state.hideChecked) {
+          groupItems = [...groupItems].sort((a, b) => Number(itemChecked(a.id)) - Number(itemChecked(b.id)));
+        }
+        return { cat, items: groupItems };
+      })
+      .filter((group) => group.items.length);
 
     els.groceryList.innerHTML = "";
+
+    const tools = document.createElement("div");
+    tools.className = "grocery-tools";
+    tools.innerHTML = `
+      <label class="visually-hidden" for="grocery-search">Search list</label>
+      <input type="search" id="grocery-search" class="grocery-search" placeholder="Search list" value="${escapeAttr(q)}" autocomplete="off" />
+      <button type="button" class="share-list-link" id="grocery-share">Share list</button>
+      <a class="share-list-link" id="grocery-sms" hidden>Text list</a>
+    `;
+    els.groceryList.appendChild(tools);
+    const searchEl = tools.querySelector("#grocery-search");
+    if (searchEl) {
+      searchEl.addEventListener("input", () => {
+        renderGrocery();
+        const el = document.getElementById("grocery-search");
+        if (el) {
+          el.focus();
+          const v = el.value;
+          try {
+            el.setSelectionRange(v.length, v.length);
+          } catch (_) {}
+        }
+      });
+    }
+    const shareBtn = tools.querySelector("#grocery-share");
+    if (shareBtn) shareBtn.addEventListener("click", () => {
+      shareGroceryList();
+    });
 
     const tuckerNote = document.createElement("p");
     tuckerNote.className = "tucker-note";
@@ -3730,7 +4569,7 @@
     totalBar.className = "store-totals";
     const loc = state.location || "Vero Beach";
     const col = (id, label, val, left) =>
-      `<button type="button" class="${id === "best" ? "best" : ""}" data-store="${id}" aria-pressed="${state.store === id}">${state.store === id ? "⭐ " : ""}${label}<b>${formatMoney2(val)}</b><small>est. · ${formatMoney2(left)} left</small></button>`;
+      `<button type="button" class="${id === "best" ? "best" : ""}" data-store="${id}" aria-pressed="${state.store === id}">${label}<b>${formatMoney2(val)}</b><small>est. · ${formatMoney2(left)} left</small></button>`;
     totalBar.innerHTML = `
       <div class="tot" role="group" aria-label="Which store total to use">
         ${col("aldi", "All Aldi", tots.a, tots.aLeft)}${col("publix", "All Publix", tots.p, tots.pLeft)}${col("best", "Best split", tots.b, tots.bLeft)}
@@ -3748,10 +4587,39 @@
     els.groceryList.appendChild(totalBar);
 
     byCat.forEach((group) => {
-      const h = document.createElement("h3");
-      h.className = "category" + (group.cat === "Tucker lunchbox" ? " category-tucker" : "");
-      h.textContent = group.cat;
-      els.groceryList.appendChild(h);
+      const fold = document.createElement("details");
+      fold.className = "aisle-fold" + (group.cat === "Tucker lunchbox" ? " category-tucker" : "");
+      fold.dataset.aisle = group.cat;
+      const searching = Boolean(q);
+      fold.open = searching ? true : isAisleOpen(group.cat);
+      const sum = document.createElement("summary");
+      const customCat = isCustomCategory(group.cat);
+      sum.innerHTML = `<span class="aisle-sum-lab">${escapeHtml(group.cat)} · ${group.items.length}</span>${
+        customCat
+          ? `<button type="button" class="aisle-cat-del" data-del-cat="${escapeAttr(group.cat)}" aria-label="Delete category ${escapeAttr(group.cat)}">${DEL_ICO}</button>`
+          : ""
+      }${AISLE_CHEV}`;
+      fold.appendChild(sum);
+      fold.addEventListener("toggle", () => {
+        if (!grocerySearchQuery()) setAisleOpen(group.cat, fold.open);
+      });
+      const delCatBtn = sum.querySelector("[data-del-cat]");
+      if (delCatBtn) {
+        delCatBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const cat = delCatBtn.dataset.delCat;
+          const inCat = (state.custom || []).filter((c) => c.category === cat);
+          if (inCat.length && !confirm(`Remove category "${cat}" and its ${inCat.length} item${inCat.length > 1 ? "s" : ""}?`)) return;
+          state.custom = (state.custom || []).filter((c) => c.category !== cat);
+          setCustomCategories(getCustomCategories().filter((c) => c !== cat));
+          setAisleOpen(cat, false);
+          persist();
+          refreshCategoryPicker();
+          renderGrocery();
+          showToast("Category removed");
+        });
+      }
 
       const ul = document.createElement("ul");
       ul.className = "item-list";
@@ -3790,6 +4658,11 @@
                     ? `<button type="button" class="meta-chip have-chip${have ? " is-on" : ""}" data-edit="have" aria-pressed="${have}">
                         ${have ? "Have it ✓" : "Have it"}
                       </button>`
+                    : ""
+                }
+                ${
+                  item.custom
+                    ? `<button type="button" class="meta-chip del-custom" data-edit="del" aria-label="Remove ${escapeAttr(item.name)}">${DEL_ICO}</button>`
                     : ""
                 }
               </div>
@@ -3856,6 +4729,21 @@
             showToast(itemHaveIt(item.id) ? "Marked Have it — hidden from list" : "Back on the list");
           });
         }
+        const delBtn = li.querySelector('.meta-chip[data-edit="del"]');
+        if (delBtn) {
+          delBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            state.custom = (state.custom || []).filter((c) => c.id !== item.id);
+            delete state.checked[item.id];
+            delete state.prices[item.id];
+            delete state.qty[item.id];
+            delete state.notes[item.id];
+            persist();
+            renderGrocery();
+            showToast("Removed custom item");
+          });
+        }
         li.querySelector(".meta-save").addEventListener("click", () => {
           setQty(item.id, li.querySelector(".qty-input").value);
           setNote(item.id, li.querySelector(".note-input").value);
@@ -3865,7 +4753,8 @@
         });
         ul.appendChild(li);
       });
-      els.groceryList.appendChild(ul);
+      fold.appendChild(ul);
+      els.groceryList.appendChild(fold);
     });
 
     if (!byCat.length) {
@@ -3873,7 +4762,9 @@
       empty.className = "grocery-empty";
       empty.textContent = state.hideChecked
         ? "All visible items are checked (or Have-it hidden). Toggle Show checked / Hidden to review."
-        : "No grocery lines for this view.";
+        : q
+          ? "No items match your search."
+          : "No grocery lines for this view.";
       els.groceryList.appendChild(empty);
     }
 
@@ -4114,6 +5005,7 @@
           </div>
           <button type="button" class="sh-btn" id="set-hol-add" style="margin-top:0.5rem">Add holiday</button>
         </section>
+        <button type="button" class="sh-btn" id="set-replay" style="margin-bottom:0.5rem">Replay welcome</button>
         <button type="button" class="sh-btn p wide" id="set-save">Save settings</button>
       `;
       els.settingsBody.querySelector("#set-store-add").onclick = () => {
@@ -4145,6 +5037,7 @@
         state.holidays.push({ id: `custom-${Date.now()}`, name: name.slice(0, 40), emoji: "🎉", kind: "custom", date, cook: false });
         draw();
       };
+      els.settingsBody.querySelector("#set-replay").onclick = () => { closeSettings(); replayWelcome(); };
       els.settingsBody.querySelector("#set-save").onclick = () => {
         const raw = els.settingsBody.querySelector("#set-rules").value;
         state.houseRules = raw.split(/\n+/).map((s) => s.trim()).filter(Boolean).slice(0, 20);
@@ -4160,13 +5053,370 @@
     draw();
     els.settingsModal.classList.add("open");
     els.settingsModal.setAttribute("aria-hidden", "false");
+    updateBackBtn();
   }
 
   function closeSettings() {
     if (!els.settingsModal) return;
     els.settingsModal.classList.remove("open");
     els.settingsModal.setAttribute("aria-hidden", "true");
+    updateBackBtn();
   }
+
+
+  /* ---- First-visit voice welcome (speechSynthesis, on-device) ---- */
+  const WELCOME_KEY = "family-meals-welcome-done-v1";
+  let welcomeMuted = false;
+  let welcomeBusy = false;
+
+  function welcomeDone() {
+    try { return localStorage.getItem(WELCOME_KEY) === "1"; } catch (_) { return false; }
+  }
+  function markWelcomeDone() {
+    try { localStorage.setItem(WELCOME_KEY, "1"); } catch (_) {}
+  }
+  function speak(text) {
+    if (welcomeMuted || !window.speechSynthesis) return;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(String(text));
+      u.rate = 1;
+      u.pitch = 1;
+      window.speechSynthesis.speak(u);
+    } catch (_) {}
+  }
+  function stopSpeak() {
+    try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (_) {}
+  }
+
+  const MIC_ICO = '<svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+  const MUTE_ICO = '<svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
+  const UNMUTE_ICO = '<svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>';
+
+  function hasSpeechRec() {
+    return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  }
+  function listenOnce(onResult) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+    const rec = new SR();
+    rec.lang = "en-US";
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = (e) => {
+      const t = e.results && e.results[0] && e.results[0][0] ? e.results[0][0].transcript : "";
+      onResult(String(t || "").trim());
+    };
+    try { rec.start(); } catch (_) {}
+  }
+
+  function ensureWelcomeOverlay() {
+    let el = document.getElementById("welcome-overlay");
+    if (el) return el;
+    el = document.createElement("div");
+    el.id = "welcome-overlay";
+    el.className = "welcome-overlay";
+    el.setAttribute("role", "dialog");
+    el.setAttribute("aria-modal", "true");
+    el.setAttribute("aria-label", "Welcome");
+    el.hidden = true;
+    document.body.appendChild(el);
+    return el;
+  }
+
+  function closeWelcome() {
+    stopSpeak();
+    welcomeBusy = false;
+    const el = document.getElementById("welcome-overlay");
+    if (el) { el.hidden = true; el.innerHTML = ""; }
+  }
+
+  function startWelcome(force) {
+    if (welcomeBusy) return;
+    if (!force && welcomeDone()) return;
+    welcomeBusy = true;
+    const el = ensureWelcomeOverlay();
+    el.hidden = false;
+    const steps = [
+      {
+        id: "store",
+        ask: "Which store do you shop at most, and what city?",
+        speak: "Which store do you shop at most? Then tell me your city.",
+        render: (box) => {
+          const stores = ["Aldi", "Publix", ...(state.customStores || [])];
+          box.innerHTML = `<p class="welcome-q">${escapeHtml(steps[0].ask)}</p>
+            <div class="welcome-opts">${stores.map((s) => `<button type="button" class="welcome-opt" data-store="${escapeAttr(s)}">${escapeHtml(s)}</button>`).join("")}</div>
+            <label class="fld">Location</label>
+            <input class="inp" id="w-loc" value="${escapeAttr(state.location || "Vero Beach")}" placeholder="City" />
+            <button type="button" class="welcome-opt primary" data-next="1">Continue</button>`;
+          box.querySelectorAll("[data-store]").forEach((b) => b.onclick = () => {
+            state.storeName = b.dataset.store;
+            box.querySelectorAll("[data-store]").forEach((x) => x.classList.toggle("on", x === b));
+          });
+          box.querySelector("[data-next]").onclick = () => {
+            state.location = (box.querySelector("#w-loc").value || "Vero Beach").trim().slice(0, 60);
+            persist();
+            goStep(1);
+          };
+        },
+      },
+      {
+        id: "budget",
+        ask: "What is your weekly grocery budget?",
+        speak: "What is your weekly grocery budget? Tap an amount, or skip.",
+        render: (box) => {
+          const amts = [80, 100, 120, 150, 200];
+          box.innerHTML = `<p class="welcome-q">${escapeHtml(steps[1].ask)}</p>
+            <div class="welcome-opts">${amts.map((n) => `<button type="button" class="welcome-opt" data-amt="${n}">$${n}</button>`).join("")}
+            <button type="button" class="welcome-opt" data-amt="0">No budget</button></div>`;
+          box.querySelectorAll("[data-amt]").forEach((b) => b.onclick = () => {
+            const n = Number(b.dataset.amt);
+            if (!n) state.budget = normalizeBudget({ on: false, amt: null, days: 7 });
+            else state.budget = normalizeBudget({ on: true, amt: n, days: 7 });
+            persist();
+            goStep(2);
+          });
+        },
+      },
+      {
+        id: "holidays",
+        ask: "Want holidays left blank on the plan (no groceries, no budget)?",
+        speak: "Want holidays left blank on the plan? Yes keeps them blank. No means cook normally.",
+        render: (box) => {
+          box.innerHTML = `<p class="welcome-q">${escapeHtml(steps[2].ask)}</p>
+            <div class="welcome-opts">
+              <button type="button" class="welcome-opt" data-h="blank">Yes — leave blank</button>
+              <button type="button" class="welcome-opt" data-h="cook">No — cook normally</button>
+            </div>`;
+          box.querySelectorAll("[data-h]").forEach((b) => b.onclick = () => {
+            const cook = b.dataset.h === "cook";
+            (state.holidays || []).forEach((h) => { h.cook = cook; });
+            persist();
+            goStep(3);
+          });
+        },
+      },
+      {
+        id: "rules",
+        ask: "Keep the default house rules, or open Settings later to edit them?",
+        speak: "Keep the default house rules? You can edit them anytime in Settings.",
+        render: (box) => {
+          box.innerHTML = `<p class="welcome-q">${escapeHtml(steps[3].ask)}</p>
+            <div class="welcome-opts">
+              <button type="button" class="welcome-opt primary" data-r="keep">Keep defaults</button>
+              <button type="button" class="welcome-opt" data-r="edit">I'll edit in Settings</button>
+            </div>`;
+          box.querySelectorAll("[data-r]").forEach((b) => b.onclick = () => {
+            finish(b.dataset.r === "edit");
+          });
+        },
+      },
+    ];
+
+    function chrome() {
+      return `<div class="welcome-card">
+        <div class="welcome-tools">
+          <button type="button" class="back-link welcome-mute" id="w-mute" aria-label="${welcomeMuted ? "Unmute" : "Mute"}">${welcomeMuted ? UNMUTE_ICO : MUTE_ICO}<span>${welcomeMuted ? "Unmute" : "Mute"}</span></button>
+          <button type="button" class="back-link" id="w-skip" aria-label="Skip">Skip</button>
+        </div>
+        <div id="w-body"></div>
+        ${hasSpeechRec() ? `<button type="button" class="back-link welcome-mic" id="w-mic" aria-label="Answer by voice">${MIC_ICO}<span>Voice</span></button>` : ""}
+      </div>`;
+    }
+
+    function goStep(i) {
+      if (i >= steps.length) { finish(false); return; }
+      el.innerHTML = chrome();
+      const body = el.querySelector("#w-body");
+      steps[i].render(body);
+      speak(steps[i].speak);
+      el.querySelector("#w-mute").onclick = () => {
+        welcomeMuted = !welcomeMuted;
+        if (welcomeMuted) stopSpeak();
+        goStep(i);
+      };
+      el.querySelector("#w-skip").onclick = () => finish(false);
+      const mic = el.querySelector("#w-mic");
+      if (mic) mic.onclick = () => {
+        speak("Listening. You can also tap an answer.");
+        listenOnce((text) => {
+          if (!text) return;
+          if (i === 0) {
+            const low = text.toLowerCase();
+            if (/publix/.test(low)) state.storeName = "Publix";
+            else if (/aldi/.test(low)) state.storeName = "Aldi";
+            const loc = text.replace(/aldi|publix|store|in|at/gi, "").trim();
+            if (loc.length > 2) state.location = loc.slice(0, 60);
+            persist();
+            goStep(1);
+          } else if (i === 1) {
+            const m = text.replace(/,/g, "").match(/(\d{2,3})/);
+            if (m) {
+              state.budget = normalizeBudget({ on: true, amt: Number(m[1]), days: 7 });
+              persist();
+            }
+            goStep(2);
+          } else if (i === 2) {
+            const cook = /cook|no/.test(text.toLowerCase()) && !/yes|blank/.test(text.toLowerCase());
+            (state.holidays || []).forEach((h) => { h.cook = cook; });
+            persist();
+            goStep(3);
+          } else {
+            finish(false);
+          }
+        });
+      };
+    }
+
+    function finish(openSet) {
+      markWelcomeDone();
+      closeWelcome();
+      persist();
+      renderAll();
+      showToast("You're set — welcome!");
+      if (openSet) openSettings();
+    }
+
+    // Gate: tap to start (browsers block audio until gesture)
+    el.innerHTML = `<div class="welcome-card">
+      <p class="welcome-hello">Welcome!</p>
+      <p class="welcome-sub">Tap to start a quick setup. I'll talk you through it.</p>
+      <button type="button" class="welcome-opt primary" id="w-start">Welcome! Tap to start</button>
+      <button type="button" class="back-link" id="w-skip0" style="margin-top:0.5rem">Skip</button>
+    </div>`;
+    el.querySelector("#w-start").onclick = () => {
+      speak("Welcome to Burns Family Meals. Let's set up your week.");
+      goStep(0);
+    };
+    el.querySelector("#w-skip0").onclick = () => finish(false);
+  }
+
+  function replayWelcome() {
+    try { localStorage.removeItem(WELCOME_KEY); } catch (_) {}
+    startWelcome(true);
+  }
+
+  /* ---- Local food autocomplete (prefix then substring) ---- */
+  const FOOD_WORDS = [
+    "apple","apples","asparagus","avocado","bacon","bagel","banana","bananas","basil","beans","beef","bell pepper","berries","biscuit","black beans","blueberries","bread","breakfast sausage","broccoli","broth","brown rice","brussels sprouts","bun","buns","burger","butter","buttermilk","cabbage","carrot","carrots","cauliflower","celery","cereal","cheddar","cheese","chicken","chicken breast","chicken breasts","chili","chips","chives","cilantro","cinnamon","coconut milk","coffee","coleslaw","corn","corn tortillas","cottage cheese","crackers","cream cheese","cucumber","dinner rolls","dressing","eggs","english muffins","feta","fish","flour","flour tortillas","french fries","frozen pizza","fruit","fruit snacks","garlic","garlic bread","greek yogurt","green beans","ground beef","guacamole","ham","hamburger buns","honey","hot dogs","hummus","italian seasoning","jalapeno","juice","kale","ketchup","kiwi","lemon","lettuce","lime","lunch meat","mango","maple syrup","marinara","mayonnaise","meatballs","milk","mozzarella","mushrooms","mustard","nachos","noodles","nuts","oats","olive oil","olives","onion","onions","orange","oranges","oregano","pancake mix","pancakes","parmesan","pasta","peanut butter","pear","peas","pepper","peppers","pickles","pineapple","pita","pizza","pork","pork chops","potato","potatoes","pretzel","pretzels","quesadilla","quinoa","ranch","raspberries","rice","roast chicken","romaine","rotisserie","salsa","salt","sausage","shallot","shrimp","sour cream","soy sauce","spinach","squash","steak","strawberries","sub rolls","sweet potato","sweet potatoes","syrup","taco seasoning","tacos","tilapia","tomato","tomatoes","tortilla chips","tortillas","tuna","turkey","vanilla","veggie mix","vinegar","waffles","watermelon","yogurt","zucchini","aldi chicken","publix rotisserie","bagged salad","string cheese","yogurt cups","apple juice","beef sticks","pringles","frozen fries","texas toast","smoked sausage","alfredo sauce","chili beans","diced tomatoes","long grain rice","salad bag","broccoli crowns","almonds","anchovies","applesauce","artichoke","arugula","bagel chips","baked beans","baking powder","baking soda","balsamic","barbeque sauce","barley","basmati rice","bean sprouts","beef broth","beets","biscuits","black pepper","blackberries","bok choy","bouillon","bratwurst","breadcrumbs","breakfast links","brie","brioche","broccoli slaw","brown sugar","butter lettuce","butternut squash","cabbage mix","canola oil","cantaloupe","capers","cardamom","cashews","cauliflower rice","cayenne","celery salt","cereal bars","cherries","cherry tomatoes","chicken broth","chicken stock","chicken tenders","chili powder","chipotle","chorizo","ciabatta","clam sauce","cloves","cocoa","coconut","cod","coffee creamer","coleslaw mix","collard greens","cookie dough","coriander","corn chips","corn dogs","cornmeal","cornstarch","couscous","crab","cranberries","cream","creamer","croutons","crushed tomatoes","cumin","curry","dates","deli turkey","dill","edamame","eggplant","enchilada sauce","english muffin","evaporated milk","fajita mix","farro","fennel","feta cheese","fig","fish sticks","flank steak","flatbread","food coloring","fresh herbs","frosting","frozen berries","frozen corn","frozen peas","frozen waffles","garbanzo beans","ginger","gnocchi","goat cheese","graham crackers","granola","grape jelly","grapefruit","grapes","gravy","green onion","grits","ground turkey","half and half","hash browns","heavy cream","hoisin","honey mustard","horseradish","hot sauce","ice cream","icing","instant potatoes","italian sausage","jack cheese","jam","jasmine rice","jelly","kaiser rolls","ketchup packets","kidney beans","kimchi","lasagna noodles","leeks","lemon juice","lemonade","lentils","lime juice","lobster","macaroni","mango salsa","maple","margarine","marshmallows","mashed potatoes","meatloaf mix","melon","mexican cheese","milk chocolate","minced garlic","mint","monterey jack","mushroom","naan","navy beans","nectarine","nonstick spray","nutella","nutmeg","oat milk","oatmeal","okra","olive","onion powder","orange juice","oreos","orzo","paprika","parmesan cheese","parsley","peach","peaches","peanut","peanuts","pecans","penne","pepper jack","pepperoni","pesto","pickle relish","pinto beans","pita chips","plantains","plum","poblano","polenta","pomegranate","popcorn","pork loin","pork tenderloin","potato chips","potato salad","powdered sugar","prosciutto","provolone","puff pastry","pumpkin","quinoa blend","radish","raisins","ravioli","red onion","red pepper flakes","refried beans","relish","ricotta","rigatoni","roma tomatoes","rosemary","rum extract","rye bread","salad dressing","salami","salmon","salsa verde","saltine crackers","sauerkraut","scallions","sea salt","seasoning salt","sesame oil","sesame seeds","shallots","sherbet","shortening","sirloin","slaw mix","sliced ham","snap peas","soda","sourdough","soy milk","spaghetti squash","spam","sparkling water","spinach dip","spring mix","sprouts","squash mix","sriracha","steak sauce","string beans","sugar","sunflower seeds","sushi rice","swiss cheese","taco shells","tahini","tater tots","tea","thyme","tofu","tomato paste","tomato sauce","tortellini","trail mix","truffle oil","turkey bacon","turkey breast","turnip","tzatziki","vanilla extract","vegetable broth","vegetable oil","walnuts","water chestnuts","whipped cream","white beans","white bread","white rice","whole chicken","whole milk","worcestershire","wraps","yellow squash","yogurt tubes","ziti"
+  ];
+
+  function collectFoodSuggestSources() {
+    const names = new Set();
+    const add = (s) => {
+      const t = String(s || "").trim();
+      if (t.length >= 2) names.add(t);
+    };
+    try {
+      allTemplateDinners().forEach((d) => add(d.day && d.day.dinner));
+    } catch (_) {}
+    Object.keys(SIDE_ITEMS || {}).forEach((id) => add(SIDE_ITEMS[id].name));
+    Object.keys(FAM_PRICES || {}).forEach((k) => add(FAM_PRICES[k].n));
+    Object.keys(LIVE_PRICES || {}).forEach((k) => add(LIVE_PRICES[k].n));
+    Object.keys(EXTRA_DINNERS || {}).forEach((k) => add(EXTRA_DINNERS[k].dinner));
+    FOOD_WORDS.forEach(add);
+    try {
+      (currentPlan().groceries || []).forEach((g) => add(g.name));
+    } catch (_) {}
+    try {
+      (state.custom || []).forEach((c) => add(c.name));
+    } catch (_) {}
+    return [...names];
+  }
+
+  function foodSuggestMatches(query, limit) {
+    const q = String(query || "").trim().toLowerCase();
+    if (q.length < 1) return [];
+    const all = collectFoodSuggestSources();
+    const prefix = [];
+    const sub = [];
+    const seen = new Set();
+    all.forEach((name) => {
+      const low = name.toLowerCase();
+      if (seen.has(low)) return;
+      if (low.startsWith(q)) { seen.add(low); prefix.push(name); }
+      else if (low.includes(q)) { seen.add(low); sub.push(name); }
+    });
+    prefix.sort((a, b) => a.length - b.length || a.localeCompare(b));
+    sub.sort((a, b) => a.length - b.length || a.localeCompare(b));
+    return prefix.concat(sub).slice(0, limit || 10);
+  }
+
+  function bindFoodAutocomplete(input) {
+    if (!input || input.dataset.foodAcBound === "1") return;
+    input.dataset.foodAcBound = "1";
+    let wrap = input.closest(".food-ac-wrap");
+    if (!wrap) {
+      wrap = document.createElement("div");
+      wrap.className = "food-ac-wrap";
+      input.parentNode.insertBefore(wrap, input);
+      wrap.appendChild(input);
+    }
+    let list = wrap.querySelector(".food-ac-list");
+    if (!list) {
+      list = document.createElement("ul");
+      list.className = "food-ac-list";
+      list.hidden = true;
+      list.setAttribute("role", "listbox");
+      wrap.appendChild(list);
+    }
+    let active = -1;
+    const close = () => { list.hidden = true; list.innerHTML = ""; active = -1; };
+    const open = () => {
+      const matches = foodSuggestMatches(input.value, 10);
+      if (!matches.length) { close(); return; }
+      list.innerHTML = matches.map((m, i) =>
+        `<li role="option"><button type="button" class="food-ac-item${i === active ? " is-active" : ""}" data-ac="${escapeAttr(m)}">${escapeHtml(m)}</button></li>`
+      ).join("");
+      list.hidden = false;
+      list.querySelectorAll("[data-ac]").forEach((btn) => {
+        btn.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          input.value = btn.dataset.ac || "";
+          close();
+          input.dispatchEvent(new Event("change", { bubbles: true }));
+          input.focus();
+        });
+      });
+    };
+    input.addEventListener("input", open);
+    input.addEventListener("focus", () => { if (input.value.trim().length >= 1) open(); });
+    input.addEventListener("blur", () => { setTimeout(close, 120); });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") { close(); return; }
+      if (list.hidden) return;
+      const items = [...list.querySelectorAll(".food-ac-item")];
+      if (!items.length) return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        active = (active + 1) % items.length;
+        items.forEach((el, i) => el.classList.toggle("is-active", i === active));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        active = (active - 1 + items.length) % items.length;
+        items.forEach((el, i) => el.classList.toggle("is-active", i === active));
+      } else if (e.key === "Enter" && active >= 0) {
+        e.preventDefault();
+        items[active].dispatchEvent(new Event("mousedown", { bubbles: true }));
+      }
+    });
+  }
+
+  function isFoodAcInput(el) {
+    if (!el || el.tagName !== "INPUT") return false;
+    if (el.type && el.type !== "text" && el.type !== "search") return false;
+    if (el.id === "custom-name" || el.classList.contains("food-ac-input") || el.hasAttribute("data-food-ac")) return true;
+    return false;
+  }
+  function initFoodAutocomplete() {
+    document.querySelectorAll("#custom-name, input[data-food-ac], input.food-ac-input").forEach(bindFoodAutocomplete);
+    if (document.documentElement.dataset.foodAcDelegate === "1") return;
+    document.documentElement.dataset.foodAcDelegate = "1";
+    document.addEventListener("focusin", (e) => {
+      if (isFoodAcInput(e.target)) bindFoodAutocomplete(e.target);
+    });
+  }
+
 
   function injectUpgradeStyles() {
     if (document.getElementById("burns-v4-styles")) return;
@@ -4182,8 +5432,10 @@
       ".rcpt-btn .ico{stroke:#fff;width:20px;height:20px}",
       ".cal-btn.icon-btn,.repeat-btn.icon-btn{width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border:2px solid var(--teal);border-radius:14px;background:var(--white);color:var(--teal-deep);cursor:pointer;font-size:0}",
       ".cal-btn .ico,.repeat-btn .ico{width:20px;height:20px;stroke:currentColor}",
-      ".month-arrow.icon-btn{appearance:none;width:40px;height:40px;min-width:40px;min-height:40px;padding:0;border:2px solid rgba(15,110,110,.3);border-radius:12px;background:#fff;color:var(--teal-deep);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}",
+      ".month-arrow.icon-btn{appearance:none;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border:none;border-radius:0;background:transparent;box-shadow:none;color:var(--teal-deep);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}",
       ".month-arrow .ico{width:20px;height:20px;stroke:currentColor}",
+      ".cal-nav button{width:44px;height:44px;min-width:44px;min-height:44px;border:none;border-radius:0;background:transparent;box-shadow:none;font-size:1.25rem;font-weight:800;color:var(--teal-deep);cursor:pointer;padding:0}",
+      ".month-hold-hint{margin:.1rem 0 .35rem;font-size:.75rem;font-weight:700;color:var(--ink-soft);text-align:center;line-height:1.2}",
       ".hero-card{background:linear-gradient(165deg,#fffaf4 0%,#e7f4ef 55%,#f8efe4 100%);border-radius:22px;padding:1.1rem 1rem 1.15rem;box-shadow:var(--shadow);margin-bottom:1rem;text-align:center}",
       ".rcpt-top{display:flex;justify-content:center;align-items:center;gap:.35rem}",
       ".hero-budget{margin:.85rem auto 0;max-width:28rem;padding:.75rem .9rem;border-radius:16px;background:rgba(255,255,255,.72);border:2px solid rgba(15,110,110,.2);cursor:pointer;text-align:left}",
@@ -4218,8 +5470,7 @@
       ".meal-log{padding:.55rem .85rem .8rem;display:flex;flex-direction:column;gap:.35rem;border-top:1px dashed rgba(23,48,66,.12)}",
       ".log-chip{min-height:36px;border-radius:999px;border:2px solid rgba(15,110,110,.22);background:var(--bg);font:inherit;font-weight:800;font-size:.78rem;padding:.25rem .65rem;cursor:pointer}",
       ".log-chip.on{background:var(--teal-soft);border-color:var(--teal)}",
-      ".log-status,.log-bad{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}",
-      ".log-left{font-weight:800;font-size:.78rem;display:flex;gap:.35rem;align-items:center}",
+      ".log-status{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}",
       ".week-review-panel{background:var(--white);border-radius:20px;box-shadow:var(--shadow);padding:.9rem 1rem;margin:1rem 0}",
       ".gentle-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:1rem;z-index:40;max-width:min(92vw,26rem);background:#124f4f;color:#fff;padding:.75rem 1rem;border-radius:14px;font-weight:750;box-shadow:var(--shadow)}",
       ".gentle-banner .chip-btn{margin-left:.5rem;background:#fff;color:var(--teal-deep)}",
@@ -4237,15 +5488,353 @@
       "@keyframes jumpflash{0%,100%{box-shadow:none}40%{box-shadow:0 0 0 4px rgba(212,87,42,.35)}}",
       ".day-tag{margin:.15rem 0;font-weight:800;font-size:.75rem;color:var(--coral-deep)}",
       ".edited-badge{position:absolute;top:.35rem;right:.35rem;font-size:.65rem;font-weight:900;background:transparent;color:var(--coral-deep);border-radius:0;padding:0}",
-      ".cart-btn.icon-btn{appearance:none;min-width:44px;min-height:44px;padding:0;border:none;background:transparent;color:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}",
-      ".cart-btn .ico{stroke:#fff;width:20px;height:20px}",
+      ".list-link{appearance:none;min-width:44px;min-height:44px;padding:0 .35rem;border:none;background:transparent;color:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:.2rem;font:inherit;font-size:.75rem;font-weight:800;text-decoration:underline;text-underline-offset:3px;opacity:.85;border-radius:0;box-shadow:none}",
+      ".list-link .ico{stroke:currentColor;width:14px;height:14px}",
+      ".shuffle-row{display:flex;justify-content:flex-end;margin:.35rem 0 0}",
+      ".shuffle-link{appearance:none;border:none;background:transparent;box-shadow:none;border-radius:0;padding:.35rem .25rem;min-height:44px;display:inline-flex;align-items:center;gap:.3rem;cursor:pointer;font:inherit;font-size:.85rem;font-weight:800;color:var(--teal-deep);text-decoration:underline;text-underline-offset:3px}",
+      ".shuffle-link .ico{width:16px;height:16px;stroke:currentColor}",
       ".btn.icon-btn .ico{stroke:currentColor;width:18px;height:18px}",
       ".btn-primary.icon-btn .ico{stroke:#fff}",
     ].join("");
     document.head.appendChild(s);
   }
 
+  
+  const SHUFFLE_PREV_KEY = "family-meals-shuffle-prev-v1";
+  function shuffleDinnerPool(weekendDayIds) {
+    const weekend = new Set(weekendDayIds || []);
+    return Object.keys(EXTRA_DINNERS).filter((key) => {
+      const ex = EXTRA_DINNERS[key];
+      if (!ex || ex.kind !== "dinner") return false;
+      if (isDown(ex.dinner)) return false;
+      // No spaghetti / meat sauce titles
+      if (/spaghetti|meat sauce|marinara pasta/i.test(ex.dinner)) return false;
+      return true;
+    });
+  }
+  function shuffleWeek() {
+    // Self-check: uniqueness — `exclude` Set + `used.includes` / `prevSet` ensure no meal key is
+    // assigned twice in one shuffle; previous shuffle set is preferred-avoided via SHUFFLE_PREV_KEY.
+    const plan = currentPlan();
+    if (!plan || !plan.days || !plan.days.length) {
+      showToast("Pick a week template first");
+      return;
+    }
+    const days = plan.days;
+    const weekendIds = days.filter((d) => /^(sat|sun)$/i.test(d.id)).map((d) => d.id);
+    let pool = shuffleDinnerPool(weekendIds);
+    // Prefer favorites lightly (still random)
+    const fav = pool.filter((k) => isFav(EXTRA_DINNERS[k].dinner));
+    const rest = pool.filter((k) => !fav.includes(k));
+    pool = [...fav, ...rest];
+
+    // Avoid immediately previous set when possible
+    let prev = [];
+    try { prev = JSON.parse(localStorage.getItem(SHUFFLE_PREV_KEY) || "[]"); } catch (_) { prev = []; }
+    const prevSet = new Set(prev);
+
+    function pickN(n, opts) {
+      const { allowWeekendChili = false, exclude = new Set() } = opts || {};
+      let candidates = pool.filter((k) => {
+        if (exclude.has(k)) return false;
+        const ex = EXTRA_DINNERS[k];
+        if (ex.weekendOnly && !allowWeekendChili) return false;
+        return true;
+      });
+      // Prefer not reusing previous set
+      const fresh = candidates.filter((k) => !prevSet.has(k));
+      if (fresh.length >= n) candidates = fresh;
+      // Fisher-Yates
+      for (let i = candidates.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+      }
+      return candidates.slice(0, n);
+    }
+
+    // Chili: at most one weekend chili, and not every shuffle (~35% chance)
+    const useChili = Math.random() < 0.35;
+    const chiliKeys = pool.filter((k) => EXTRA_DINNERS[k].weekendOnly);
+    const picked = [];
+    const exclude = new Set();
+
+    // Map day slots that can be filled (skip holidays)
+    const fillable = days.filter((td) => {
+      const eff = effectiveDay(td);
+      return !(eff.holiday || eff.overrideType === "holiday");
+    });
+
+    // Locked / favorite nights stay
+    const locked = new Set();
+    fillable.forEach((td) => {
+      const ov = dayOverride(td.id);
+      const eff = effectiveDay(td);
+      if (ov && (ov.type === "eatout" || ov.type === "removed")) {
+        locked.add(td.id);
+        return;
+      }
+      if (isFav(eff.dinner) && ov && ov.type === "pick") {
+        locked.add(td.id);
+        if (ov.key) exclude.add(ov.key);
+      }
+    });
+
+    const need = fillable.filter((td) => !locked.has(td.id));
+    // Assign chili to one weekend day if chosen
+    let chiliDay = null;
+    let chiliKey = null;
+    if (useChili && chiliKeys.length && weekendIds.some((id) => need.some((d) => d.id === id))) {
+      const weekendNeed = need.filter((d) => /^(sat|sun)$/i.test(d.id));
+      if (weekendNeed.length) {
+        chiliDay = weekendNeed[Math.floor(Math.random() * weekendNeed.length)].id;
+        chiliKey = chiliKeys[Math.floor(Math.random() * chiliKeys.length)];
+        exclude.add(chiliKey);
+      }
+    }
+
+    const dinnerKeys = pickN(need.length + 2, { exclude });
+    let di = 0;
+    const used = [];
+    need.forEach((td) => {
+      let key;
+      if (chiliDay && td.id === chiliDay && chiliKey) key = chiliKey;
+      else {
+        // skip chili keys for weekdays
+        while (di < dinnerKeys.length && EXTRA_DINNERS[dinnerKeys[di]].weekendOnly) di++;
+        key = dinnerKeys[di++] || pickN(1, { exclude: new Set(used) })[0];
+      }
+      if (!key) return;
+      used.push(key);
+      exclude.add(key);
+      state.dayOverrides[td.id] = { type: "pick", key };
+    });
+
+    // Taco leftovers → next dinner: if a taco night is picked, force next fillable to leftovers
+    const ordered = fillable.map((d) => d.id);
+    ordered.forEach((id, idx) => {
+      const ov = state.dayOverrides[id];
+      if (!ov || ov.type !== "pick" || !ov.key) return;
+      const name = (EXTRA_DINNERS[ov.key] && EXTRA_DINNERS[ov.key].dinner) || "";
+      if (!/taco/i.test(name)) return;
+      const nextId = ordered[idx + 1];
+      if (!nextId || locked.has(nextId)) return;
+      const nextEff = effectiveDay(days.find((d) => d.id === nextId) || { id: nextId });
+      if (nextEff.holiday) return;
+      state.dayOverrides[nextId] = { type: "leftovers" };
+    });
+
+    try { localStorage.setItem(SHUFFLE_PREV_KEY, JSON.stringify(used)); } catch (_) {}
+    persist();
+    renderAll();
+    showToast("Week shuffled — groceries & budget updated");
+  }
+
+
+  /* ===== Items 41–42: multi-photo storage sections ===== */
+  const FM_PHOTO_KEY = "fm-storage-photos-v1";
+  const FM_SEC_KEY = "fm-storage-sections";
+  const FM_BUILTIN_STORAGE = [
+    { id: "pantry", label: "Pantry", emoji: "🥫" },
+    { id: "fridge", label: "Fridge", emoji: "🧊" },
+    { id: "freezer", label: "Freezer", emoji: "❄️" },
+  ];
+  const FM_CAM_ICO = `<svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+  const FM_PLUS_ICO = `<svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+  const FM_X_ICO = `<svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+
+  function fmMigratePhotoVal(v) {
+    if (Array.isArray(v)) return v.filter((x) => typeof x === "string" && x);
+    if (typeof v === "string" && v) return [v];
+    return [];
+  }
+  function loadFmPhotos() {
+    try {
+      const j = JSON.parse(localStorage.getItem(FM_PHOTO_KEY) || "{}");
+      if (!j || typeof j !== "object") return {};
+      const out = {};
+      Object.keys(j).forEach((k) => { out[k] = fmMigratePhotoVal(j[k]); });
+      return out;
+    } catch (_) { return {}; }
+  }
+  function saveFmPhotos(map) {
+    try {
+      localStorage.setItem(FM_PHOTO_KEY, JSON.stringify(map));
+      return true;
+    } catch (e) {
+      showToast("Not enough space to save these photos. Remove some and try again.");
+      return false;
+    }
+  }
+  function getFmStorageSections() {
+    try {
+      const j = JSON.parse(localStorage.getItem(FM_SEC_KEY) || "[]");
+      if (!Array.isArray(j)) return [];
+      return j
+        .filter((x) => x && typeof x === "object" && x.id && x.label)
+        .map((x) => ({ id: String(x.id).slice(0, 40), label: String(x.label).trim().slice(0, 40) }))
+        .filter((x) => x.label);
+    } catch (_) { return []; }
+  }
+  function setFmStorageSections(arr) {
+    try { localStorage.setItem(FM_SEC_KEY, JSON.stringify(arr.slice(0, 20))); } catch (_) {}
+  }
+  function allFmStorageSections() {
+    const custom = getFmStorageSections();
+    const ids = new Set(FM_BUILTIN_STORAGE.map((s) => s.id));
+    return [...FM_BUILTIN_STORAGE, ...custom.filter((c) => !ids.has(c.id))];
+  }
+  function fmCompressImageFile(file, maxW, quality) {
+    maxW = maxW || 1100;
+    quality = quality == null ? 0.7 : quality;
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          let w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+          if (!w || !h) { URL.revokeObjectURL(url); resolve(null); return; }
+          if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
+          const c = document.createElement("canvas");
+          c.width = w; c.height = h;
+          c.getContext("2d").drawImage(img, 0, 0, w, h);
+          const out = c.toDataURL("image/jpeg", quality);
+          URL.revokeObjectURL(url);
+          resolve(out);
+        } catch (err) { URL.revokeObjectURL(url); reject(err); }
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("img")); };
+      img.src = url;
+    });
+  }
+  async function fmAppendSectionPhotos(sectionId, fileList) {
+    const map = loadFmPhotos();
+    const arr = (map[sectionId] || []).slice();
+    const files = [...fileList].filter((f) => f && f.type && f.type.startsWith("image/"));
+    for (const f of files) {
+      try {
+        let data = await fmCompressImageFile(f);
+        if (!data) {
+          data = await new Promise((res, rej) => {
+            const fr = new FileReader();
+            fr.onload = () => res(fr.result);
+            fr.onerror = rej;
+            fr.readAsDataURL(f);
+          });
+        }
+        arr.push(data);
+      } catch (_) {}
+    }
+    map[sectionId] = arr;
+    return saveFmPhotos(map);
+  }
+  function fmRemoveSectionPhoto(sectionId, idx) {
+    const map = loadFmPhotos();
+    const arr = (map[sectionId] || []).slice();
+    if (idx < 0 || idx >= arr.length) return;
+    arr.splice(idx, 1);
+    if (arr.length) map[sectionId] = arr; else delete map[sectionId];
+    saveFmPhotos(map);
+  }
+  function fmDeleteCustomSection(id) {
+    if (FM_BUILTIN_STORAGE.some((s) => s.id === id)) return;
+    setFmStorageSections(getFmStorageSections().filter((s) => s.id !== id));
+    const map = loadFmPhotos();
+    delete map[id];
+    saveFmPhotos(map);
+  }
+  function fmAddCustomSection(name) {
+    const label = String(name || "").trim().slice(0, 40);
+    if (!label) return null;
+    const all = allFmStorageSections();
+    if (all.some((s) => s.label.toLowerCase() === label.toLowerCase())) return null;
+    const id = "c:" + label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 36);
+    if (!id || id === "c:" || all.some((s) => s.id === id)) return null;
+    const arr = getFmStorageSections();
+    arr.push({ id, label });
+    setFmStorageSections(arr);
+    return id;
+  }
+  function fmStorageShareFiles(sectionId) {
+    return (loadFmPhotos()[sectionId] || []).slice();
+  }
+  let fmStockShowNew = false;
+  function renderStockPhotos() {
+    const host = document.getElementById("stock-sections");
+    if (!host) return;
+    const map = loadFmPhotos();
+    const secs = allFmStorageSections();
+    const newHtml = fmStockShowNew
+      ? `<div class="ph-new-row"><input id="fmPhNewName" placeholder="Name the new section…" maxlength="40" autocomplete="off" /><button type="button" class="btn btn-secondary" id="fmPhNewAdd">Add</button><button type="button" class="btn btn-ghost" id="fmPhNewCancel">Cancel</button></div>`
+      : "";
+    const tiles = secs.map((sec) => {
+      const photos = map[sec.id] || [];
+      const custom = !FM_BUILTIN_STORAGE.some((b) => b.id === sec.id);
+      const thumbs = photos
+        .map((src, i) => `<span class="ph-thumb"><img alt="" src="${src}" /><button type="button" class="ph-x" data-rmph="${escapeAttr(sec.id)}" data-i="${i}" aria-label="Remove photo">${FM_X_ICO}</button></span>`)
+        .join("");
+      const addLab = photos.length ? "Add more photos" : "Add photos";
+      return `<div class="ph-sec${photos.length ? " done" : ""}" data-sec="${escapeAttr(sec.id)}">
+        ${custom ? `<button type="button" class="ph-sec-del" data-delsec="${escapeAttr(sec.id)}" aria-label="Delete section">${FM_X_ICO}</button>` : ""}
+        <div class="ph-sec-lab">${sec.emoji ? `<span class="big">${sec.emoji}</span>` : ""}${escapeHtml(sec.label)}</div>
+        ${thumbs ? `<div class="ph-thumbs">${thumbs}</div>` : ""}
+        <button type="button" class="ph-add" data-addph="${escapeAttr(sec.id)}">${FM_CAM_ICO}<span>${addLab}</span></button>
+        <input type="file" accept="image/*" multiple data-phfile="${escapeAttr(sec.id)}" hidden />
+      </div>`;
+    }).join("");
+    host.innerHTML = `${newHtml}<div class="photos stock-photos">${tiles}<button type="button" class="ph-add-sec" id="fmPhAddSec" aria-label="Add storage section">${FM_PLUS_ICO}<span>Add section</span></button></div>`;
+    host.querySelectorAll("[data-addph]").forEach((btn) => {
+      btn.onclick = () => {
+        const id = btn.dataset.addph;
+        const inp = host.querySelector(`[data-phfile="${CSS.escape(id)}"]`);
+        if (inp) inp.click();
+      };
+    });
+    host.querySelectorAll("[data-phfile]").forEach((inp) => {
+      inp.onchange = async () => {
+        const id = inp.dataset.phfile;
+        if (!inp.files || !inp.files.length) return;
+        await fmAppendSectionPhotos(id, inp.files);
+        inp.value = "";
+        renderStockPhotos();
+      };
+    });
+    host.querySelectorAll("[data-rmph]").forEach((btn) => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fmRemoveSectionPhoto(btn.dataset.rmph, +btn.dataset.i);
+        renderStockPhotos();
+      };
+    });
+    host.querySelectorAll("[data-delsec]").forEach((btn) => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fmDeleteCustomSection(btn.dataset.delsec);
+        renderStockPhotos();
+      };
+    });
+    const addSec = host.querySelector("#fmPhAddSec");
+    if (addSec) addSec.onclick = () => { fmStockShowNew = true; renderStockPhotos(); };
+    const cancel = host.querySelector("#fmPhNewCancel");
+    if (cancel) cancel.onclick = () => { fmStockShowNew = false; renderStockPhotos(); };
+    const add = host.querySelector("#fmPhNewAdd");
+    const nameEl = host.querySelector("#fmPhNewName");
+    const doAdd = () => {
+      const id = fmAddCustomSection(nameEl ? nameEl.value : "");
+      fmStockShowNew = false;
+      if (!id) showToast("Need a unique section name");
+      renderStockPhotos();
+    };
+    if (add) add.onclick = doAdd;
+    if (nameEl) {
+      nameEl.onkeydown = (e) => { if (e.key === "Enter") doAdd(); };
+      setTimeout(() => nameEl.focus(), 40);
+    }
+  }
+
   function renderAll() {
+    try { renderStockPhotos(); } catch (_) {}
     els.weekLabel.value = state.weekTitle;
     renderTemplates();
     renderCalendar();
@@ -4272,6 +5861,85 @@
     if (announce && changed) {
       showToast(`Loaded ${WEEKS[nextWeek].label} Option ${nextPlan}`);
     }
+  }
+
+  function updateBackBtn() {
+    const btn = els.backBtn;
+    if (!btn) return;
+    const open = (typeof sheetOpen === "function" && sheetOpen())
+      || (els.settingsModal && els.settingsModal.classList.contains("open"))
+      || (els.swapModal && els.swapModal.classList.contains("open"))
+      || (els.modal && els.modal.classList.contains("open"));
+    const hist = (window.history && window.history.length > 1);
+    btn.hidden = !(open || hist);
+  }
+  function goBackApp() {
+    if (typeof sheetOpen === "function" && sheetOpen()) { closeSheet(); updateBackBtn(); return; }
+    if (els.settingsModal && els.settingsModal.classList.contains("open")) { closeSettings(); updateBackBtn(); return; }
+    if (els.swapModal && els.swapModal.classList.contains("open")) { closeSwapPicker(); updateBackBtn(); return; }
+    if (els.modal && els.modal.classList.contains("open")) { closeRecipe(); updateBackBtn(); return; }
+    if (window.history && window.history.length > 1) { window.history.back(); return; }
+    updateBackBtn();
+  }
+
+  function repeatLastWeek() {
+    const month = activeMonth();
+    const curW = String(state.week || "1");
+    const curP = state.plan || "A";
+    let srcWeek = null;
+    let srcPlan = null;
+    // Prefer previous week number in this month with a pick
+    const n = Number(curW);
+    if (n > 1) {
+      for (let w = n - 1; w >= 1; w--) {
+        const id = String(w);
+        if (month.deletedWeeks && month.deletedWeeks[id]) continue;
+        srcWeek = id;
+        srcPlan = month.picks[id] || curP;
+        break;
+      }
+    }
+    // Else previous month week 4
+    if (!srcWeek) {
+      const prevKey = shiftMonthKey(state.monthKey, -1);
+      const prevMonth = state.months && state.months[prevKey];
+      if (prevMonth) {
+        for (let w = 4; w >= 1; w--) {
+          const id = String(w);
+          if (prevMonth.deletedWeeks && prevMonth.deletedWeeks[id]) continue;
+          if (prevMonth.picks && prevMonth.picks[id]) {
+            srcWeek = id;
+            srcPlan = prevMonth.picks[id];
+            const srcEdits = (prevMonth.weekEdits && prevMonth.weekEdits[id + srcPlan]) || {};
+            loadTemplate(curW, srcPlan, true);
+            state.dayOverrides = JSON.parse(JSON.stringify(srcEdits));
+            month.picks[curW] = srcPlan;
+            const key = curW + srcPlan;
+            month.weekEdits[key] = state.dayOverrides;
+            state.weekEdits[key] = state.dayOverrides;
+            persist();
+            renderAll();
+            showToast("Repeated last week’s plan");
+            return;
+          }
+        }
+      }
+    }
+    if (!srcWeek) {
+      showToast("No previous week to repeat yet");
+      return;
+    }
+    const srcKey = srcWeek + srcPlan;
+    const srcEdits = (month.weekEdits && month.weekEdits[srcKey]) || (state.weekEdits && state.weekEdits[srcKey]) || {};
+    loadTemplate(curW, srcPlan, true);
+    state.dayOverrides = JSON.parse(JSON.stringify(srcEdits));
+    month.picks[curW] = srcPlan;
+    const key = curW + srcPlan;
+    month.weekEdits[key] = state.dayOverrides;
+    state.weekEdits[key] = state.dayOverrides;
+    persist();
+    renderAll();
+    showToast("Repeated last week’s plan");
   }
 
   function boot() {
@@ -4301,6 +5969,11 @@
         if (e.target === els.settingsModal) closeSettings();
       });
     }
+    
+    const shuffleBtn = document.getElementById("shuffle-btn");
+    if (shuffleBtn) shuffleBtn.addEventListener("click", () => shuffleWeek());
+    const repeatBtn = document.getElementById("repeat-btn");
+    if (repeatBtn) repeatBtn.addEventListener("click", () => repeatLastWeek());
     if (els.calBtn) {
       els.calBtn.addEventListener("click", () => {
         openCal({
@@ -4362,6 +6035,23 @@
       }
     });
 
+    if (els.customCategory) {
+      els.customCategory.addEventListener("change", () => updateNewCatFieldVisibility());
+      refreshCategoryPicker(els.customCategory.value);
+    }
+    if (els.delCustomCat) {
+      els.delCustomCat.addEventListener("click", () => {
+        const cat = els.customCategory && els.customCategory.value;
+        if (!isCustomCategory(cat)) return;
+        if ((state.custom || []).some((c) => c.category === cat)) {
+          showToast("Category still has items");
+          return;
+        }
+        setCustomCategories(getCustomCategories().filter((c) => c !== cat));
+        refreshCategoryPicker("Pantry");
+        showToast("Category removed");
+      });
+    }
     els.addCustom.addEventListener("click", () => {
       const name = els.customName.value.trim();
       if (!name) {
@@ -4369,11 +6059,13 @@
         els.customName.focus();
         return;
       }
+      const category = resolveCategoryFromForm();
+      if (!category) return;
       const id = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
       state.custom.push({
         id,
         name: name.slice(0, 80),
-        category: normalizeCategory(els.customCategory.value),
+        category,
       });
       if (els.customPrice && els.customPrice.value.trim()) {
         setPrice(id, els.customPrice.value);
@@ -4381,6 +6073,7 @@
       }
       els.customName.value = "";
       persist();
+      refreshCategoryPicker(category);
       renderGrocery();
       showToast("Added to grocery list");
     });
@@ -4458,6 +6151,10 @@
     writeShareToUrl(false);
     updateWakeLock();
     loadPricesJson();
+    if (els.backBtn) els.backBtn.addEventListener("click", goBackApp);
+    updateBackBtn();
+    if (typeof initFoodAutocomplete === "function") initFoodAutocomplete();
+    setTimeout(() => { if (typeof startWelcome === "function") startWelcome(false); }, 400);
   }
 
   if (document.readyState === "loading") {
