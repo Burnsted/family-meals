@@ -5629,7 +5629,212 @@ function sidesBlockHTML(dayId, day) {
     showToast("Week shuffled — groceries & budget updated");
   }
 
+
+  /* ===== Items 41–42: multi-photo storage sections ===== */
+  const FM_PHOTO_KEY = "fm-storage-photos-v1";
+  const FM_SEC_KEY = "fm-storage-sections";
+  const FM_BUILTIN_STORAGE = [
+    { id: "pantry", label: "Pantry", emoji: "🥫" },
+    { id: "fridge", label: "Fridge", emoji: "🧊" },
+    { id: "freezer", label: "Freezer", emoji: "❄️" },
+  ];
+  const FM_CAM_ICO = `<svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+  const FM_PLUS_ICO = `<svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+  const FM_X_ICO = `<svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+
+  function fmMigratePhotoVal(v) {
+    if (Array.isArray(v)) return v.filter((x) => typeof x === "string" && x);
+    if (typeof v === "string" && v) return [v];
+    return [];
+  }
+  function loadFmPhotos() {
+    try {
+      const j = JSON.parse(localStorage.getItem(FM_PHOTO_KEY) || "{}");
+      if (!j || typeof j !== "object") return {};
+      const out = {};
+      Object.keys(j).forEach((k) => { out[k] = fmMigratePhotoVal(j[k]); });
+      return out;
+    } catch (_) { return {}; }
+  }
+  function saveFmPhotos(map) {
+    try {
+      localStorage.setItem(FM_PHOTO_KEY, JSON.stringify(map));
+      return true;
+    } catch (e) {
+      showToast("Not enough space to save these photos. Remove some and try again.");
+      return false;
+    }
+  }
+  function getFmStorageSections() {
+    try {
+      const j = JSON.parse(localStorage.getItem(FM_SEC_KEY) || "[]");
+      if (!Array.isArray(j)) return [];
+      return j
+        .filter((x) => x && typeof x === "object" && x.id && x.label)
+        .map((x) => ({ id: String(x.id).slice(0, 40), label: String(x.label).trim().slice(0, 40) }))
+        .filter((x) => x.label);
+    } catch (_) { return []; }
+  }
+  function setFmStorageSections(arr) {
+    try { localStorage.setItem(FM_SEC_KEY, JSON.stringify(arr.slice(0, 20))); } catch (_) {}
+  }
+  function allFmStorageSections() {
+    const custom = getFmStorageSections();
+    const ids = new Set(FM_BUILTIN_STORAGE.map((s) => s.id));
+    return [...FM_BUILTIN_STORAGE, ...custom.filter((c) => !ids.has(c.id))];
+  }
+  function fmCompressImageFile(file, maxW, quality) {
+    maxW = maxW || 1100;
+    quality = quality == null ? 0.7 : quality;
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          let w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+          if (!w || !h) { URL.revokeObjectURL(url); resolve(null); return; }
+          if (w > maxW) { h = Math.round((h * maxW) / w); w = maxW; }
+          const c = document.createElement("canvas");
+          c.width = w; c.height = h;
+          c.getContext("2d").drawImage(img, 0, 0, w, h);
+          const out = c.toDataURL("image/jpeg", quality);
+          URL.revokeObjectURL(url);
+          resolve(out);
+        } catch (err) { URL.revokeObjectURL(url); reject(err); }
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("img")); };
+      img.src = url;
+    });
+  }
+  async function fmAppendSectionPhotos(sectionId, fileList) {
+    const map = loadFmPhotos();
+    const arr = (map[sectionId] || []).slice();
+    const files = [...fileList].filter((f) => f && f.type && f.type.startsWith("image/"));
+    for (const f of files) {
+      try {
+        let data = await fmCompressImageFile(f);
+        if (!data) {
+          data = await new Promise((res, rej) => {
+            const fr = new FileReader();
+            fr.onload = () => res(fr.result);
+            fr.onerror = rej;
+            fr.readAsDataURL(f);
+          });
+        }
+        arr.push(data);
+      } catch (_) {}
+    }
+    map[sectionId] = arr;
+    return saveFmPhotos(map);
+  }
+  function fmRemoveSectionPhoto(sectionId, idx) {
+    const map = loadFmPhotos();
+    const arr = (map[sectionId] || []).slice();
+    if (idx < 0 || idx >= arr.length) return;
+    arr.splice(idx, 1);
+    if (arr.length) map[sectionId] = arr; else delete map[sectionId];
+    saveFmPhotos(map);
+  }
+  function fmDeleteCustomSection(id) {
+    if (FM_BUILTIN_STORAGE.some((s) => s.id === id)) return;
+    setFmStorageSections(getFmStorageSections().filter((s) => s.id !== id));
+    const map = loadFmPhotos();
+    delete map[id];
+    saveFmPhotos(map);
+  }
+  function fmAddCustomSection(name) {
+    const label = String(name || "").trim().slice(0, 40);
+    if (!label) return null;
+    const all = allFmStorageSections();
+    if (all.some((s) => s.label.toLowerCase() === label.toLowerCase())) return null;
+    const id = "c:" + label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 36);
+    if (!id || id === "c:" || all.some((s) => s.id === id)) return null;
+    const arr = getFmStorageSections();
+    arr.push({ id, label });
+    setFmStorageSections(arr);
+    return id;
+  }
+  function fmStorageShareFiles(sectionId) {
+    return (loadFmPhotos()[sectionId] || []).slice();
+  }
+  let fmStockShowNew = false;
+  function renderStockPhotos() {
+    const host = document.getElementById("stock-sections");
+    if (!host) return;
+    const map = loadFmPhotos();
+    const secs = allFmStorageSections();
+    const newHtml = fmStockShowNew
+      ? `<div class="ph-new-row"><input id="fmPhNewName" placeholder="Name the new section…" maxlength="40" autocomplete="off" /><button type="button" class="btn btn-secondary" id="fmPhNewAdd">Add</button><button type="button" class="btn btn-ghost" id="fmPhNewCancel">Cancel</button></div>`
+      : "";
+    const tiles = secs.map((sec) => {
+      const photos = map[sec.id] || [];
+      const custom = !FM_BUILTIN_STORAGE.some((b) => b.id === sec.id);
+      const thumbs = photos
+        .map((src, i) => `<span class="ph-thumb"><img alt="" src="${src}" /><button type="button" class="ph-x" data-rmph="${escapeAttr(sec.id)}" data-i="${i}" aria-label="Remove photo">${FM_X_ICO}</button></span>`)
+        .join("");
+      const addLab = photos.length ? "Add more photos" : "Add photos";
+      return `<div class="ph-sec${photos.length ? " done" : ""}" data-sec="${escapeAttr(sec.id)}">
+        ${custom ? `<button type="button" class="ph-sec-del" data-delsec="${escapeAttr(sec.id)}" aria-label="Delete section">${FM_X_ICO}</button>` : ""}
+        <div class="ph-sec-lab">${sec.emoji ? `<span class="big">${sec.emoji}</span>` : ""}${escapeHtml(sec.label)}</div>
+        ${thumbs ? `<div class="ph-thumbs">${thumbs}</div>` : ""}
+        <button type="button" class="ph-add" data-addph="${escapeAttr(sec.id)}">${FM_CAM_ICO}<span>${addLab}</span></button>
+        <input type="file" accept="image/*" multiple data-phfile="${escapeAttr(sec.id)}" hidden />
+      </div>`;
+    }).join("");
+    host.innerHTML = `${newHtml}<div class="photos stock-photos">${tiles}<button type="button" class="ph-add-sec" id="fmPhAddSec" aria-label="Add storage section">${FM_PLUS_ICO}<span>Add section</span></button></div>`;
+    host.querySelectorAll("[data-addph]").forEach((btn) => {
+      btn.onclick = () => {
+        const id = btn.dataset.addph;
+        const inp = host.querySelector(`[data-phfile="${CSS.escape(id)}"]`);
+        if (inp) inp.click();
+      };
+    });
+    host.querySelectorAll("[data-phfile]").forEach((inp) => {
+      inp.onchange = async () => {
+        const id = inp.dataset.phfile;
+        if (!inp.files || !inp.files.length) return;
+        await fmAppendSectionPhotos(id, inp.files);
+        inp.value = "";
+        renderStockPhotos();
+      };
+    });
+    host.querySelectorAll("[data-rmph]").forEach((btn) => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fmRemoveSectionPhoto(btn.dataset.rmph, +btn.dataset.i);
+        renderStockPhotos();
+      };
+    });
+    host.querySelectorAll("[data-delsec]").forEach((btn) => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fmDeleteCustomSection(btn.dataset.delsec);
+        renderStockPhotos();
+      };
+    });
+    const addSec = host.querySelector("#fmPhAddSec");
+    if (addSec) addSec.onclick = () => { fmStockShowNew = true; renderStockPhotos(); };
+    const cancel = host.querySelector("#fmPhNewCancel");
+    if (cancel) cancel.onclick = () => { fmStockShowNew = false; renderStockPhotos(); };
+    const add = host.querySelector("#fmPhNewAdd");
+    const nameEl = host.querySelector("#fmPhNewName");
+    const doAdd = () => {
+      const id = fmAddCustomSection(nameEl ? nameEl.value : "");
+      fmStockShowNew = false;
+      if (!id) showToast("Need a unique section name");
+      renderStockPhotos();
+    };
+    if (add) add.onclick = doAdd;
+    if (nameEl) {
+      nameEl.onkeydown = (e) => { if (e.key === "Enter") doAdd(); };
+      setTimeout(() => nameEl.focus(), 40);
+    }
+  }
+
   function renderAll() {
+    try { renderStockPhotos(); } catch (_) {}
     els.weekLabel.value = state.weekTitle;
     renderTemplates();
     renderCalendar();

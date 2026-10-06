@@ -40,6 +40,24 @@
   .ph.done{border:2px solid var(--on)}
   .ph .ok{position:absolute;bottom:6px;left:6px;right:6px;background:rgba(14,165,233,.9);color:#fff;border-radius:8px;padding:3px;font-size:12px}
   .ph input{display:none}
+  .photos{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
+  .ph-sec{position:relative;border:2px dashed var(--chip);border-radius:14px;padding:10px 8px 8px;display:flex;flex-direction:column;gap:6px;min-height:140px;text-align:center}
+  .ph-sec.done{border-color:var(--on)}
+  .ph-sec-lab{font-size:13px;font-weight:800;color:var(--ink);line-height:1.2}
+  .ph-sec-lab .big{display:block;font-size:28px;margin-bottom:2px}
+  .ph-thumbs{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+  .ph-thumb{position:relative;width:56px;height:56px;border-radius:8px;overflow:hidden;border:2px solid var(--chip);flex-shrink:0}
+  .ph-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .ph-thumb .ph-x{position:absolute;top:1px;right:1px;width:20px;height:20px;border:0;border-radius:50%;background:rgba(15,23,42,.75);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;line-height:0}
+  .ph-thumb .ph-x .ico{width:12px;height:12px;stroke:#fff}
+  .ph-add{appearance:none;border:0;background:transparent;color:var(--tealD,#0ea5e9);font:inherit;font-size:12px;font-weight:800;text-decoration:underline;text-underline-offset:2px;cursor:pointer;min-height:36px;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:4px 2px}
+  .ph-add .ico{width:14px;height:14px;stroke:currentColor}
+  .ph-add-sec{appearance:none;border:2px dashed var(--chip);border-radius:14px;background:transparent;color:var(--mut);min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;font:inherit;font-weight:800;font-size:13px}
+  .ph-add-sec .ico{width:22px;height:22px;stroke:currentColor}
+  .ph-sec-del{appearance:none;position:absolute;top:4px;right:4px;width:24px;height:24px;border:0;border-radius:50%;background:rgba(15,23,42,.7);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+  .ph-sec-del .ico{width:12px;height:12px;stroke:#fff}
+  .ph-new-row{display:flex;gap:8px;margin:0 0 12px;align-items:center}
+  .ph-new-row input{flex:1;min-height:44px;border-radius:12px;border:2px solid var(--chip);background:#0b1222;color:var(--ink);padding:10px;font:inherit;font-weight:700}
   .sum{text-align:left}
   .sum h2{font-size:17px;margin:16px 0 6px}
   .sum p{margin:0}
@@ -1098,13 +1116,31 @@ function reset(){
       build,xOpen:null,weekStart:null,about:getAbout(),aboutReturn:false,sides:new Set(),picks:{},custom:{},open:null,cOpen:null,mealCustom:[],kitPhotos:[],sidePick:null,pickBackup:null};
   loadBuildCheese();
   CUSTOM_MEALS.forEach(m=>{if(st.meals[m.id]==null){/* keep unset until user picks */}});
-  queue=["photos","stores","main","about","equip","coffee","meals","MEALB","sides","BUILD","summary"]; pos=0;
+  queue=["photos","stores","about","equip","coffee","meals","MEALB","sides","BUILD","summary"]; pos=0;
   document.body.classList.remove("light");
+}
+/** Item 44: no primary-store question — derive silently (cheapest selected store est., else first). */
+function deriveMainStore(){
+  const selected=[...(st&&st.stores?st.stores:[])];
+  if(!selected.length){if(st)st.main="";return""}
+  const ap=selected.filter(s=>s==="Aldi"||s==="Publix");
+  if(ap.length&&typeof W!=="undefined"&&W&&W.items&&W.items.length&&typeof totals==="function"){
+    try{
+      const t=totals();
+      if(ap.includes("Aldi")&&ap.includes("Publix")){st.main=t.a<=t.p?"Aldi":"Publix";return st.main}
+      st.main=ap[0];return st.main;
+    }catch(_){}
+  }
+  // No week totals yet: prefer Aldi among selected (usually cheaper in prices.json), else first selected
+  if(selected.includes("Aldi")){st.main="Aldi";return"Aldi"}
+  if(selected.includes("Publix")){st.main="Publix";return"Publix"}
+  st.main=selected[0];return st.main;
 }
 const card=$("card");
 function go(n=1){pos+=n;
   for(let g=0;g<50;g++){const s=queue[pos];
-    if(s==="main"&&st.stores.size<2){if(st.stores.size===1)st.main=[...st.stores][0];pos+=n>0?1:-1;continue}
+    // Item 44: skip legacy "main" step if an old session still has it queued
+    if(s==="main"){pos+=n>0?1:-1;continue}
     if(s==="coffee"&&!(st.equip.has("lavazza")||st.equip.has("nespresso")||st.equip.has("espresso"))){pos+=n>0?1:-1;continue}
     if(s==="MEALB"){buildMealSteps();continue}
     if(s==="BUILD"){buildDrill();continue}
@@ -1286,20 +1322,21 @@ function render(){
     const add=()=>{const v=$("own").value.trim();if(v&&!STORES.includes(v)&&!st.extra.includes(v)){st.extra.push(v);st.stores.add(v)}render()};
     $("add").onclick=add;$("own").onkeydown=e=>{if(e.key==="Enter")add()};
     wireAllAutocomplete(card);
-    $("nx").onclick=()=>{if(!st.stores.size)return;card.querySelectorAll("[data-sloc]").forEach(inp=>{st.storeLoc[inp.dataset.sloc]=inp.value.trim()});saveStoreLoc();go()};
+    $("nx").onclick=()=>{if(!st.stores.size)return;card.querySelectorAll("[data-sloc]").forEach(inp=>{st.storeLoc[inp.dataset.sloc]=inp.value.trim()});saveStoreLoc();deriveMainStore();go()};
   } else if(s==="main"){
-    card.innerHTML=`<div class="emoji">🏪</div><h1>Which store most?</h1><p class="sub">Prices and the grocery list lean toward this one.</p>
-      <div class="chips">${[...st.stores].map(x=>`<span class="chip${st.main===x?" main":" off"}" data-x="${esc(x)}">${esc(x)}</span>`).join("")}</div>${btns("Next →",!st.main)}`;
-    card.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{st.main=c.dataset.x;render()});
-    $("nx").onclick=()=>st.main&&go();
+    // Item 44: removed — jump past any stale main step
+    deriveMainStore();go();
   } else if(s==="about") aboutStep();
   else if(s==="photos"){
-    const tile=(k,e,l)=>`<label class="ph${st.photos[k]?" done":""}">${st.photos[k]?`<img src="${st.photos[k]}"><span class="ok">✓ ${l}</span>`:`<span class="big">${e}</span>${l}<br>Tap for photo`}<input type="file" accept="image/*" capture="environment" data-k="${k}"></label>`;
-    const n=Object.keys(st.photos).length;
-    card.innerHTML=`<div class="emoji">📸</div><h1>Show me what you have</h1><p class="sub">One photo each so I can see what's already there.</p>
-      <div class="photos">${tile("pantry","🥫","Pantry")}${tile("fridge","🧊","Fridge")}${tile("freezer","❄️","Freezer")}</div>
+    // migrate any in-memory single strings before render
+    if(st.photos){Object.keys(st.photos).forEach(k=>{st.photos[k]=migratePhotoVal(st.photos[k])});saveCamPhotos({...loadCamPhotos(),...st.photos})}
+    const ui=renderStoragePhotosUI({showNew:!!st._phNew});
+    const map=ui.map;
+    const n=BUILTIN_STORAGE.filter(s=>sectionPhotoCount(map,s.id)>0).length;
+    card.innerHTML=`<div class="emoji">📸</div><h1>Show me what you have</h1><p class="sub">Snap pantry, fridge, and freezer — multiple photos per section are fine.</p>
+      ${ui.html}
       ${btns(n===3?"Next →":`Next → (${n}/3)`,false,n<3?"Skip photos for now":null)}`;
-    card.querySelectorAll("input[type=file]").forEach(inp=>inp.onchange=()=>{const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{st.photos[inp.dataset.k]=r.result;render()};r.readAsDataURL(f)});
+    wireStoragePhotosUI(card,()=>render());
     $("nx").onclick=()=>go();const sk=$("sk");if(sk)sk.onclick=()=>go();
   } else if(s==="equip"){
     const fm=st.equip.has("foreman");
@@ -1529,12 +1566,13 @@ function summary(){
     const subs=Object.keys(st.picks).filter(k=>k.startsWith(s+" › ")&&st.picks[k].size).map(k=>{const lv=k.split(" › ")[1];return `${esc(lv==="then"?DRILL[s].then.key:lv)}: ${[...st.picks[k]].map(esc).join(", ")}`});
     return `<p><b>${s}</b>: ${top.map(esc).join(", ")}${subs.length?`<br><span class="no">${subs.join("<br>")}</span>`:""}</p>`;
   }).join("");
-  const others=[...st.stores].filter(x=>x!==st.main);
+  deriveMainStore();
+  const storeList=[...st.stores];
   const ys=allMeals().filter(m=>st.meals[m.id]==="yes"), ns=allMeals().filter(m=>st.meals[m.id]==="no");
   const eq=[...C.EQUIP.filter(e=>st.equip.has(e.id)).map(e=>e.label),...(st.custom.equip||[]).filter(v=>st.equip.has("c:"+v))];
   card.innerHTML=`<div class="sum"><h1 style="text-align:center">Your picks</h1>
-    <h2>🛒 Stores</h2><p>${st.main?`<b>${esc(st.main)}</b> (main)${others.length?", also "+others.map(esc).join(", "):""}`:"Skipped: using Aldi + Publix"}</p>
-    <h2>📸 Photos</h2><p>${["pantry","fridge","freezer"].map(k=>(st.photos[k]?"✓ ":"✗ ")+k).join(" · ")}</p>
+    <h2>🛒 Stores</h2><p>${storeList.length?storeList.map(esc).join(" · "):"Skipped: using Aldi + Publix"}</p>
+    <h2>📸 Photos</h2><p>${allStorageSections().map(s=>{const n=sectionPhotoCount(loadCamPhotos(),s.id);return(n?"✓ ":"✗ ")+s.label+(n>1?" ×"+n:"")}).join(" · ")}</p>
     <h2>🍳 Gear</h2><p>${eq.length?eq.map(x=>`<span class="tag">${esc(x)}</span>`).join(""):"None picked: assuming Foreman + microwave"}</p>
     ${(st.equip.has("lavazza")||st.equip.has("nespresso")||st.equip.has("espresso"))?`<h2>☕ Coffee</h2><p>${coffeeDesc()}</p><p class="no">${coffeeLine(true)}</p>`:""}
     <h2>🥩 Meals</h2><p>${ys.length?[...ys.map(m=>`<span class="tag y">✓ ${esc(m.v?mv(m.id)+" · ":"")}${esc(m.name)}</span>`)].join(""):"Skipped: I'll pick grill favorites"}</p>
@@ -1751,6 +1789,9 @@ function buildList(groups,mealIds){
   if(days.some(d=>d.bf&&(d.bf.id==="bagel"||d.bf.id==="bec")))add("creamcheese",{n:"Cream cheese",q:"1 tub",a:2.49,p:3.79,why:"breakfast"});
   if(becWk){add("bacon",{q:`${becWk} weekend breakfasts`,why:"breakfast"});add("eggs",{why:"breakfast"});add("cheeseslice",{why:"breakfast"})}
   const eggsToastWk=days.filter(d=>d.bf&&d.bf.id==="eggs_toast").length;
+  const yogWk=days.filter(d=>d.bf&&d.bf.id==="yogurt_granola").length;
+  const bfBurWk=days.filter(d=>d.bf&&d.bf.id==="bf_burrito").length;
+  if(eggsToastWk){add("eggs",{why:"breakfast"});add("bread",{why:"breakfast"});}
   if(yogWk)add("yogurt",{why:"breakfast"});
   if(bfBurWk){add("eggs",{why:"breakfast"});add("tortilla",{why:"breakfast"});add("cheeseslice",{why:"breakfast"});add("salsa",{why:"breakfast"})}
   add("bread",{why:"toast"});add("season",{why:"steak & chicken"});add("spray",{why:"Foreman + pans"});add("bags",{why:"freezer portions"});
@@ -1797,7 +1838,7 @@ function renderWeek(){
   const wl=fmtWeek(s0), bud=getBud(), edited=Object.keys(W.ov).length>0;
   const bh=budHero(t.b);
   const otherStores=[...st.stores].filter(x=>x!=="Aldi"&&x!=="Publix");
-  const main=st.main==="Aldi"||st.main==="Publix"?st.main:"";
+  const main=deriveMainStore();
   const byA={};W.items.forEach(it=>{(byA[it.aisle]=byA[it.aisle]||[]).push(it)});
   const nCk=W.ck.size, filt=W.listFilter;
   const MN=id=>id&&M(id);
@@ -1848,9 +1889,10 @@ function renderWeek(){
   <section class="gpanel"><div class="stitle" style="margin-top:0"><h2>Shopping list</h2><span>${nCk} checked</span></div>
     <div class="grocery-tools"><label class="visually-hidden" for="grocery-search">Search list</label><input type="search" id="grocery-search" class="grocery-search" placeholder="Search list" value="${esc(W.gSearch||"")}" autocomplete="off" /><button type="button" class="share-list-link" id="grocery-share">Share list</button><a class="share-list-link" id="grocery-sms" hidden>Text list</a></div>
     <div class="byday" id="byDay">${["All",...DN].map((lab,ix)=>`<button type="button" data-fd="${ix===0?"":ix-1}" class="${(filt==null&&ix===0)||filt===ix-1?"on":""}">${lab}</button>`).join("")}</div>
-    <div class="tot"><div class="${main==="Aldi"?"main":""}">All Aldi<b>${t.a.toFixed(2)}</b>est.${estStoreNote("Aldi")}</div>
-      <div class="${main==="Publix"?"main":""}">All Publix<b>${t.p.toFixed(2)}</b>est.${estStoreNote("Publix")}</div>
-      <div class="best">Best split<b>$${t.b.toFixed(2)}</b>est.</div></div>
+    <div class="tot"><div class="best">Est. total (${esc(main==="Publix"?"Publix":main==="Aldi"?"Aldi":(main||"Aldi"))})<b>$${(main==="Publix"?t.p:t.a).toFixed(2)}</b>est.${estStoreNote(main==="Publix"?"Publix":"Aldi")}</div>
+      <div>All Aldi<b>${t.a.toFixed(2)}</b>est.${estStoreNote("Aldi")}</div>
+      <div>All Publix<b>${t.p.toFixed(2)}</b>est.${estStoreNote("Publix")}</div>
+      <div>Best split<b>$${t.b.toFixed(2)}</b>est.</div></div>
     <div class="cpy"><button type="button" class="cpb p ico-btn" data-copy="all">${icons.copy} Copy whole list</button>
       <button type="button" class="cpb ico-btn" data-copy="Aldi">${icons.copy} Aldi</button>
       <button type="button" class="cpb ico-btn" data-copy="Publix">${icons.copy} Publix</button></div>
@@ -2335,6 +2377,161 @@ function weekReview(days){const L=getLog().log,s0=weekStartDate();
    <h3 class="aisle">Suggestions</h3>${sug.length?`<ul class="sgl">${sug.join("")}</ul>`:`<p class="hint">Log a few days and simple tips show up here (like "Skipped twice: swap it?").</p>`}</section>`}
 
 
+
+/* ===== Items 41–42: multi-photo storage + custom sections ===== */
+const CM_PHOTO_KEY="cm-storage-photos-v1";
+const CM_SEC_KEY="cm-storage-sections";
+const BUILTIN_STORAGE=[{id:"pantry",label:"Pantry",emoji:"🥫"},{id:"fridge",label:"Fridge",emoji:"🧊"},{id:"freezer",label:"Freezer",emoji:"❄️"}];
+function migratePhotoVal(v){
+  if(Array.isArray(v))return v.filter(x=>typeof x==="string"&&x);
+  if(typeof v==="string"&&v)return[v];
+  return[];
+}
+function loadCamPhotos(){
+  let fromLs={};
+  try{const j=JSON.parse(localStorage.getItem(CM_PHOTO_KEY)||"{}");if(j&&typeof j==="object")fromLs=j}catch(_){}
+  const merged={...(st&&st.photos?st.photos:{}),...fromLs};
+  const out={};
+  Object.keys(merged).forEach(k=>{out[k]=migratePhotoVal(merged[k])});
+  return out;
+}
+function saveCamPhotos(map){
+  try{localStorage.setItem(CM_PHOTO_KEY,JSON.stringify(map));if(st)st.photos=map;return true}
+  catch(e){toast("Not enough space to save these photos. Remove some and try again.");return false}
+}
+function getCamStorageSections(){
+  try{const j=JSON.parse(localStorage.getItem(CM_SEC_KEY)||"[]");
+    if(!Array.isArray(j))return[];
+    return j.filter(x=>x&&typeof x==="object"&&x.id&&x.label).map(x=>({id:String(x.id).slice(0,40),label:String(x.label).trim().slice(0,40)})).filter(x=>x.label)}
+  catch(_){return[]}
+}
+function setCamStorageSections(arr){
+  try{localStorage.setItem(CM_SEC_KEY,JSON.stringify(arr.slice(0,20)))}catch(_){}
+}
+function allStorageSections(){
+  const custom=getCamStorageSections();
+  const builtinIds=new Set(BUILTIN_STORAGE.map(s=>s.id));
+  return[...BUILTIN_STORAGE,...custom.filter(c=>!builtinIds.has(c.id))];
+}
+function sectionPhotoCount(map,id){return(map[id]||[]).length}
+function compressImageFile(file,maxW,quality){
+  maxW=maxW||1100;quality=quality==null?0.7:quality;
+  return new Promise((resolve,reject)=>{
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=()=>{
+      try{
+        let w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;
+        if(!w||!h){URL.revokeObjectURL(url);resolve(null);return}
+        if(w>maxW){h=Math.round(h*maxW/w);w=maxW}
+        const c=document.createElement("canvas");c.width=w;c.height=h;
+        const ctx=c.getContext("2d");ctx.drawImage(img,0,0,w,h);
+        const out=c.toDataURL("image/jpeg",quality);
+        URL.revokeObjectURL(url);resolve(out);
+      }catch(err){URL.revokeObjectURL(url);reject(err)}
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error("img"))};
+    img.src=url;
+  });
+}
+async function appendSectionPhotos(sectionId,fileList){
+  const map=loadCamPhotos();
+  const arr=(map[sectionId]||[]).slice();
+  const files=[...fileList].filter(f=>f&&f.type&&f.type.startsWith("image/"));
+  for(const f of files){
+    try{
+      let data=await compressImageFile(f);
+      if(!data){const r=await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=rej;fr.readAsDataURL(f)});data=r}
+      arr.push(data);
+    }catch(_){}
+  }
+  map[sectionId]=arr;
+  if(!saveCamPhotos(map))return false;
+  return true;
+}
+function removeSectionPhoto(sectionId,idx){
+  const map=loadCamPhotos();
+  const arr=(map[sectionId]||[]).slice();
+  if(idx<0||idx>=arr.length)return;
+  arr.splice(idx,1);
+  if(arr.length)map[sectionId]=arr;else delete map[sectionId];
+  saveCamPhotos(map);
+}
+function deleteCustomStorageSection(id){
+  if(BUILTIN_STORAGE.some(s=>s.id===id))return;
+  setCamStorageSections(getCamStorageSections().filter(s=>s.id!==id));
+  const map=loadCamPhotos();
+  delete map[id];
+  saveCamPhotos(map);
+}
+function addCustomStorageSection(name){
+  const label=String(name||"").trim().slice(0,40);
+  if(!label)return null;
+  const all=allStorageSections();
+  if(all.some(s=>s.label.toLowerCase()===label.toLowerCase()))return null;
+  const id="c:"+label.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,36);
+  if(!id||id==="c:"||all.some(s=>s.id===id))return null;
+  const arr=getCamStorageSections();
+  arr.push({id,label});
+  setCamStorageSections(arr);
+  return id;
+}
+function renderStoragePhotosUI(opts){
+  opts=opts||{};
+  const map=loadCamPhotos();
+  if(st)st.photos=map;
+  const secs=allStorageSections();
+  const showNew=!!opts.showNew;
+  const newHtml=showNew?`<div class="ph-new-row"><input id="phNewName" placeholder="Name the new section…" maxlength="40" autocomplete="off"><button type="button" class="sbtn" id="phNewAdd">Add</button><button type="button" class="ghost" id="phNewCancel" style="margin:0;padding:8px">Cancel</button></div>`:"";
+  const tiles=secs.map(sec=>{
+    const photos=map[sec.id]||[];
+    const custom=!BUILTIN_STORAGE.some(b=>b.id===sec.id);
+    const thumbs=photos.map((src,i)=>`<span class="ph-thumb"><img alt="" src="${src}"><button type="button" class="ph-x" data-rmph="${esc(sec.id)}" data-i="${i}" aria-label="Remove photo">${icons.close}</button></span>`).join("");
+    const addLab=photos.length?"Add more photos":"Add photos";
+    return `<div class="ph-sec${photos.length?" done":""}" data-sec="${esc(sec.id)}">
+      ${custom?`<button type="button" class="ph-sec-del" data-delsec="${esc(sec.id)}" aria-label="Delete section">${icons.close}</button>`:""}
+      <div class="ph-sec-lab">${sec.emoji?`<span class="big">${sec.emoji}</span>`:""}${esc(sec.label)}</div>
+      ${thumbs?`<div class="ph-thumbs">${thumbs}</div>`:""}
+      <button type="button" class="ph-add" data-addph="${esc(sec.id)}">${icons.cam}<span>${addLab}</span></button>
+      <input type="file" accept="image/*" multiple data-phfile="${esc(sec.id)}" hidden>
+    </div>`;
+  }).join("");
+  const addBtn=`<button type="button" class="ph-add-sec" id="phAddSec" aria-label="Add storage section">${icons.plus}<span>Add section</span></button>`;
+  return{html:`${newHtml}<div class="photos">${tiles}${addBtn}</div>`,map,secs};
+}
+function wireStoragePhotosUI(root,onChange){
+  const redraw=()=>{if(typeof onChange==="function")onChange();else render()};
+  root.querySelectorAll("[data-addph]").forEach(btn=>{
+    btn.onclick=()=>{const id=btn.dataset.addph;const inp=root.querySelector(`[data-phfile="${CSS.escape(id)}"]`);if(inp)inp.click()};
+  });
+  root.querySelectorAll("[data-phfile]").forEach(inp=>{
+    inp.onchange=async()=>{
+      const id=inp.dataset.phfile;const files=inp.files;if(!files||!files.length)return;
+      await appendSectionPhotos(id,files);inp.value="";redraw();
+    };
+  });
+  root.querySelectorAll("[data-rmph]").forEach(btn=>{
+    btn.onclick=e=>{e.preventDefault();e.stopPropagation();removeSectionPhoto(btn.dataset.rmph,+btn.dataset.i);redraw()};
+  });
+  root.querySelectorAll("[data-delsec]").forEach(btn=>{
+    btn.onclick=e=>{e.preventDefault();e.stopPropagation();deleteCustomStorageSection(btn.dataset.delsec);redraw()};
+    try{longPress(btn.closest(".ph-sec"),()=>{deleteCustomStorageSection(btn.dataset.delsec);redraw()})}catch(_){}
+  });
+  const addSec=root.querySelector("#phAddSec");
+  if(addSec)addSec.onclick=()=>{st._phNew=true;redraw()};
+  const cancel=root.querySelector("#phNewCancel");
+  if(cancel)cancel.onclick=()=>{st._phNew=false;redraw()};
+  const add=root.querySelector("#phNewAdd");
+  const nameEl=root.querySelector("#phNewName");
+  const doAdd=()=>{const id=addCustomStorageSection(nameEl?nameEl.value:"");st._phNew=false;if(!id)toast("Need a unique section name");redraw()};
+  if(add)add.onclick=doAdd;
+  if(nameEl){nameEl.onkeydown=e=>{if(e.key==="Enter")doAdd()};setTimeout(()=>nameEl.focus(),50)}
+}
+function storagePhotosShareFiles(sectionId){
+  const map=loadCamPhotos();
+  return(map[sectionId]||[]).slice();
+}
+
 /* ===== Items 35-40: collapse/search/share, custom grocery, XP, template share ===== */
 const XP_KEY="cameron-meals-xp-v1";
 const XP_AWARD_KEY="cameron-meals-xp-awards-v1";
@@ -2342,6 +2539,7 @@ const CG_KEY="cameron-meals-custom-grocery-v1";
 const CC_KEY="cameron-meals-custom-cats-v1";
 const CA_OPEN_KEY="cameron-meals-aisle-open-v1";
 const CAM_SHARE_BASE="https://burnsted.github.io/cameron-meals/";
+const STD_EQUIP=["stove","oven","micro","toaster","fridge"];
 const CAM_AISLE_CHEV=`<svg class="aisle-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
 const BADGES=[
   {id:"setup",name:"Set up",how:"Finish About me basics + confirm equipment"},
@@ -2409,7 +2607,8 @@ async function shareCamList(){
   const aisleMap={};all.forEach(it=>{const k=it.aisle||"other";(aisleMap[k]=aisleMap[k]||[]).push(it)});
   const labs=Object.fromEntries([...AISLES,...getCamCats().map(c=>[c,c])]);
   Object.keys(aisleMap).forEach(k=>{lines.push("",String(labs[k]||k).toUpperCase());aisleMap[k].forEach(it=>{const p=it.a!=null&&(it.p==null||it.a<=it.p)?it.a:it.p;if(p!=null)total+=p;lines.push("- "+it.n+(p!=null?" · est. $"+Number(p).toFixed(2):""))})});
-  lines.push("","Est. total: $"+total.toFixed(2));const text=lines.join("\n");
+  const estStore=(typeof deriveMainStore==="function"?deriveMainStore():(st&&st.main))||"Aldi";
+  lines.push("","Est. total ("+estStore+"): $"+total.toFixed(2));const text=lines.join("\n");
   try{if(navigator.share){await navigator.share({title:"Shopping list",text});return}}catch(err){if(err&&err.name==="AbortError")return}
   try{await navigator.clipboard.writeText(text);toast("List copied")}catch(_){copyTxt(text,"List copied")}
   const sms=$("grocery-sms");if(sms){sms.href="sms:?&body="+encodeURIComponent(text.slice(0,1500));sms.hidden=false}
@@ -2440,7 +2639,8 @@ function buildShareTemplate(dropPlan,dropRatings){
   const set=getSettings()||{},bud=getBud()||{},rules=typeof getRules==="function"?getRules():[];
   const ratings={};try{const r=getRates();Object.keys(r).forEach(k=>{if(r[k]&&(r[k].r===1||r[k].r===2||r[k].r===-1))ratings[k]={r:r[k].r}})}catch(_){}
   const theme=(()=>{try{return localStorage.getItem("cameron-meals-theme-v1")||document.documentElement.getAttribute("data-theme")||"light"}catch(_){return"light"}})();
-  const tpl={v:1,stores:st?[...st.stores]:[],storeLoc:st&&st.storeLoc?st.storeLoc:{},main:st?st.main:"",extra:st?(st.extra||[]).slice():[],budget:bud,breakfast:{bfWeekday:set.bfWeekday,bfAlt:set.bfAlt,bfWeekend:set.bfWeekend,bfAltWeeks:set.bfAltWeeks,grabNights:set.grabNights},rules,customCats:getCamCats(),customItems:getCamCustom(),theme,meals:st?st.meals:{},mealV:st?st.mealV:{},sides:st?[...st.sides]:[],picks:{}};
+  const tpl={v:1,stores:st?[...st.stores]:[],storeLoc:st&&st.storeLoc?st.storeLoc:{},extra:st?(st.extra||[]).slice():[],budget:bud,breakfast:{bfWeekday:set.bfWeekday,bfAlt:set.bfAlt,bfWeekend:set.bfWeekend,bfAltWeeks:set.bfAltWeeks,grabNights:set.grabNights},rules,customCats:getCamCats(),customItems:getCamCustom(),theme,meals:st?st.meals:{},mealV:st?st.mealV:{},sides:st?[...st.sides]:[],picks:{}};
+  // Item 40: no equipment. Item 42: no custom storage sections/photos. Item 44: no primary/main store.
   if(st&&st.picks)Object.keys(st.picks).forEach(k=>{tpl.picks[k]=[...(st.picks[k]||[])]});
   // exclude equipment + coffee machines entirely
   if(!dropPlan&&W){tpl.week={ov:W.ov||{},base:(W.base||[]).map(d=>({meal:d.meal,dinner:d.dinner,kind:d.kind,sideName:d.sideName,cook:d.cook,grab:d.grab,e:d.e,cut:d.cut}))}}
@@ -2486,6 +2686,7 @@ function applyStdEquip(){
   st.equip=new Set(ids);
   st.coffee={brand:"",brandOther:"",machines:new Set(),drinks:new Set(),milk:"No milk",perWeek:7};
   st.photos={};
+  try{localStorage.removeItem(CM_PHOTO_KEY)}catch(_){}
 }
 function stdEquipLabels(){
   ensureStdEquipOptions();
@@ -2500,7 +2701,8 @@ async function importTemplate(tpl,replace){
   if(Array.isArray(tpl.stores))st.stores=new Set(tpl.stores);
   if(tpl.storeLoc)st.storeLoc=tpl.storeLoc;
   if(tpl.extra)st.extra=tpl.extra.slice();
-  if(tpl.main)st.main=tpl.main;
+  // Item 44: ignore saved/shared primary store — derive silently after stores load
+  try{deriveMainStore()}catch(_){}
   if(tpl.meals)st.meals=tpl.meals;
   if(tpl.mealV)st.mealV=tpl.mealV;
   if(Array.isArray(tpl.sides))st.sides=new Set(tpl.sides);
