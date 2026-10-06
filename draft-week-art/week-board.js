@@ -22,15 +22,19 @@
   function cleanCopy(s) {
     return String(s == null ? "" : s)
       .replace(/[—–]/g, " ")
-      .replace(/\s*\/\s*/g, " ")
+      .replace(/\s*\/\s*/g, " or ")
       .replace(/\s+/g, " ")
       .trim();
   }
 
   function weekOfLabel(weekTitle) {
     const raw = cleanCopy(weekTitle || "");
-    if (/^week of /i.test(raw)) return raw.replace(/^week of /i, "Week of ");
-    if (raw) return "Week of " + raw;
+    if (/^week of /i.test(raw)) {
+      // Normalize "Week of Oct 5 11" → keep if already good; else rebuild
+      const fixed = raw.replace(/^week of /i, "Week of ");
+      if (/\bto\b/.test(fixed) && /\d{4}/.test(fixed)) return fixed;
+    }
+    if (raw && !/^week of /i.test(weekTitle || "")) return "Week of " + raw;
     try {
       const now = new Date();
       const day = now.getDay();
@@ -38,8 +42,22 @@
       mon.setDate(now.getDate() - ((day + 6) % 7));
       const sun = new Date(mon);
       sun.setDate(mon.getDate() + 6);
-      const fmt = (d) => d.toLocaleDateString(undefined, { month: "long", day: "numeric" });
-      return "Week of " + fmt(mon) + " to " + fmt(sun);
+      const mShort = (d) => d.toLocaleDateString("en-US", { month: "short" });
+      if (mon.getMonth() === sun.getMonth() && mon.getFullYear() === sun.getFullYear()) {
+        return "Week of " + mShort(mon) + " " + mon.getDate() + " to " + sun.getDate() + ", " + sun.getFullYear();
+      }
+      return (
+        "Week of " +
+        mShort(mon) +
+        " " +
+        mon.getDate() +
+        " to " +
+        mShort(sun) +
+        " " +
+        sun.getDate() +
+        ", " +
+        sun.getFullYear()
+      );
     } catch (_) {
       return "Week of this week";
     }
@@ -59,43 +77,47 @@
 
   function shortName(title) {
     const FA = root.FoodArt;
-    // Full primary dish name (sides stripped). No word-count truncate.
-    if (FA && FA.shortMealName) return cleanCopy(FA.shortMealName(title));
+    // Short board label: primary dish, ≤3 words
+    if (FA && FA.shortMealName) return cleanCopy(FA.shortMealName(title, 3));
     return cleanCopy(String(title || "Meal"))
       .replace(/\s*\+\s*.*$/, "")
       .replace(/\s*\(.*$/, "")
-      .trim() || "Meal";
+      .split(/\s+/)
+      .slice(0, 3)
+      .join(" ") || "Meal";
   }
 
   function oneLineNote(raw, maxLen) {
     const t = cleanCopy(raw || "");
     if (!t) return "";
-    const limit = maxLen || 28;
+    const limit = maxLen || 22;
     if (t.length <= limit) return t;
     return t.slice(0, limit - 1).replace(/\s+\S*$/, "").trim() + "…";
   }
 
   function noteForDay(d) {
-    if (d.boardNote) return oneLineNote(d.boardNote, 26);
-    if (d.note) return oneLineNote(d.note, 26);
+    if (d.boardNote) return oneLineNote(d.boardNote, 20);
+    if (d.kind === "leftover" || d.kind === "reuse") return "Leftovers";
+    if (d.kind === "light") return "Light day";
+    if (d.note) return oneLineNote(d.note, 20);
     const enjoy = d.recipe && d.recipe.enjoy ? cleanCopy(d.recipe.enjoy) : "";
-    if (enjoy && enjoy.length < 28) return enjoy;
+    if (enjoy && enjoy.length < 22) return enjoy;
     if (d.tedNote) {
       const t = cleanCopy(d.tedNote).replace(/^Ted:\s*/i, "Ted: ");
       if (/leftover/i.test(t)) return "Ted leftovers";
-      return oneLineNote(t, 24);
+      return oneLineNote(t, 18);
     }
     if (d.tag && /grab/i.test(d.tag)) return "Grab and go";
-    if (d.kind === "leftover" || d.kind === "reuse") return "Leftovers";
-    if (d.kind === "light") return "Light day";
     const title = String(d.title || d.dinner || "").toLowerCase();
     if (/rotisserie|easy/i.test(title)) return "Easy start";
+    if (/taco rebuild/i.test(title)) return "Same meat new shape";
     if (/taco/i.test(title)) return "Taco night";
     if (/steak|grill/i.test(title)) return "Ted grills";
     if (/pizza|takeout|take out|grab/i.test(title)) return "Takeout night";
     if (/salmon|fish|tilapia/i.test(title)) return "Ted leftovers";
     if (/chili/i.test(title)) return "Football day";
     if (/alfredo|pasta/i.test(title)) return "Family cooks";
+    if (/breakfast/i.test(title)) return "Hot plates together";
     return "On the board";
   }
 

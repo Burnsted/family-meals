@@ -2720,6 +2720,17 @@ html, body {
   overflow-x: hidden;
   max-width: 100%;
 }
+#week-board-host {
+  display: block;
+  width: 100%;
+  min-height: 12rem;
+  margin: 0 0 0.5rem;
+}
+#week-board-host .week-board {
+  display: block;
+  visibility: visible;
+  width: 100%;
+}
 .week-board-utils {
   display: flex;
   flex-direction: column;

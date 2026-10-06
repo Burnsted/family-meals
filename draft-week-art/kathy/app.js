@@ -601,14 +601,8 @@
   }
 
   function weekDatesLabel() {
-    const now = new Date();
-    const day = now.getDay();
-    const mon = new Date(now);
-    mon.setDate(now.getDate() - ((day + 6) % 7));
-    const sun = new Date(mon);
-    sun.setDate(mon.getDate() + 6);
-    const fmt = (d) => d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-    return fmt(mon) + " to " + fmt(sun);
+    // Empty → WeekBoard.weekOfLabel builds "Week of Oct 5 to 11, 2026"
+    return "";
   }
 
   function buildLockPackage(groceryItems) {
@@ -711,6 +705,11 @@
     const focus = state.focusDay != null ? state.focusDay : (state.openDay != null ? state.openDay : today);
     return order.map((i) => {
       const d = days[i];
+      const dish = d.dishId ? dishById(d.dishId) : null;
+      const artKey =
+        (dish && dish.name) ||
+        d.dishId ||
+        (d.kind === "light" ? "light" : d.title);
       return {
         index: i,
         name: d.name,
@@ -718,7 +717,15 @@
         kind: d.kind,
         today: i === today,
         active: i === focus,
-        artKey: d.title,
+        artKey: artKey,
+        boardNote:
+          d.kind === "leftover" || d.kind === "reuse"
+            ? "Leftovers"
+            : d.kind === "light"
+              ? "Light day"
+              : d.kind === "cook"
+                ? "Batch night"
+                : "",
       };
     });
   }
@@ -1192,7 +1199,6 @@
     let body = `<p class="meta-line">${esc(day.note || "")}</p>`;
     if (day.from) body += `<p class="meta-line">From ${esc(day.from)}.</p>`;
     if (dish && day.kind === "cook") {
-      body += `<p class="meta-line">About ${dish.prepMinutes} minutes prep${dish.cookMinutes ? `, then about ${dish.cookMinutes} minutes in the ${dish.oven ? "oven" : "pot"}` : ""}.</p>`;
       body += `<p class="meta-line">Seasoning: ${esc(dish.season)}. ${esc(dish.fiber)}.</p>`;
       if (dish.twist) body += `<div class="block"><h4>New twist on a classic</h4><p>${esc(dish.twist)}</p></div>`;
       if (dish.quickSwap) body += `<div class="block"><h4>Quick swap</h4><p>${esc(dish.quickSwap)}</p></div>`;
@@ -1277,16 +1283,31 @@
       const order = (FA && FA.MON_SUN_FROM_SUN0) || [1, 2, 3, 4, 5, 6, 0];
       const days = order.map((i) => {
         const d = state.week.days[i];
+        const dish = d.dishId ? dishById(d.dishId) : null;
+        // Diversify photos: prefer dish name / id over leftover "from Sunday" titles
+        const artKey =
+          (dish && dish.name) ||
+          d.dishId ||
+          (d.kind === "light" ? "light" : d.title);
+        const boardNote =
+          d.kind === "leftover" || d.kind === "reuse"
+            ? "Leftovers"
+            : d.kind === "light"
+              ? "Light day"
+              : d.kind === "cook"
+                ? "Batch night"
+                : "";
         return {
           index: i,
           short: d.name,
           name: d.name,
           title: d.title,
-          note: d.note,
+          note: boardNote || d.note,
+          boardNote: boardNote,
           kind: d.kind,
           today: i === today,
           active: focus === i,
-          artKey: d.title,
+          artKey: artKey,
         };
       });
       return WB.boardHTML(days, {
@@ -1309,10 +1330,8 @@
     const app = document.getElementById("app");
     app.classList.add("has-week");
     app.classList.toggle("week-is-locked", locked);
-    const nightWord = state.cookDays === 1 ? "night you cook" : "nights you cook";
     app.innerHTML = `
       ${topbar(false)}
-      <p class="kicker">Cooking for ${state.people} · ${state.cookDays} ${nightWord} · ${state.prepMinutes} minutes prep</p>
       ${stripHtml}
       <div class="week-board-utils">
       <div class="week-actions" id="week-actions-row">

@@ -2904,7 +2904,7 @@ function ensureSideOffers(dayId, day) {
     }
     return String(s == null ? "" : s)
       .replace(/[—–]/g, " ")
-      .replace(/\s*\/\s*/g, " ")
+      .replace(/\s*\/\s*/g, " or ")
       .replace(/\s+/g, " ")
       .trim();
   }
@@ -3220,30 +3220,15 @@ function ensureSideOffers(dayId, day) {
     return { main: 500, meal: 650 };
   }
   function calorieBadges(day) {
-    const c = caloriesForDay(day);
-    if (!c.main && !c.meal) return "";
-    return `<span class="cal-badges"><span class="cal-main" title="USDA FoodData Central typical serving">🔥 ~${c.main} cal per serving</span><span class="cal-meal" title="Main plus sides">This meal: ~${c.meal} cal per serving</span></span>`;
+    // Steve photo-real re-check: no estimate-ish calorie chrome on day cards.
+    void day;
+    return "";
   }
 
-  function prepCookFor(day) {
-    if (day.overrideType === "eatout" || day.overrideType === "removed" || day.overrideType === "holiday" || day.overrideType === "pickmeal") return null;
-    if (day.overrideType === "leftovers") return [2, 5, true];
-    if (day.overrideType === "grabgo" || day.grabGo) return [5, 10, false];
-    const d = String(day.dinner || "").toLowerCase();
-    const rules = [
-      [/potato bar/, 10, 45], [/rotisserie/, 5, 10], [/taco rebuild/, 10, 10], [/taco/, 10, 15],
-      [/alfredo|pasta bake/, 10, 25], [/salmon/, 5, 15], [/tilapia/, 5, 12], [/chili/, 15, 60],
-      [/breakfast-for-dinner/, 5, 15], [/sheet-pan/, 15, 35], [/quesadilla/, 10, 10],
-      [/oven chicken/, 10, 30], [/burger/, 10, 12], [/pork/, 10, 20], [/pizza/, 5, 18], [/sub/, 5, 5],
-    ];
-    for (const [re, p, c] of rules) if (re.test(d)) return [p, c, false];
-    return [10, 20, false];
-  }
   function prepCookBadge(day) {
-    const pc = prepCookFor(day);
-    if (!pc) return "";
-    const mins = (n) => (n >= 60 ? `~${Math.round(n / 60)} hr` : `~${n} min`);
-    return `<span class="pc" aria-label="Prep ${pc[0]} minutes, ${pc[2] ? "reheat" : "cook"} ${pc[1]} minutes"><span>🔪 Prep ${mins(pc[0])}</span><span>🔥 ${pc[2] ? "Reheat" : "Cook"} ${mins(pc[1])}</span></span>`;
+    // Steve photo-real re-check: strip prep/cook/fire badges from default day chrome.
+    void day;
+    return "";
   }
 
   function rateKey(name) {
@@ -4173,13 +4158,9 @@ function ensureSideOffers(dayId, day) {
           <span>${day.short}</span>
           <div class="day-head-actions">
             ${holClass ? "" : `<button type="button" class="swap-link" data-swap-day="${escapeAttr(templateDay.id)}" aria-label="Swap ${escapeAttr(day.day)} dinner"><span>Swap</span></button>`}
-
-            <span class="emoji" aria-hidden="true">${day.icon}</span>
           </div>
         </div>
-        <button type="button" class="day-body day-body-btn${holClass ? " is-holiday" : ""}" aria-label="${escapeAttr(day.day)}: ${escapeAttr(day.dinner)}. Tap for recipe.">
-          <span class="emo-row"><span class="meal-emoji" aria-hidden="true">${day.mealEmoji}</span>${prepCookBadge(day)}</span>
-          ${typeof calorieBadges === "function" ? calorieBadges(Object.assign({}, day, { _sideDayId: templateDay.id })) : ""}
+        <button type="button" class="day-body day-body-btn${holClass ? " is-holiday" : ""}" aria-label="${escapeAttr(day.day)}: ${escapeAttr(uiCopy(day.dinner))}. Tap for recipe.">
           <p class="day-dinner">${isFav(day.dinner) ? '<span class="fav-badge">⭐</span> ' : ""}${escapeHtml(uiCopy(day.dinner))}</p>
           <div class="day-meat-row" data-day-meat="${escapeAttr(templateDay.id)}"></div>
           ${day.tag ? `<p class="day-tag">${escapeHtml(day.tag)}</p>` : ""}
