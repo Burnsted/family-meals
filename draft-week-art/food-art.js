@@ -12,6 +12,17 @@
         }
       }
     } catch (_) {}
+    try {
+      // Pages + local: always resolve to …/draft-week-art/
+      const path = String(location.pathname || "");
+      const m = path.match(/^(.*\/draft-week-art\/)/);
+      if (m) return location.origin + m[1];
+      if (/\/kathy\/?$/.test(path)) {
+        return location.origin + path.replace(/\/kathy\/?$/, "/");
+      }
+      const dir = path.replace(/\/[^/]*$/, "/");
+      return location.origin + dir;
+    } catch (_) {}
     return "";
   }
 
@@ -28,54 +39,58 @@
       .replace(/"/g, "&quot;");
   }
 
+  /** Map meal text → photo key. Dish cues first so leftovers stay diverse. */
   function keyFromText(text) {
     const t = String(text || "").toLowerCase();
-    if (/leftover|\bagain\b|from (sun|mon|tue|wed|thu|fri|sat|yesterday|container)/.test(t)) return "leftover";
-    if (/light day|yogurt|toast/.test(t)) return "light";
     if (/rotisserie/.test(t)) return "rotisserie";
-    if (/chicken|thigh/.test(t)) return "chicken";
+    if (/taco/.test(t)) return "taco";
     if (/chili/.test(t)) return "chili";
-    if (/soup|stew|chowder/.test(t)) return "soup";
+    if (/alfredo/.test(t)) return "alfredo";
     if (/salmon/.test(t)) return "salmon";
-    if (/tilapia|fish|tuna|white fish/.test(t)) return "fish";
+    if (/tilapia|white fish|fish|tuna/.test(t)) return "fish";
     if (/shrimp|scampi/.test(t)) return "shrimp";
     if (/breakfast|pancake/.test(t)) return "breakfast";
-    if (/egg/.test(t)) return "eggs";
-    if (/alfredo/.test(t)) return "alfredo";
+    if (/egg\b|egg bake|scrambled/.test(t)) return "eggs";
     if (/pasta|lasagna|noodle/.test(t)) return "pasta";
     if (/salad/.test(t)) return "salad";
     if (/pie|shepherd/.test(t)) return "pie";
     if (/burrito|wrap/.test(t)) return "burrito";
     if (/quesadilla/.test(t)) return "quesadilla";
     if (/pepper/.test(t)) return "pepper";
+    if (/chicken|thigh|pulled chicken/.test(t)) return "chicken";
+    if (/soup|stew|chowder/.test(t)) return "soup";
     if (/cheese/.test(t)) return "cheese";
-    if (/taco/.test(t)) return "taco";
     if (/burger/.test(t)) return "burger";
     if (/steak|sirloin|ribeye/.test(t)) return "steak";
     if (/pizza|takeout|take out|grab/.test(t)) return "pizza";
     if (/sandwich/.test(t)) return "sandwich";
     if (/sausage|brat/.test(t)) return "sausage";
     if (/potato/.test(t)) return "potato";
-    if (/grill|bbq|pork|meatloaf|roast|beef/.test(t)) return "meat";
+    if (/grill|bbq|pork|meatloaf|roast|beef|turkey/.test(t)) return "meat";
     if (/rice|bowl/.test(t)) return "rice";
+    if (/light day|yogurt|toast/.test(t)) return "light";
+    if (/^leftovers?\b|\bleftover\b|\bagain\b/.test(t)) return "leftover";
     return "default";
   }
 
-  /** Main meal name only: strip side stacks (+ rice, and salad, etc.). Full words, no truncate. */
-  function shortMealName(title) {
+  /** Main meal name only: strip side stacks. Slash → "or". */
+  function shortMealName(title, maxWords) {
     let s = String(title || "Meal")
       .replace(/\s+again$/i, "")
       .replace(/[—–]/g, " ")
       .replace(/\s*\/\s*/g, " or ")
       .replace(/\s*\+\s*.*$/, "")
       .replace(/\s*\(.*$/, "")
+      .replace(/\s+from\s+(sunday|monday|tuesday|wednesday|thursday|friday|saturday).*$/i, "")
       .replace(/\s+/g, " ")
       .trim();
-    // Prefer primary dish phrase before "with"
-    if (/\swith\s/i.test(s) && s.length > 28) {
+    if (/\swith\s/i.test(s) && s.length > 22) {
       s = s.split(/\swith\s/i)[0].trim();
     }
     if (!s) return "Meal";
+    const limit = maxWords || 4;
+    const words = s.split(/\s+/);
+    if (words.length > limit) s = words.slice(0, limit).join(" ");
     return s;
   }
 
@@ -88,41 +103,26 @@
       esc(src) +
       '" alt="' +
       esc(title || "Meal") +
-      '" loading="lazy" decoding="async" width="240" height="240" />'
+      '" loading="eager" decoding="async" width="240" height="240" />'
     );
   }
 
   function art(keyOrText, size) {
     const key = keyFromText(keyOrText);
-    // Prefer meals/, then sides/ for leftovers/light fallbacks
     const mealSrc = MEAL_DIR + key + ".webp";
-    const fallbacks = {
-      leftover: SIDE_DIR + "rice.webp",
-      light: SIDE_DIR + "yogurt.webp",
-      pie: SIDE_DIR + "potatoes.webp",
-      shrimp: MEAL_DIR + "fish.webp",
-      sandwich: MEAL_DIR + "chicken.webp",
-      sausage: MEAL_DIR + "meat.webp",
-      potato: SIDE_DIR + "baked-potato.webp",
-      pepper: SIDE_DIR + "zucchini-peppers.webp",
-      default: MEAL_DIR + "chicken.webp",
-    };
-    let src = mealSrc;
-    // Fallback only when meal key is known to be side-only in older trees
-    if (key === "potato" && !src) src = SIDE_DIR + "baked-potato.webp";
-    if (fallbacks[key] && key === "pepper") src = fallbacks.pepper;
     const sizeClass =
       size === "board" ? "food-photo-board" : size === "lg" ? "food-photo-lg" : "food-photo-sm";
     const title = shortMealName(keyOrText);
+    const fallback = MEAL_DIR + "chicken.webp";
     return (
       '<img class="food-photo ' +
       sizeClass +
       '" src="' +
-      esc(src) +
+      esc(mealSrc) +
       '" alt="' +
       esc(title) +
-      '" loading="lazy" decoding="async" width="240" height="240" onerror="this.onerror=null;this.src=\'' +
-      esc(MEAL_DIR + "chicken.webp") +
+      '" loading="eager" decoding="async" width="240" height="240" onerror="this.onerror=null;this.src=\'' +
+      esc(fallback) +
       "';\" />"
     );
   }
@@ -136,7 +136,7 @@
       beef: TUCKER_DIR + "beef.webp",
       juice: TUCKER_DIR + "juice.webp",
     };
-    const src = map[id] || SIDE_DIR + "yogurt.webp";
+    const src = map[id] || MEAL_DIR + "default.webp";
     const sideFallback =
       id === "yogurt"
         ? SIDE_DIR + "yogurt.webp"
@@ -144,11 +144,11 @@
           ? SIDE_DIR + "fruit-cup.webp"
           : id === "chips"
             ? SIDE_DIR + "potato-chips.webp"
-            : SIDE_DIR + "yogurt.webp";
+            : MEAL_DIR + "default.webp";
     return (
       '<img class="food-photo food-photo-tucker" src="' +
       esc(src) +
-      '" alt="" loading="lazy" decoding="async" width="96" height="96" onerror="this.onerror=null;this.src=\'' +
+      '" alt="" loading="eager" decoding="async" width="96" height="96" onerror="this.onerror=null;this.src=\'' +
       esc(sideFallback) +
       "';\" />"
     );
@@ -174,7 +174,7 @@
     const cells = (days || [])
       .map(function (d, i) {
         const letter = d.letter || dayLetter(d.short || d.name);
-        const title = shortMealName(d.title || d.dinner || d.meal || "Meal");
+        const title = shortMealName(d.title || d.dinner || d.meal || "Meal", 3);
         const artHtml = art(d.artKey || d.title || d.dinner || d.meal || "default");
         const kind = d.kind || "";
         const cls =
@@ -225,5 +225,7 @@
     weekStripHTML: weekStripHTML,
     MON_SUN_FROM_SUN0: MON_SUN_FROM_SUN0,
     photoHTML: photoHTML,
+    BASE: BASE,
+    MEAL_DIR: MEAL_DIR,
   };
 })(typeof window !== "undefined" ? window : globalThis);
