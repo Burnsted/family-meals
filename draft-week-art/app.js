@@ -3105,7 +3105,8 @@ function ensureSideOffers(dayId, day) {
     const ownKey = (dayId) => dinnerKey(weekId, planId, dayId);
     const desc = (dayId) => draft[dayId] || { type: "pick", key: ownKey(dayId) };
     const norm = () => Object.keys(draft).forEach((d) => { if (draft[d].type === "pick" && draft[d].key === ownKey(d)) delete draft[d]; });
-    const options = sortBySuggest(allTemplateDinners().filter((d) => !isDown(d.day.dinner)));
+    const DAY_MEAL_MAX = 7;
+    const options = sortBySuggest(allTemplateDinners().filter((d) => !isDown(d.day.dinner))).slice(0, DAY_MEAL_MAX);
     const inn = openSheet("", `Customize ${week.label} ${planId}`);
     const draw = () => {
       inn.innerHTML = shTop(`Customize ${escapeHtml(week.label)} · ${planId}`) + `
@@ -4299,135 +4300,51 @@ function ensureSideOffers(dayId, day) {
     swapTargetDayId = dayId;
     const current = effectiveDay(templateDay);
     els.swapTitle.textContent = `Swap ${templateDay.day}`;
+    const DAY_MEAL_MAX = 7;
     const dinners = sortBySuggest(allTemplateDinners().filter((d) => {
       return !(d.weekId === state.week && d.planId === state.plan && d.day.id === dayId) && !isDown(d.day.dinner);
-    }));
-    const listedNames = new Set(dinners.map((d) => String(d.day.dinner || "").toLowerCase()));
+    })).slice(0, DAY_MEAL_MAX);
     const ov = dayOverride(dayId);
-    const weekendDay = /^(sat|sun)$/.test(dayId);
-    const ggButtons = Object.keys(GRAB_GO).map((key) => {
-      const g = GRAB_GO[key];
-      const on = ov && (ov.type === "grabgo" || ov.type === "pick") && ov.key === key;
-      return `<button type="button" class="swap-option${on ? " is-on" : ""}" data-swap-type="grabgo" data-swap-key="${escapeAttr(key)}">
-        <span class="swap-option-title">${escapeHtml(g.tag)} · ${escapeHtml(g.dinner.replace(/^Grab & go:\s*/, ""))}</span>
-        <span class="swap-option-sub">Adds grocery lines</span>
-      </button>`;
-    }).join("");
+    const mealTitle = (dinner) => {
+      const FA = window.FoodArt;
+      if (FA && FA.shortMealName) return uiCopy(FA.shortMealName(dinner));
+      return uiCopy(dinner);
+    };
     els.swapBody.innerHTML = `
-      <p class="swap-current">Now: <strong>${escapeHtml(uiCopy(current.dinner))}</strong></p>
+      <p class="swap-current">Now: <strong>${escapeHtml(mealTitle(current.dinner))}</strong></p>
       <div class="swap-options" role="list">
         <button type="button" class="swap-option" data-swap-type="reset" ${!ov ? "disabled" : ""}>
           <span class="swap-option-title">Restore template</span>
-          <span class="swap-option-sub">${escapeHtml(uiCopy(templateDay.dinner))}</span>
+          <span class="swap-option-sub">${escapeHtml(mealTitle(templateDay.dinner))}</span>
         </button>
         <button type="button" class="swap-option${ov && ov.type === "leftovers" ? " is-on" : ""}" data-swap-type="leftovers">
           <span class="swap-option-title">Leftovers</span>
           <span class="swap-option-sub">Clears this night’s grocery lines</span>
         </button>
         <button type="button" class="swap-option${ov && ov.type === "eatout" ? " is-on" : ""}" data-swap-type="eatout">
-          <span class="swap-option-title">Eat out / takeout</span>
+          <span class="swap-option-title">Eat out or takeout</span>
           <span class="swap-option-sub">Clears this night’s grocery lines</span>
         </button>
       </div>
-      <h4 class="swap-section-title">Grab & go</h4>
-      <div class="swap-options" role="list">${ggButtons}</div>
-      <h4 class="swap-section-title">Dinners from templates</h4>
+      <h4 class="swap-section-title">Dinner choices</h4>
       <div class="swap-options swap-options-scroll" role="list">
         ${dinners
           .map((d) => {
             const on = ov && ov.type === "pick" && ov.key === d.key;
             return `<button type="button" class="swap-option${on ? " is-on" : ""}" data-swap-type="pick" data-swap-key="${escapeAttr(d.key)}">
-              <span class="swap-option-title">${""}${escapeHtml(uiCopy(d.day.dinner))}</span>
-              <span class="swap-option-sub">${escapeHtml(d.label)}${d.day.tedNote ? " · Ted leftover sub" : ""}</span>
+              <span class="swap-option-title">${escapeHtml(mealTitle(d.day.dinner))}</span>
+              <span class="swap-option-sub">${escapeHtml(uiCopy(d.label))}${d.day.tedNote ? " · Ted leftover sub" : ""}</span>
             </button>`;
           })
           .join("")}
       </div>
-      <h4 class="swap-section-title">More ideas</h4>
-      <div class="swap-more-wrap">
-        <div class="swap-options" id="swap-more-list" role="list"></div>
-        <button type="button" class="swap-more-btn" id="swap-more-btn">More</button>
-      </div>
-      <p class="swap-footnote">Grocery lines for this night update automatically. Share link and this phone save the swap.</p>
+      <p class="swap-footnote">Up to ${DAY_MEAL_MAX} dinners. Grocery lines for this night update automatically. Share link and this phone save the swap.</p>
     `;
-    const moreList = els.swapBody.querySelector("#swap-more-list");
-    const moreBtn = els.swapBody.querySelector("#swap-more-btn");
-    const shownExtra = new Set();
-    function extraPool() {
-      return Object.keys(EXTRA_DINNERS).filter((key) => {
-        const ex = EXTRA_DINNERS[key];
-        if (!ex) return false;
-        if (shownExtra.has(key)) return false;
-        if (isDown(ex.dinner)) return false;
-        if (listedNames.has(String(ex.dinner || "").toLowerCase())) return false;
-        if (ex.weekendOnly && !weekendDay) return false;
-        return true;
+    els.swapBody.querySelectorAll("[data-swap-type]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        applyDaySwap(dayId, btn.dataset.swapType, btn.dataset.swapKey || null);
       });
-    }
-    function renderExtraBtn(key) {
-      const ex = EXTRA_DINNERS[key];
-      const on = ov && ov.type === "pick" && ov.key === key;
-      const sub = [
-        ex.kindLabel || "More ideas",
-        "prices",
-        ex.weekendOnly ? "weekend only" : "",
-        ex.tedNote ? "Ted leftover sub" : "",
-      ].filter(Boolean).join(" · ");
-      return `<button type="button" class="swap-option${on ? " is-on" : ""}" data-swap-type="pick" data-swap-key="${escapeAttr(key)}">
-        <span class="swap-option-title">${""}${escapeHtml(uiCopy(ex.dinner))}</span>
-        <span class="swap-option-sub">${escapeHtml(sub)}</span>
-      </button>`;
-    }
-    function bindSwapClicks(root) {
-      (root || els.swapBody).querySelectorAll("[data-swap-type]").forEach((btn) => {
-        if (btn.dataset.boundSwap) return;
-        btn.dataset.boundSwap = "1";
-        btn.addEventListener("click", () => {
-          applyDaySwap(dayId, btn.dataset.swapType, btn.dataset.swapKey || null);
-        });
-      });
-    }
-    function appendMoreBatch() {
-      const pool = extraPool();
-      if (!pool.length) {
-        if (moreBtn) {
-          moreBtn.disabled = true;
-          moreBtn.textContent = "No more ideas";
-        }
-        return;
-      }
-      const dinnersLeft = pool.filter((k) => EXTRA_DINNERS[k].kind === "dinner");
-      const breakfasts = pool.filter((k) => EXTRA_DINNERS[k].kind === "breakfast");
-      const lunches = pool.filter((k) => EXTRA_DINNERS[k].kind === "adult-lunch");
-      const batch = [];
-      const take = (arr, n) => {
-        while (arr.length && batch.length < n) batch.push(arr.shift());
-      };
-      // 10 to 15 items: mostly dinners, plus breakfast + adult lunch each tap
-      const target = 12 + Math.floor(Math.random() * 4); // 12 to 15
-      take(dinnersLeft, Math.min(9, target - 3));
-      take(breakfasts, 2);
-      take(lunches, 2);
-      take(dinnersLeft, target);
-      take(breakfasts, target);
-      take(lunches, target);
-      take(pool.filter((k) => !batch.includes(k)), target);
-      const html = batch.map((key) => {
-        shownExtra.add(key);
-        listedNames.add(String(EXTRA_DINNERS[key].dinner || "").toLowerCase());
-        return renderExtraBtn(key);
-      }).join("");
-      if (moreList) {
-        moreList.insertAdjacentHTML("beforeend", html);
-        bindSwapClicks(moreList);
-      }
-      if (moreBtn && !extraPool().length) {
-        moreBtn.disabled = true;
-        moreBtn.textContent = "No more ideas";
-      }
-    }
-    if (moreBtn) moreBtn.addEventListener("click", appendMoreBatch);
-    bindSwapClicks(els.swapBody);
+    });
     els.swapModal.classList.add("open");
     els.swapModal.setAttribute("aria-hidden", "false");
     if (els.swapClose) els.swapClose.focus();
@@ -6620,6 +6537,9 @@ function ensureSideOffers(dayId, day) {
           name: "",
           defaultSection: "Menu extras",
           large: false,
+          priceRequired: true,
+          priceLabel: "Price",
+          priceHint: "Enter a dollar amount so customs count in your grocery total.",
           onAdd: (item) => {
             const id = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
             const section = item.section;
@@ -6708,7 +6628,7 @@ function ensureSideOffers(dayId, day) {
     const tipPop = document.getElementById("shop-mode-tip-pop");
     if (tipBtn && tipPop) {
       const tipText =
-        "Shop mode: larger grocery checkboxes, checked items move to the bottom, and the screen stays on while you shop.";
+        "Day swap shows up to 7 dinners plus Restore, Leftovers, and Eat out. The week board fits all seven days at phone width.";
       tipPop.textContent = tipText;
       tipBtn.title = tipText;
       let tipTimer = null;
@@ -6810,13 +6730,14 @@ function ensureSideOffers(dayId, day) {
     try {
       if (welcomeDone && welcomeDone()) return true;
     } catch (_) {}
-    // Mid-flow draft counts as returning. never remount to first-run gate
+    // Mid-flow draft counts as returning. never remount to first-run gate.
+    // Default week/plan alone does not count — otherwise home never shows.
     if (state && (state.weekLocked || (state.custom && state.custom.length) ||
         (state.stockProduce && state.stockProduce.length) ||
         (state.munchies && state.munchies.length) ||
         (state.dayOverrides && Object.keys(state.dayOverrides).length) ||
         (state.haveIt && Object.keys(state.haveIt).length))) return true;
-    return !!(state && state.week && state.plan);
+    return false;
   }
   function enterBurnsApp(mode) {
     try { localStorage.setItem(HOME_GATE_KEY, "1"); } catch (_) {}
@@ -6849,12 +6770,17 @@ function ensureSideOffers(dayId, day) {
     document.body.classList.add("show-home-gate");
     const app = document.getElementById("main-app") || document.querySelector(".app");
     if (app) app.style.display = "none";
+    const enter = (mode) => enterBurnsApp(mode || "build");
     const primary = document.getElementById("home-primary-cta");
-    if (primary) primary.onclick = () => enterBurnsApp("build");
+    if (primary) primary.onclick = () => enter("build");
     const photos = document.getElementById("home-setup-photos");
-    if (photos) photos.onclick = () => enterBurnsApp("photos");
+    if (photos) photos.onclick = () => enter("photos");
     const qs = document.getElementById("home-setup-questions");
-    if (qs) qs.onclick = () => enterBurnsApp("questions");
+    if (qs) qs.onclick = () => enter("questions");
+    // Interactive JPG board: any day tap enters the week.
+    gate.querySelectorAll("#home-burns-board [data-strip-day]").forEach((b) => {
+      b.addEventListener("click", () => enter("week"));
+    });
     return true;
   }
 

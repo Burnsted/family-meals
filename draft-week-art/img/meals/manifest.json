@@ -1,0 +1,277 @@
+{
+  "mapping": {
+    "chicken": "chicken.webp",
+    "rotisserie": "rotisserie.webp",
+    "taco": "taco.webp",
+    "chili": "chili.webp",
+    "fish": "fish.webp",
+    "salmon": "salmon.webp",
+    "pasta": "pasta.webp",
+    "alfredo": "alfredo.webp",
+    "eggs": "eggs.webp",
+    "breakfast": "breakfast.webp",
+    "burger": "burger.webp",
+    "steak": "steak.webp",
+    "meat": "meat.webp",
+    "soup": "soup.webp",
+    "salad": "salad.webp",
+    "rice": "rice.webp",
+    "burrito": "burrito.webp",
+    "quesadilla": "quesadilla.webp",
+    "cheese": "cheese.webp",
+    "pizza": "pizza.webp",
+    "sandwich": "sandwich.webp",
+    "sausage": "sausage.webp",
+    "potato": "potato.webp",
+    "pie": "pie.webp",
+    "shrimp": "shrimp.webp",
+    "leftover": "leftover.webp",
+    "light": "light.webp",
+    "default": "default.webp",
+    "grill": "grill.webp",
+    "pepper": "pepper.webp"
+  },
+  "credits": [
+    {
+      "slug": "chicken",
+      "file": "chicken.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ABoston_Market_Half_Rotisserie_Chicken_Meal_%2818400272521%29.jpg",
+      "author": "Willis Lam",
+      "license": "CC BY-SA 2.0",
+      "bytes": 34726
+    },
+    {
+      "slug": "rotisserie",
+      "file": "rotisserie.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ARotisserieChicken.jpg",
+      "author": "Joe Schneid, Louisville, KY",
+      "license": "CC BY 3.0",
+      "bytes": 61698
+    },
+    {
+      "slug": "taco",
+      "file": "taco.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ATacos_rojos_de_deshebrada_con_cueritos_de_cerdo.jpg",
+      "author": "1000b",
+      "license": "CC BY-SA 4.0",
+      "bytes": 14574
+    },
+    {
+      "slug": "chili",
+      "file": "chili.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ABowl_of_chili_with_sour_cream_and_cheese.jpg",
+      "author": "Andy Melton from Lancing, TN, USA",
+      "license": "CC BY-SA 2.0",
+      "bytes": 12288
+    },
+    {
+      "slug": "fish",
+      "file": "fish.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ALiat_Portal_for_Foodie_Disorder_-_Oven-baked_teriyaki_salmon_with_vegetables.jpg",
+      "author": "HaJunkiyada",
+      "license": "CC BY-SA 4.0",
+      "bytes": 22108
+    },
+    {
+      "slug": "salmon",
+      "file": "salmon.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ALiat_Portal_for_Foodie_Disorder_-_Grilled_salmon_with_sweet_potatoes.jpg",
+      "author": "HaJunkiyada",
+      "license": "CC BY-SA 4.0",
+      "bytes": 28514
+    },
+    {
+      "slug": "pasta",
+      "file": "pasta.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AChicken_fettuccine_alfredo.JPG",
+      "author": "Dllu",
+      "license": "CC BY-SA 4.0",
+      "bytes": 26486
+    },
+    {
+      "slug": "alfredo",
+      "file": "alfredo.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AChicken_fettuccine_alfredo.JPG",
+      "author": "Dllu",
+      "license": "CC BY-SA 4.0",
+      "bytes": 26486
+    },
+    {
+      "slug": "eggs",
+      "file": "eggs.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ALiat_Portal_for_Foodie_Disorder_-_Breakfast_in_Israel_scrambled_eggs_with_herbs_and_vegetables.jpg",
+      "author": "HaJunkiyada",
+      "license": "CC BY-SA 4.0",
+      "bytes": 34314
+    },
+    {
+      "slug": "breakfast",
+      "file": "breakfast.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3APancakes_for_Breakfast_-_Oxkutzkab_Yucatan.jpg",
+      "author": "Bernard DUPONT",
+      "license": "CC BY-SA 2.0",
+      "bytes": 19640
+    },
+    {
+      "slug": "burger",
+      "file": "burger.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ACheeseburger_on_a_plate.jpg",
+      "author": "TheCulinaryGeek from Chicago, USA",
+      "license": "CC BY 2.0",
+      "bytes": 11030
+    },
+    {
+      "slug": "steak",
+      "file": "steak.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AGrilled_steak_served_on_a_plate_with_avocado_and_sauce.jpg",
+      "author": "Shixart1985",
+      "license": "CC BY 2.0",
+      "bytes": 27440
+    },
+    {
+      "slug": "meat",
+      "file": "meat.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AGrilled_mixed_steak_in_close_up.jpg",
+      "author": "Geoffreyrabbit",
+      "license": "CC BY-SA 4.0",
+      "bytes": 31626
+    },
+    {
+      "slug": "soup",
+      "file": "soup.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AChicken_Noodle_Soup_US.jpg",
+      "author": "Nichijyou123",
+      "license": "CC BY-SA 4.0",
+      "bytes": 35300
+    },
+    {
+      "slug": "salad",
+      "file": "salad.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AFriday_Night_Dinner_Salad_%2831033732438%29.jpg",
+      "author": "Chris Hunkeler from Carlsbad, California, USA",
+      "license": "CC BY-SA 2.0",
+      "bytes": 34516
+    },
+    {
+      "slug": "rice",
+      "file": "rice.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AOyakodon_003.jpg",
+      "author": "Ocdp",
+      "license": "CC0",
+      "bytes": 25922
+    },
+    {
+      "slug": "burrito",
+      "file": "burrito.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ASmothered_breakfast_burrito.JPG",
+      "author": "Jeffrey Beall",
+      "license": "CC BY 4.0",
+      "bytes": 29396
+    },
+    {
+      "slug": "quesadilla",
+      "file": "quesadilla.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ACheese_quesadilla.jpg",
+      "author": "Corn cheese",
+      "license": "CC0",
+      "bytes": 6902
+    },
+    {
+      "slug": "cheese",
+      "file": "cheese.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AQuesadilla_2.jpg",
+      "author": "Popo le Chien",
+      "license": "CC BY-SA 3.0",
+      "bytes": 31952
+    },
+    {
+      "slug": "pizza",
+      "file": "pizza.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AVegetarian_Pizza.jpg",
+      "author": "Petar Milo\u0161evi\u0107",
+      "license": "CC BY-SA 4.0",
+      "bytes": 32514
+    },
+    {
+      "slug": "sandwich",
+      "file": "sandwich.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AChicken_salad_sandwich_with_dill_pickles.jpg",
+      "author": "Robert Loescher",
+      "license": "CC BY-SA 4.0",
+      "bytes": 44212
+    },
+    {
+      "slug": "sausage",
+      "file": "sausage.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ASausage_making-H-5-edited2.jpg",
+      "author": "L\u00e1szl\u00f3 Szalai (Beyond silence)",
+      "license": "CC BY-SA 3.0",
+      "bytes": 22796
+    },
+    {
+      "slug": "potato",
+      "file": "potato.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3APrime_rib_and_baked_potato_-_Massachusetts.jpg",
+      "author": "Daderot",
+      "license": "CC0",
+      "bytes": 45362
+    },
+    {
+      "slug": "pie",
+      "file": "pie.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AShepherdsPieAndPeas.JPG",
+      "author": "Simon Speed",
+      "license": "CC0",
+      "bytes": 46066
+    },
+    {
+      "slug": "shrimp",
+      "file": "shrimp.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ARed_Lobster%27s_Endless_Shrimp_05.jpg",
+      "author": "Harrison Keely",
+      "license": "CC BY 4.0",
+      "bytes": 32354
+    },
+    {
+      "slug": "leftover",
+      "file": "leftover.webp",
+      "source": "local:meals/chicken.webp",
+      "author": "meal asset",
+      "license": "see meals CREDITS",
+      "bytes": 14284,
+      "note": "Replaced Leftover Crack concert photo with plated meal"
+    },
+    {
+      "slug": "light",
+      "file": "light.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AYogurt_fruit_bowl.jpg",
+      "author": "Jumbocombo0811",
+      "license": "CC BY-SA 4.0",
+      "bytes": 32734
+    },
+    {
+      "slug": "default",
+      "file": "default.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ALiat_Portal_for_Foodie_Disorder_-_Homemade_Grilled_Chicken_Dinner.jpg",
+      "author": "HaJunkiyada",
+      "license": "CC BY-SA 4.0",
+      "bytes": 27792
+    },
+    {
+      "slug": "grill",
+      "file": "grill.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AGrilled_meat_served_on_a_black_plate_with_green_and_red_chilies.jpg",
+      "author": "Shixart1985",
+      "license": "CC BY 2.0",
+      "bytes": 40072
+    },
+    {
+      "slug": "pepper",
+      "file": "pepper.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AQuinoa_stuffed_peppers.jpg",
+      "author": "Mark Bonica",
+      "license": "CC BY 2.0",
+      "bytes": 16480
+    }
+  ]
+}

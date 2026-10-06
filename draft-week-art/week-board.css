@@ -1,4 +1,4 @@
-/* Burns / Kathy illustrated week board (Ted north star craft). */
+/* Burns / Kathy photo-real week board (Ted craft). Fit-all-seven @390. */
 @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Nunito:wght@700;800&display=swap");
 
 .week-board {
@@ -14,7 +14,7 @@
   --wb-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
   position: relative;
   margin: 0 0 1.25rem;
-  padding: 1.1rem 0.85rem 1rem;
+  padding: 0.85rem 0.4rem 0.75rem;
   border-radius: 6px;
   background:
     linear-gradient(180deg, rgba(255, 250, 242, 0.65), rgba(232, 220, 203, 0.35)),
@@ -42,14 +42,14 @@
 
 .week-board-head {
   text-align: center;
-  margin: 0 0 0.85rem;
-  padding: 0 0.35rem;
+  margin: 0 0 0.55rem;
+  padding: 0 0.25rem;
 }
 .week-board-title {
   margin: 0;
   font-family: "Fraunces", Georgia, "Times New Roman", serif;
   font-weight: 800;
-  font-size: clamp(1.55rem, 5.5vw, 2.35rem);
+  font-size: clamp(1.2rem, 4.6vw, 2.1rem);
   line-height: 1.05;
   color: var(--wb-orange-deep);
   letter-spacing: -0.01em;
@@ -61,48 +61,45 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.65rem;
-  margin: 0.35rem 0 0;
+  gap: 0.45rem;
+  margin: 0.25rem 0 0;
   font-family: "Nunito", "Segoe UI", sans-serif;
   font-weight: 800;
-  font-size: clamp(0.92rem, 2.8vw, 1.1rem);
+  font-size: clamp(0.72rem, 2.4vw, 1rem);
   color: var(--wb-orange);
 }
 .kathy-board .week-board-dates { color: var(--wb-teal); }
 .week-board-dates::before,
 .week-board-dates::after {
   content: "";
-  width: 28px;
-  height: 3px;
+  width: 18px;
+  height: 2px;
   border-radius: 2px;
   background: var(--wb-teal);
-  box-shadow: 0 -6px 0 var(--wb-teal), 0 6px 0 var(--wb-teal);
+  box-shadow: 0 -5px 0 var(--wb-teal), 0 5px 0 var(--wb-teal);
   opacity: 0.85;
 }
 
+/* Fit all seven day columns — no horizontal scroll at 390. */
 .week-board-cols {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  padding: 4px 2px 12px;
-  scroll-padding-inline: 4px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  overflow-x: hidden;
+  overflow-y: visible;
+  padding: 2px 0 6px;
+  width: 100%;
 }
 
 .wb-col {
   appearance: none;
-  flex: 0 0 calc(100% - 28px);
-  max-width: 220px;
-  min-width: 168px;
-  scroll-snap-align: start;
+  min-width: 0;
+  max-width: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 10px 8px 12px;
+  gap: 4px;
+  padding: 4px 1px 6px;
   border: 0;
   background: transparent;
   color: inherit;
@@ -111,28 +108,30 @@
   text-align: center;
 }
 .wb-col:focus-visible {
-  outline: 3px solid var(--wb-teal);
-  outline-offset: 3px;
-  border-radius: 10px;
+  outline: 2px solid var(--wb-teal);
+  outline-offset: 1px;
+  border-radius: 6px;
 }
 .wb-col.is-active .wb-pill {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--wb-teal) 35%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--wb-teal) 40%, transparent);
 }
 .wb-col.is-today .wb-art-frame {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--wb-orange) 45%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--wb-orange) 50%, transparent);
 }
 
 .wb-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 3.4rem;
-  padding: 0.28rem 0.85rem;
+  min-width: 0;
+  width: 100%;
+  max-width: 2.6rem;
+  padding: 0.15rem 0.15rem;
   border-radius: 999px;
   font-family: "Nunito", sans-serif;
   font-weight: 800;
-  font-size: 0.82rem;
-  letter-spacing: 0.08em;
+  font-size: clamp(0.48rem, 1.7vw, 0.72rem);
+  letter-spacing: 0.04em;
   color: #fff;
   background: var(--wb-teal);
   text-transform: uppercase;
@@ -141,34 +140,72 @@
 
 .wb-art-frame {
   width: 100%;
-  aspect-ratio: 1 / 1.05;
-  max-height: 168px;
+  aspect-ratio: 1 / 1;
+  max-height: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
+  border-radius: 8px;
   background:
     radial-gradient(ellipse at 50% 70%, rgba(255, 255, 255, 0.55), transparent 70%),
     color-mix(in srgb, var(--wb-cream-deep) 70%, #fff);
-  box-shadow: 0 4px 0 rgba(42, 33, 24, 0.06);
+  box-shadow: 0 2px 0 rgba(42, 33, 24, 0.06);
   overflow: hidden;
 }
 .wb-art-frame .food-art,
-.wb-art-frame .food-art-board {
-  width: 92%;
-  height: 92%;
-  max-width: 150px;
-  max-height: 150px;
+.wb-art-frame .food-art-board,
+.wb-art-frame .food-photo,
+.wb-art-frame .food-photo-board {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+  display: block;
+  border-radius: 6px;
+}
+
+.food-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #e8dccb;
+}
+.food-photo-board {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.food-photo-sm {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+}
+.food-photo-lg {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+}
+.food-photo-tucker {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 .wb-meal {
   margin: 0;
   font-family: "Nunito", sans-serif;
   font-weight: 800;
-  font-size: clamp(1rem, 3.2vw, 1.2rem);
-  line-height: 1.15;
+  font-size: clamp(0.52rem, 2vw, 0.95rem);
+  line-height: 1.12;
   color: var(--wb-teal-deep);
   max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
 }
 .wb-col.is-alt .wb-meal { color: var(--wb-orange-deep); }
 
@@ -176,128 +213,124 @@
   margin: 0;
   font-family: "Nunito", sans-serif;
   font-weight: 700;
-  font-size: 0.82rem;
-  line-height: 1.25;
+  font-size: clamp(0.45rem, 1.6vw, 0.72rem);
+  line-height: 1.2;
   color: var(--wb-note);
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   max-width: 100%;
-}
-.wb-note::before {
-  content: "";
-  flex: 0 0 10px;
-  height: 3px;
-  margin-top: 0.45em;
-  border-radius: 2px;
-  background: var(--wb-orange);
-  box-shadow: 0 -5px 0 var(--wb-orange), 0 5px 0 var(--wb-orange);
-  opacity: 0.9;
+  max-height: 2.5em;
 }
 
-/* Tucker lunch band */
+/* Tucker lunch band — fit six items, no H-scroll */
 .wb-tucker {
-  margin: 0.35rem 0 0;
-  padding: 0.7rem 0.75rem 0.85rem;
-  border-radius: 14px;
+  margin: 0.35rem 0.15rem 0;
+  padding: 0.5rem 0.4rem 0.55rem;
+  border-radius: 10px;
   background: var(--wb-red);
   color: #fff8f0;
-  box-shadow: 0 4px 0 rgba(42, 33, 24, 0.12);
+  box-shadow: 0 3px 0 rgba(42, 33, 24, 0.12);
 }
 .wb-tucker-label {
-  margin: 0 0 0.55rem;
+  margin: 0 0 0.4rem;
   font-family: "Nunito", sans-serif;
   font-weight: 800;
-  font-size: 0.92rem;
+  font-size: clamp(0.7rem, 2.4vw, 0.9rem);
   letter-spacing: 0.01em;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.wb-tucker-label::after {
-  content: "";
-  width: 10px;
-  height: 3px;
-  border-radius: 2px;
-  background: var(--wb-orange);
-  box-shadow: 0 -5px 0 var(--wb-orange), 0 5px 0 var(--wb-orange);
 }
 .wb-tucker-items {
-  display: flex;
-  gap: 0;
-  overflow-x: auto;
-  scroll-snap-type: x proximity;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 2px;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 2px;
+  overflow: hidden;
+  padding-bottom: 0;
 }
 .wb-tucker-item {
-  flex: 0 0 auto;
-  min-width: 72px;
-  max-width: 88px;
+  min-width: 0;
+  max-width: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 0 8px;
-  scroll-snap-align: start;
+  gap: 3px;
+  padding: 0 2px;
   position: relative;
 }
 .wb-tucker-item + .wb-tucker-item::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 8px;
-  bottom: 22px;
-  border-left: 1.5px dashed rgba(255, 230, 210, 0.45);
+  content: none;
 }
 .wb-tucker-art {
-  width: 48px;
-  height: 48px;
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255, 248, 240, 0.14);
-  border-radius: 10px;
+  border-radius: 8px;
+  overflow: hidden;
 }
-.wb-tucker-art svg { width: 40px; height: 40px; display: block; }
+.wb-tucker-art svg,
+.wb-tucker-art img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
 .wb-tucker-name {
   font-family: "Nunito", sans-serif;
-  font-size: 0.68rem;
+  font-size: clamp(0.42rem, 1.5vw, 0.65rem);
   font-weight: 700;
   text-align: center;
-  line-height: 1.15;
+  line-height: 1.1;
   color: #fff4ea;
+  word-break: break-word;
 }
 
 .week-board-utils {
   margin: 0.85rem 0 0;
 }
 
-@media (min-width: 720px) {
-  .wb-col {
-    flex: 0 0 calc((100% - 40px) / 3.2);
-    min-width: 150px;
-  }
+/* Home gate: interactive photo board */
+.home-hero .week-board {
+  margin: 1rem 0 1.15rem;
+  text-align: left;
+}
+.home-hero .week-board-title {
+  font-size: clamp(1.35rem, 5vw, 1.9rem);
+}
+.home-hero.burns-home .week-board {
+  border-color: color-mix(in srgb, #fffaf4 35%, transparent);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+}
+.home-hero.kathy-home .week-board {
+  box-shadow: 0 10px 28px rgba(30, 51, 48, 0.12);
 }
 
-@media (min-width: 1100px) {
+@media (min-width: 560px) {
+  .week-board { padding: 1.1rem 0.75rem 1rem; }
+  .wb-col { gap: 6px; padding: 8px 4px 10px; }
+  .wb-pill {
+    max-width: 3.2rem;
+    padding: 0.22rem 0.45rem;
+    font-size: 0.72rem;
+  }
+  .wb-art-frame { border-radius: 12px; }
+  .wb-meal { font-size: clamp(0.78rem, 1.8vw, 1.05rem); }
+  .wb-note { font-size: 0.72rem; }
+  .wb-tucker { padding: 0.65rem 0.7rem 0.75rem; }
+  .wb-tucker-art { max-width: 64px; }
+}
+
+@media (min-width: 900px) {
   .week-board { padding: 1.35rem 1.1rem 1.15rem; }
-  .week-board-cols {
-    overflow-x: visible;
-    scroll-snap-type: none;
-    gap: 8px;
-  }
-  .wb-col {
-    flex: 1 1 0;
-    min-width: 0;
-    max-width: none;
-  }
-  .wb-art-frame { max-height: 150px; }
-  .wb-tucker-items { overflow-x: visible; justify-content: space-between; }
-  .wb-tucker-item { flex: 1 1 0; max-width: none; }
+  .week-board-cols { gap: 8px; }
+  .wb-art-frame { border-radius: 14px; }
+  .wb-tucker-items { gap: 6px; }
+  .wb-tucker-art { max-width: 72px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .week-board-cols { scroll-behavior: auto; }
+  .wb-col { transition: none; }
 }

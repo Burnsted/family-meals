@@ -40,9 +40,9 @@
       <input id="add-item-name" class="add-item-inp" type="text" maxlength="80" value="${esc(opts.name || "")}" autocomplete="off" />
       <label class="add-item-lab" for="add-item-qty">Quantity</label>
       <input id="add-item-qty" class="add-item-inp" type="text" maxlength="40" value="1" inputmode="text" />
-      <label class="add-item-lab" for="add-item-price">Price (your approx)</label>
-      <input id="add-item-price" class="add-item-inp" type="text" maxlength="12" inputmode="decimal" placeholder="Optional" />
-      <p class="add-item-hint">Leave blank if you do not know. Never invent a price.</p>
+      <label class="add-item-lab" for="add-item-price">${esc(opts.priceLabel || "Price")}</label>
+      <input id="add-item-price" class="add-item-inp" type="text" maxlength="12" inputmode="decimal" placeholder="${esc(opts.priceRequired ? "Required for total" : "Optional")}" />
+      <p class="add-item-hint">${esc(opts.priceHint || (opts.priceRequired ? "Enter a dollar amount so it can count in your grocery total." : "Leave blank if you do not know. Never invent a price."))}</p>
       <label class="add-item-lab" for="add-item-section">Category</label>
       <select id="add-item-section" class="add-item-inp">
         ${SECTIONS.map((s) => `<option value="${esc(s)}"${s === defSec ? " selected" : ""}>${esc(s)}</option>`).join("")}
@@ -64,6 +64,19 @@
     const qtyEl = document.getElementById("add-item-qty");
     const priceEl = document.getElementById("add-item-price");
     const secEl = document.getElementById("add-item-section");
+    const hintEl = bg.querySelector(".add-item-hint");
+    function syncPriceRequirement() {
+      const need = !!opts.priceRequired || (secEl && secEl.value === "Menu extras");
+      priceEl.placeholder = need ? "Required for total" : "Optional";
+      if (hintEl) {
+        hintEl.textContent = need
+          ? "Enter a dollar amount so customs count in your grocery total."
+          : opts.priceHint || "Leave blank if you do not know. Never invent a price.";
+      }
+      return need;
+    }
+    if (secEl) secEl.addEventListener("change", syncPriceRequirement);
+    syncPriceRequirement();
     document.getElementById("add-item-cancel").onclick = () => {
       closeSheet();
       if (opts.onCancel) opts.onCancel();
@@ -81,6 +94,12 @@
       if (rawPrice) {
         const n = Number(rawPrice);
         if (Number.isFinite(n) && n >= 0) price = Math.round(n * 100) / 100;
+      }
+      const needPrice = syncPriceRequirement();
+      if (needPrice && (price == null || !Number.isFinite(price))) {
+        priceEl.focus();
+        priceEl.setAttribute("aria-invalid", "true");
+        return;
       }
       // Never invent a price: null if blank or invalid
       const section = SECTIONS.includes(secEl.value) ? secEl.value : defSec;

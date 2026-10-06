@@ -1,0 +1,61 @@
+{
+  "mapping": {
+    "yogurt": "yogurt.webp",
+    "cheese": "cheese.webp",
+    "chips": "chips.webp",
+    "fruit": "fruit.webp",
+    "beef": "beef.webp",
+    "juice": "juice.webp"
+  },
+  "credits": [
+    {
+      "slug": "yogurt",
+      "file": "yogurt.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AJoghurt.jpg",
+      "author": "No machine-readable author provided. Rainer Zenz assumed (based on copyright claims).",
+      "license": "CC BY-SA 3.0",
+      "bytes": 8072
+    },
+    {
+      "slug": "cheese",
+      "file": "cheese.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3AClara_Peeters_-_Still_Life_with_Cheeses%2C_Almonds_and_Pretzels.jpg",
+      "author": "Clara Peeters",
+      "license": "Public domain",
+      "bytes": 46426
+    },
+    {
+      "slug": "chips",
+      "file": "chips.webp",
+      "source": "local:sides/potato-chips.webp",
+      "author": "side asset",
+      "license": "see sides CREDITS",
+      "bytes": 27762,
+      "note": "Replaced Fred Baur portrait with potato chips photo"
+    },
+    {
+      "slug": "fruit",
+      "file": "fruit.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3APyrus_pyrifolia_fruit_on_tree_PS_2z_LR.jpg",
+      "author": "PumpkinSky",
+      "license": "CC BY-SA 4.0",
+      "bytes": 37736
+    },
+    {
+      "slug": "beef",
+      "file": "beef.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ADoughnDolce_Beef_Sandwich.jpg",
+      "author": "Vincent60030",
+      "license": "CC BY-SA 4.0",
+      "bytes": 39968
+    },
+    {
+      "slug": "juice",
+      "file": "juice.webp",
+      "source": "https://commons.wikimedia.org/wiki/File%3ANut_fruit_mix_in_pouch_with_test_booklet_and_juice_box_on_table_%2820681977544%29.jpg",
+      "author": "Personal Creations",
+      "license": "CC BY 2.0",
+      "bytes": 24324
+    }
+  ]
+}
