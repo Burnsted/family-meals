@@ -419,7 +419,8 @@
   .week-log-strip .wls-counts{font-size:12px;font-weight:800;color:var(--wsoft);width:100%}
   .grocery-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px}
   .grocery-search{flex:1 1 140px;min-height:44px;border-radius:12px;border:2px solid rgba(15,110,110,.28);background:var(--white);color:var(--wink);padding:8px 10px;font:inherit;font-weight:700}
-  .share-list-link,.share-app-link{appearance:none;border:0;background:transparent;color:var(--tealD);font:inherit;font-weight:800;font-size:14px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:6px}
+  .share-list-link,.share-app-link{appearance:none;border:0;background:transparent;color:var(--tealD);font:inherit;font-weight:800;font-size:14px;text-decoration:none;cursor:pointer;min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 4px}
+  .share-list-link .ico,.share-app-link .ico{width:16px;height:16px;stroke:currentColor;display:block}
   .share-app-link .ico{width:16px;height:16px;stroke:currentColor}
   .share-app-quiet{display:block;width:100%;text-align:center;margin:18px 0 8px;color:var(--wsoft);font:inherit;font-weight:700;font-size:13px;text-decoration:underline;text-underline-offset:3px;background:none;border:0;cursor:pointer;min-height:40px}
   .g-custom-add{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px;align-items:center}
@@ -579,6 +580,7 @@ const icons={
   cart:ICO(`<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>`),
   cam:ICO(`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`),
   copy:ICO(`<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>`),
+  share:ICO(`<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>`),
   rcpt:ICO(`<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>`),
   close:ICO(`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`),
   back:ICO(`<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>`),
@@ -2122,9 +2124,9 @@ function renderWeek(){
   ${ratingsPanel()}
   ${W.extra.length?`<div class="nextwk">Next up: ${W.extra.map(g=>({pork:mv("pork"),brats:mv("brats"),chicken:"chicken",burger:"burgers",steak:"steak"}[g])).join(", ")}</div>`:""}
   <section class="gpanel"><div class="stitle" style="margin-top:0"><h2>Shopping list · week of ${esc(wl.split(",")[0]||wl)}</h2><span>${nCk} checked</span></div>
-    <div class="grocery-tools"><label class="visually-hidden" for="grocery-search">Search list</label><input type="search" id="grocery-search" class="grocery-search" placeholder="Search list" value="${esc(W.gSearch||"")}" autocomplete="off" /><button type="button" class="share-list-link" id="grocery-share">Share list</button></div>
+    <div class="grocery-tools"><label class="visually-hidden" for="grocery-search">Search list</label><input type="search" id="grocery-search" class="grocery-search" placeholder="Search list" value="${esc(W.gSearch||"")}" autocomplete="off" /><button type="button" class="share-list-link" id="grocery-share" aria-label="Share list">${icons.share}</button></div>
     <div class="tot"><div class="best">Est. total (${esc(main==="Publix"?"Publix":main==="Aldi"?"Aldi":(main||"Aldi"))})<b>$${(main==="Publix"?t.p:t.a).toFixed(2)}</b>est.${estStoreNote(main==="Publix"?"Publix":"Aldi")}</div></div>
-    <div class="cpy"><button type="button" class="cpb p ico-btn" data-copy="all">${icons.copy} Copy list</button></div>
+    <div class="cpy"><button type="button" class="cpb p ico-btn" data-copy="all" aria-label="Share list">${icons.share}</button></div>
     ${W.cph?`<div class="cph" id="cphBox"><p class="cph-t">✓ Copied. Want to send a photo with it?</p><button type="button" class="cpb p ico-btn" id="cphB">${icons.cam} Take a photo</button><input type="file" accept="image/*" capture="environment" hidden id="cphIn"><div class="thumbs" id="cphTh"></div><div id="cphAct"></div></div>`:""}
     ${(st.equip.has("lavazza")||st.equip.has("nespresso")||st.equip.has("espresso"))?`<p class="emo" style="margin:8px 0 2px">☕</p><p class="gnote cof">${coffeeLine(false)}</p>`:""}
     <p class="pchk">Prices ${fmtDateLong(PRICE_META.updated)}${PRICE_META.loaded?"":" · estimates"}</p>
@@ -2155,7 +2157,7 @@ function renderWeek(){
   const bbw=$("backBtnWeek");if(bbw)bbw.onclick=e=>{e.stopPropagation();goBackApp()};
   wk.querySelectorAll("[data-del]").forEach(b=>b.onclick=e=>{e.stopPropagation();openDelete(+b.dataset.del)});
   wk.querySelectorAll("[data-shop]").forEach(b=>b.onclick=e=>{e.stopPropagation();const i=+b.dataset.shop;W.shopHi=i;W.listFilter=i;renderWeek();const el=wk.querySelector(`[data-li="${i}"]`);if(el)el.scrollIntoView({behavior:"smooth",block:"center"})});
-    wk.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>{const tx=listText(b.dataset.copy);W.cph=true;W.cphText=tx;renderWeek();copyTxt(tx,b.dataset.copy==="all"?"Whole list copied":`${b.dataset.copy} list copied`)});
+    wk.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>{shareListText(listText(b.dataset.copy),"Shopping list")});
   if(W.cph&&$("cphB")){W.cphFiles=W.cphFiles||[];photoShare({btn:$("cphB"),input:$("cphIn"),thumbs:$("cphTh"),act:$("cphAct"),store:W.cphFiles,shareLabel:"Share",title:"My shopping list",text:W.cphText||"",fallback:"Save the photo and send with your list."})}
   bindLog(wk,days);
   $("bk").onclick=()=>{hideWeekView();window.scrollTo(0,0);updateBackBtn()};
@@ -2842,6 +2844,12 @@ function setCamCats(a){try{localStorage.setItem(CC_KEY,JSON.stringify(a))}catch(
 function camAisleOpen(){try{const j=JSON.parse(localStorage.getItem(CA_OPEN_KEY)||"{}");return j&&typeof j==="object"?j:{}}catch(_){return{}}}
 function setCamAisleOpen(id,open){const m=camAisleOpen();if(open)m[id]=1;else delete m[id];try{localStorage.setItem(CA_OPEN_KEY,JSON.stringify(m))}catch(_){}}
 function camSearchQ(){const el=$("grocery-search");return el?String(el.value||"").trim().toLowerCase():""}
+async function shareListText(text,title){
+  try{if(navigator.share){await navigator.share({title:title||"Shopping list",text});return}}catch(err){if(err&&err.name==="AbortError")return}
+  try{if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(text);else throw 0}
+  catch(_){const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy")}catch(e){}ta.remove()}
+  toast("Copied")
+}
 async function shareCamList(){
   const items=(W&&W.items?W.items:[]).filter(it=>!W.have.has(it.id)&&!W.ck.has(it.id));
   const customs=getCamCustom().filter(c=>!W.have.has(c.id)&&!W.ck.has(c.id));
@@ -2850,9 +2858,8 @@ async function shareCamList(){
   const labs=Object.fromEntries([...AISLES,...getCamCats().map(c=>[c,c])]);
   Object.keys(aisleMap).forEach(k=>{lines.push("",String(labs[k]||k).toUpperCase());aisleMap[k].forEach(it=>{const p=it.a!=null&&(it.p==null||it.a<=it.p)?it.a:it.p;if(p!=null)total+=p;lines.push("- "+it.n+(p!=null?" · est. $"+Number(p).toFixed(2):""))})});
   const estStore=(typeof deriveMainStore==="function"?deriveMainStore():(st&&st.main))||"Aldi";
-  lines.push("","Est. total ("+estStore+"): $"+total.toFixed(2));const text=lines.join("\n");
-  try{if(navigator.share){await navigator.share({title:"Shopping list",text});return}}catch(err){if(err&&err.name==="AbortError")return}
-  try{await navigator.clipboard.writeText(text);toast("List copied")}catch(_){copyTxt(text,"List copied")}
+  lines.push("","Est. total ("+estStore+"): $"+total.toFixed(2));
+  await shareListText(lines.join("\n"),"Shopping list");
 }
 
 /* Item 40 template share */
