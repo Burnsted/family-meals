@@ -1,0 +1,97 @@
+/* Per-slot side Regenerate (Ted locked). Label button, not icon-only. */
+.side-slot {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  vertical-align: top;
+  max-width: 96px;
+}
+.side-slot.is-large {
+  max-width: 120px;
+  gap: 8px;
+}
+.side-slot-body {
+  width: 100%;
+}
+.side-regen-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  width: 100%;
+  padding: 0.25rem 0.35rem;
+  border: 1.5px solid color-mix(in srgb, #0f6e6e 45%, transparent);
+  border-radius: 6px;
+  background: #fffaf4;
+  color: #0a5555;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.15;
+  cursor: pointer;
+  box-shadow: none;
+}
+.side-slot.is-large .side-regen-btn {
+  min-height: 44px;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.45rem;
+}
+.side-regen-btn:hover,
+.side-regen-btn:focus-visible {
+  outline: 2px solid #0f6e6e;
+  outline-offset: 1px;
+}
+.side-slot.is-selected .side-regen-btn {
+  border-color: #0f6e6e;
+}
+
+/* Kathy coastal tweak */
+.kathy-side-slots .side-regen-btn {
+  border-color: color-mix(in srgb, #3d7a6e 50%, transparent);
+  color: #2c5c53;
+  background: #f2f7f4;
+}
+.kathy-side-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0.65rem 0 0.35rem;
+}
+.kathy-side-slots .side-pick {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 4px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: center;
+}
+.kathy-side-slots .side-pick img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+.kathy-side-slots .side-pick .sn {
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.kathy-side-slots .side-slot.is-selected .side-pick,
+.kathy-side-slots .side-pick[aria-pressed="true"] {
+  border-color: #3d7a6e;
+}
+.kathy-side-slots .side-slot.is-selected .side-pick .sn::after {
+  content: " ✓";
+  color: #2c5c53;
+}
