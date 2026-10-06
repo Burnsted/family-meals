@@ -35,7 +35,7 @@
   var MIN_CONSENT_GAP = 8;
   var FAB_SIZE_PX = 44;
   var FAB_EDGE_PX = 14;
-  var FOOTER_CLEAR_GAP_PX = 12;
+  var FOOTER_CLEAR_GAP_PX = 14;
   var STYLE_ID = 'fbw-styles';
   var ROOT_ATTR = 'data-fbw-root';
   var PAD_ATTR = 'data-fbw-pad';
