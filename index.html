@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Burns Family meal week planner and grocery list for Ted & Samantha." />
-  <meta name="theme-color" content="#0f6e6e" />
+  <meta name="theme-color" content="#0b1220" id="theme-color-meta" />
+  <script>(function(){try{var t=localStorage.getItem("fm-theme");if(t!=="light"&&t!=="dark")t="dark";document.documentElement.setAttribute("data-theme",t);document.documentElement.style.colorScheme=t;}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();</script>
   <title>Burns Family Meals</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -44,20 +45,13 @@
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M8 3.5v3M16 3.5v3M3.5 10h17"/></svg>
         </button>
       </div>
-      <p class="tagline">Cook once for dinners · leftover lunches for adults · Tucker’s fixed school kit</p>
-
-      <div class="hero-budget" id="budget-band" role="button" tabindex="0" aria-label="Budget. Tap to edit">
-        <div class="hero-budget-top">
-          <button type="button" class="budget-chip" id="budget-chip">Budget $120 / 14 days</button>
-          <span class="store-chip" id="store-chip">Aldi · Vero Beach</span>
-        </div>
-        <p class="hero-sentence" id="estimate-band">Groceries this week: about $0 of your budget</p>
-        <div class="budget-progress" id="budget-progress" aria-hidden="true">
-          <div class="budget-progress-fill" id="budget-progress-fill"></div>
-        </div>
-        <div class="bcmp" id="budget-compare" hidden></div>
-      </div>
       <p class="plan-note" id="house-note" hidden></p>
+      <div hidden aria-hidden="true">
+        <div id="budget-band"><button type="button" id="budget-chip"></button><span id="store-chip"></span>
+          <p id="estimate-band"></p><div id="budget-progress"><div id="budget-progress-fill"></div></div>
+          <div id="budget-compare"></div>
+        </div>
+      </div>
     </header>
 
     <section class="templates" aria-labelledby="templates-title">
@@ -86,17 +80,8 @@
     </section>
 
     <section class="howto" aria-labelledby="howto-title">
-      <h2 id="howto-title">Share with Ted &amp; Samantha</h2>
-      <ol>
-        <li>Tap a <strong>Week template</strong>, then <strong>Swap</strong> any night if plans change.</li>
-        <li>Check groceries — tap <strong>Have it</strong> on staples, add qty/note, optional $.</li>
-        <li>Tap <strong>Copy share link</strong> — the other phone loads the same week, swaps, checks, prices, and custom items.</li>
-        <li>Or <strong>Copy grocery list as text</strong> for iMessage/SMS.</li>
-      </ol>
-      <p class="sync-note">
-        Sync = share link (no login). Each phone also saves to localStorage.
-        Shop mode: bigger taps, checked sink to bottom, screen stays awake when supported.
-      </p>
+      <h2 id="howto-title">Share</h2>
+      <p class="sync-note">Copy share link syncs the week to the other phone. No account.</p>
     </section>
 
     <div class="actions">
@@ -133,7 +118,7 @@
     <section class="week-review-panel" id="week-review-panel" aria-labelledby="week-review-title" hidden>
       <div class="section-title">
         <h2 id="week-review-title">Week review</h2>
-        <span>Made vs planned · leftovers · tips</span>
+        <span></span>
       </div>
       <div id="week-review-body"></div>
     </section>
@@ -141,7 +126,7 @@
     <section class="ratings-panel" aria-labelledby="ratings-title">
       <div class="section-title">
         <h2 id="ratings-title">My ratings</h2>
-        <span>👎 hides from Swap · ❤️ = favorite</span>
+        <span></span>
       </div>
       <div id="my-ratings"></div>
     </section>
@@ -192,7 +177,7 @@
       </div>
     </section>
 
-    <p class="footer-note">Burns-owned planner · pantry-first · no account · no paid APIs</p>
+    <p class="footer-note">Burns Family Meals · local only</p>
   </div>
 
   <div

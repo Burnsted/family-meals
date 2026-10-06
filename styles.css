@@ -2254,3 +2254,41 @@ body.shop-mode .price-input {
 .ph-new-row{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px;align-items:center}
 .ph-new-row input{flex:1 1 140px;min-height:44px;border-radius:12px;border:2px solid rgba(15,110,110,.28);background:#fff;color:inherit;padding:10px;font:inherit;font-weight:700}
 
+
+/* Theme dark (default via html data-theme) */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b1220;
+  --card: #152033;
+  --ink: #e8eef6;
+  --muted: #9aa8b8;
+  --teal: #2dd4bf;
+  --teal-deep: #5eead4;
+  --teal-soft: rgba(45,212,191,.16);
+  --cream: #152033;
+  --line: rgba(255,255,255,.1);
+}
+html[data-theme="dark"] body { background: var(--bg); color: var(--ink); }
+html[data-theme="dark"] .hero-card,
+html[data-theme="dark"] .day-card,
+html[data-theme="dark"] .gpanel,
+html[data-theme="dark"] .week-review-panel,
+html[data-theme="dark"] .ratings-panel,
+html[data-theme="dark"] .grocery-panel,
+html[data-theme="dark"] .stock-panel,
+html[data-theme="dark"] .modal,
+html[data-theme="dark"] .sheet,
+html[data-theme="dark"] .month-opt { background: var(--card); color: var(--ink); border-color: var(--line); }
+html[data-theme="dark"] .brand { color: var(--ink); }
+html[data-theme="dark"] .muted2, html[data-theme="dark"] .tagline, html[data-theme="dark"] .footer-note { color: var(--muted); }
+html[data-theme="dark"] input, html[data-theme="dark"] select, html[data-theme="dark"] textarea {
+  background: #0b1220; color: var(--ink); border-color: rgba(45,212,191,.35);
+}
+html[data-theme="light"] { color-scheme: light; }
+
+.wst-row{display:flex;flex-wrap:wrap;gap:.6rem;margin:.4rem 0 .75rem}
+.wst-row > div{flex:1 1 90px;background:rgba(15,110,110,.08);border-radius:12px;padding:.55rem .65rem;text-align:center}
+.wst-row b{display:block;font-size:1.05rem}
+.wst-row small{display:block;font-size:.72rem;font-weight:700;opacity:.75}
+.wr-hi{margin:.25rem 0 .75rem;padding-left:1.1rem}
+html[data-theme="dark"] .wst-row > div{background:rgba(45,212,191,.12)}
