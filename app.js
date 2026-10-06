@@ -1845,14 +1845,15 @@
     const fromStorage = loadFromStorage();
     if (fromUrl) {
       state = fromUrl;
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch (_) {}
     } else if (fromStorage) {
       state = fromStorage;
     } else {
       state = defaultState();
     }
+    // Migrate legacy localStorage keys / normalize shape into current STORAGE_KEY.
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (_) {}
 
     els.templateBtns.forEach((btn) => {
       btn.addEventListener("click", () => {

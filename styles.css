@@ -790,6 +790,10 @@ body::before {
   border-radius: 10px;
 }
 
+.meta-edit[hidden] {
+  display: none !important;
+}
+
 .meta-input {
   width: 100%;
   min-height: 42px;
