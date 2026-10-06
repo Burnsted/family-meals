@@ -2123,6 +2123,8 @@ function effDays(ov){const s0=weekStartDate();return W.base.map((b,i)=>{const d=
   else if(o.t==="side"){c={...W.base[i],sideName:o.sideName,extraSides:o.extraSides||[],ch:true}}
   else if(o.t==="rm")c={cook:false,meal:null,e:"🚫",dinner:"Removed from this week",note:"Free night: no cooking, no groceries for this one. Tap Swap to pick something.",g:null,ch:true,kind:"rm"};
   else if(o.t==="left")c={cook:false,meal:null,e:"🔁",dinner:"Leftovers night",note:"Reheat whatever's in the fridge to 165°F.",g:null,ch:true,kind:"left",sideName:o.sideName!=null?o.sideName:W.base[i].sideName,extraSides:o.extraSides||W.base[i].extraSides};
+  else if(o.t==="pick"){const src=W.base[i]||{};c={cook:!!o.cook,meal:o.meal||null,e:o.e||src.e||"🍽",dinner:o.dinner||src.dinner||"",note:o.note||"",g:o.g!=null?o.g:(o.meal&&MG[o.meal])||null,ch:true,cut:o.cut||null,sideName:o.sideName!=null?o.sideName:src.sideName,extraSides:o.extraSides||src.extraSides,bf:o.bf!=null?o.bf:src.bf,grab:!!o.grab,kind:o.kind||null,lunch:o.lunch!=null?o.lunch:src.lunch}}
+  else if(o.t==="out")c={cook:false,meal:null,e:"🥡",dinner:"Eat out / takeout",note:"Night off. No cooking, no groceries.",g:null,ch:true,kind:"out"};
   else c={cook:false,meal:null,e:"🥡",dinner:"Eat out / takeout",note:"Night off. No cooking, no groceries.",g:null,ch:true,kind:"out"};
   return {...b,short,...c}})}
 function recomputeList(){const days=effDays(W.ov).filter(d=>d.kind!=="hol");const gs=[...new Set(days.map(d=>d.g).filter(Boolean))];
