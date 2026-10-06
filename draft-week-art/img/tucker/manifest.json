@@ -27,10 +27,11 @@
     {
       "slug": "chips",
       "file": "chips.webp",
-      "source": "https://commons.wikimedia.org/wiki/File%3AFred_Baur.jpg",
-      "author": "Jmoran18251",
-      "license": "CC BY-SA 4.0",
-      "bytes": 27762
+      "source": "local:sides/potato-chips.webp",
+      "author": "side asset",
+      "license": "see sides CREDITS",
+      "bytes": 27762,
+      "note": "Replaced Fred Baur portrait with potato chips photo"
     },
     {
       "slug": "fruit",

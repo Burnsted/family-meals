@@ -30,14 +30,14 @@
 
   function keyFromText(text) {
     const t = String(text || "").toLowerCase();
-    if (/leftover|again|from /.test(t)) return "leftover";
+    if (/leftover|\bagain\b|from (sun|mon|tue|wed|thu|fri|sat|yesterday|container)/.test(t)) return "leftover";
     if (/light day|yogurt|toast/.test(t)) return "light";
     if (/rotisserie/.test(t)) return "rotisserie";
     if (/chicken|thigh/.test(t)) return "chicken";
     if (/chili/.test(t)) return "chili";
     if (/soup|stew|chowder/.test(t)) return "soup";
     if (/salmon/.test(t)) return "salmon";
-    if (/tilapia|fish|tuna/.test(t)) return "fish";
+    if (/tilapia|fish|tuna|white fish/.test(t)) return "fish";
     if (/shrimp|scampi/.test(t)) return "shrimp";
     if (/breakfast|pancake/.test(t)) return "breakfast";
     if (/egg/.test(t)) return "eggs";

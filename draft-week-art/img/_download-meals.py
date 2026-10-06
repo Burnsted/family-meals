@@ -38,7 +38,7 @@ MEAL_QUERIES = {
     "potato": "baked potato dinner",
     "pie": "shepherd pie plate",
     "shrimp": "shrimp scampi plate",
-    "leftover": "leftover meal containers",
+    "leftover": "plated leftover dinner containers fridge",
     "light": "yogurt fruit breakfast bowl",
     "default": "home cooked dinner plate",
     "grill": "barbecue grilled meat plate",
@@ -48,7 +48,7 @@ MEAL_QUERIES = {
 TUCKER_QUERIES = {
     "yogurt": "yogurt cup grocery",
     "cheese": "string cheese stick package",
-    "chips": "pringles can",
+    "chips": "potato chips bag snack",
     "fruit": "fruit snacks pouch",
     "beef": "beef jerky stick",
     "juice": "apple juice box",

@@ -4305,12 +4305,17 @@ function ensureSideOffers(dayId, day) {
       return !(d.weekId === state.week && d.planId === state.plan && d.day.id === dayId) && !isDown(d.day.dinner);
     })).slice(0, DAY_MEAL_MAX);
     const ov = dayOverride(dayId);
+    const mealTitle = (dinner) => {
+      const FA = window.FoodArt;
+      if (FA && FA.shortMealName) return uiCopy(FA.shortMealName(dinner));
+      return uiCopy(dinner);
+    };
     els.swapBody.innerHTML = `
-      <p class="swap-current">Now: <strong>${escapeHtml(uiCopy(current.dinner))}</strong></p>
+      <p class="swap-current">Now: <strong>${escapeHtml(mealTitle(current.dinner))}</strong></p>
       <div class="swap-options" role="list">
         <button type="button" class="swap-option" data-swap-type="reset" ${!ov ? "disabled" : ""}>
           <span class="swap-option-title">Restore template</span>
-          <span class="swap-option-sub">${escapeHtml(uiCopy(templateDay.dinner))}</span>
+          <span class="swap-option-sub">${escapeHtml(mealTitle(templateDay.dinner))}</span>
         </button>
         <button type="button" class="swap-option${ov && ov.type === "leftovers" ? " is-on" : ""}" data-swap-type="leftovers">
           <span class="swap-option-title">Leftovers</span>
@@ -4327,7 +4332,7 @@ function ensureSideOffers(dayId, day) {
           .map((d) => {
             const on = ov && ov.type === "pick" && ov.key === d.key;
             return `<button type="button" class="swap-option${on ? " is-on" : ""}" data-swap-type="pick" data-swap-key="${escapeAttr(d.key)}">
-              <span class="swap-option-title">${escapeHtml(uiCopy(d.day.dinner))}</span>
+              <span class="swap-option-title">${escapeHtml(mealTitle(d.day.dinner))}</span>
               <span class="swap-option-sub">${escapeHtml(uiCopy(d.label))}${d.day.tedNote ? " · Ted leftover sub" : ""}</span>
             </button>`;
           })
@@ -6725,13 +6730,14 @@ function ensureSideOffers(dayId, day) {
     try {
       if (welcomeDone && welcomeDone()) return true;
     } catch (_) {}
-    // Mid-flow draft counts as returning. never remount to first-run gate
+    // Mid-flow draft counts as returning. never remount to first-run gate.
+    // Default week/plan alone does not count — otherwise home never shows.
     if (state && (state.weekLocked || (state.custom && state.custom.length) ||
         (state.stockProduce && state.stockProduce.length) ||
         (state.munchies && state.munchies.length) ||
         (state.dayOverrides && Object.keys(state.dayOverrides).length) ||
         (state.haveIt && Object.keys(state.haveIt).length))) return true;
-    return !!(state && state.week && state.plan);
+    return false;
   }
   function enterBurnsApp(mode) {
     try { localStorage.setItem(HOME_GATE_KEY, "1"); } catch (_) {}

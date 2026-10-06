@@ -235,10 +235,11 @@
     {
       "slug": "leftover",
       "file": "leftover.webp",
-      "source": "https://commons.wikimedia.org/wiki/File%3ALeftoverCrackliveatMTC%2CCologne081806.jpg",
-      "author": "Spaz Tacular",
-      "license": "CC BY 2.0",
-      "bytes": 14284
+      "source": "local:meals/chicken.webp",
+      "author": "meal asset",
+      "license": "see meals CREDITS",
+      "bytes": 14284,
+      "note": "Replaced Leftover Crack concert photo with plated meal"
     },
     {
       "slug": "light",
