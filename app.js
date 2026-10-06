@@ -15,6 +15,63 @@
   ];
   const LEGACY_CATEGORY = { Protein: "Meat" };
 
+  const CUSTOM_CATS_KEY = "fm-custom-cats-v1";
+  const AISLE_OPEN_KEY = "fm-aisle-open-v1";
+  const AISLE_CHEV = `<svg class="aisle-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
+  const DEL_ICO = `<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>`;
+  const NEW_CAT_VAL = "__new__";
+
+  function getCustomCategories() {
+    try {
+      const j = JSON.parse(localStorage.getItem(CUSTOM_CATS_KEY) || "[]");
+      if (!Array.isArray(j)) return [];
+      return j.filter((x) => typeof x === "string" && x.trim()).map((x) => x.trim().slice(0, 40));
+    } catch (_) {
+      return [];
+    }
+  }
+  function setCustomCategories(arr) {
+    try {
+      localStorage.setItem(CUSTOM_CATS_KEY, JSON.stringify(arr.slice(0, 40)));
+    } catch (_) {}
+  }
+  function ensureCustomCategory(name) {
+    const n = String(name || "").trim().slice(0, 40);
+    if (!n || CATEGORIES.includes(n)) return n;
+    const cats = getCustomCategories();
+    if (!cats.includes(n)) {
+      cats.push(n);
+      setCustomCategories(cats);
+    }
+    return n;
+  }
+  function allCategories() {
+    const extra = getCustomCategories().filter((c) => !CATEGORIES.includes(c));
+    return [...CATEGORIES, ...extra];
+  }
+  function isCustomCategory(cat) {
+    return Boolean(cat) && !CATEGORIES.includes(cat) && !LEGACY_CATEGORY[cat];
+  }
+  function getAisleOpenMap() {
+    try {
+      const j = JSON.parse(localStorage.getItem(AISLE_OPEN_KEY) || "{}");
+      return j && typeof j === "object" && !Array.isArray(j) ? j : {};
+    } catch (_) {
+      return {};
+    }
+  }
+  function setAisleOpen(id, open) {
+    const m = getAisleOpenMap();
+    if (open) m[id] = 1;
+    else delete m[id];
+    try {
+      localStorage.setItem(AISLE_OPEN_KEY, JSON.stringify(m));
+    } catch (_) {}
+  }
+  function isAisleOpen(id) {
+    return Boolean(getAisleOpenMap()[id]);
+  }
+
   function tuckerGroceries(prefix) {
     return [
       {
@@ -1524,6 +1581,8 @@
     customCategory: document.getElementById("custom-category"),
     customPrice: document.getElementById("custom-price"),
     addCustom: document.getElementById("add-custom"),
+    customNewCat: document.getElementById("custom-new-cat"),
+    delCustomCat: document.getElementById("del-custom-cat"),
     copyShare: document.getElementById("copy-share"),
     copyGrocery: document.getElementById("copy-grocery"),
     shopMode: document.getElementById("shop-mode"),
@@ -1919,7 +1978,10 @@
   function normalizeCategory(cat) {
     if (!cat || typeof cat !== "string") return "Other";
     if (LEGACY_CATEGORY[cat]) return LEGACY_CATEGORY[cat];
-    return CATEGORIES.includes(cat) ? cat : "Other";
+    const c = cat.trim().slice(0, 40);
+    if (CATEGORIES.includes(c)) return c;
+    if (getCustomCategories().includes(c)) return c;
+    return "Other";
   }
 
   function itemChecked(id) {
@@ -2066,7 +2128,7 @@
   function openReceipt(){
     const inn=openSheet(shTop("📷 Upload receipt")+`
       <p style="margin:0 0 10px;font-weight:700;font-size:15px">Snap your receipt (or a Publix app Purchases screenshot), then send it to Jarvis.</p>
-      <div class="sh-row2" style="margin-top:0"><button class="sh-btn p" data-pick="cam">📷 Take photo</button><button class="sh-btn" data-pick="lib">🖼 Choose photos</button></div>
+      <div class="sh-row2" style="margin-top:0"><button class="sh-btn p" data-pick="cam">📷 Take photo</button><button class="sh-btn" data-pick="lib">🖼 Upload receipt</button></div>
       <input type="file" accept="image/*" capture="environment" hidden data-in="cam"><input type="file" accept="image/*" multiple hidden data-in="lib">
       <div class="thumbs" data-th></div><div data-act></div>
       <p class="muted2"><b>Prices update after Jarvis reads it.</b> This page is a static site: nothing is uploaded from here. "Send to Jarvis" just opens your phone's share sheet so you can send the photo into the chat.</p>`,"Upload receipt");
@@ -3507,10 +3569,14 @@ function sidesBlockHTML(dayId, day) {
           if (price !== null) base.prices[id] = price;
           if (typeof c.qty === "string" && c.qty.trim()) base.qty[id] = c.qty.trim().slice(0, 40);
           if (typeof c.note === "string" && c.note.trim()) base.notes[id] = c.note.trim().slice(0, 80);
+          const rawCat = typeof c.category === "string" ? c.category.trim().slice(0, 40) : "Other";
+          const category = CATEGORIES.includes(rawCat) || LEGACY_CATEGORY[rawCat]
+            ? normalizeCategory(rawCat)
+            : ensureCustomCategory(rawCat || "Other");
           return {
             id,
             name: c.name.trim().slice(0, 80),
-            category: normalizeCategory(c.category),
+            category,
           };
         });
     }
@@ -4245,15 +4311,21 @@ function sidesBlockHTML(dayId, day) {
       });
     });
 
-    const custom = state.custom.map((c) => ({
-      id: c.id,
-      category: normalizeCategory(c.category),
-      name: c.name,
-      price: "",
-      hint: "custom item",
-      custom: true,
-      staple: false,
-    }));
+    const custom = state.custom.map((c) => {
+      const rawCat = typeof c.category === "string" ? c.category.trim().slice(0, 40) : "Other";
+      const category = CATEGORIES.includes(rawCat) || LEGACY_CATEGORY[rawCat]
+        ? normalizeCategory(rawCat)
+        : ensureCustomCategory(rawCat || "Other");
+      return {
+        id: c.id,
+        category,
+        name: c.name,
+        price: "",
+        hint: "custom item",
+        custom: true,
+        staple: false,
+      };
+    });
     return [...seeded, ...injected, ...custom];
   }
 
@@ -4337,20 +4409,154 @@ function sidesBlockHTML(dayId, day) {
     }
   }
 
+  function refreshCategoryPicker(selected) {
+    const sel = els.customCategory;
+    if (!sel) return;
+    const cur = selected != null ? selected : sel.value;
+    const opts = allCategories().map(
+      (c) => `<option value="${escapeAttr(c)}" ${c === cur ? "selected" : ""}>${escapeHtml(c)}</option>`
+    );
+    opts.push(`<option value="${NEW_CAT_VAL}" ${cur === NEW_CAT_VAL ? "selected" : ""}>+ New category…</option>`);
+    sel.innerHTML = opts.join("");
+    updateNewCatFieldVisibility();
+  }
+  function updateNewCatFieldVisibility() {
+    const sel = els.customCategory;
+    const neu = els.customNewCat;
+    const del = els.delCustomCat;
+    if (!sel || !neu) return;
+    const isNew = sel.value === NEW_CAT_VAL;
+    neu.hidden = !isNew;
+    if (isNew) neu.focus();
+    if (del) {
+      const cat = sel.value;
+      const emptyCustom = isCustomCategory(cat) && !(state.custom || []).some((c) => c.category === cat);
+      del.hidden = !emptyCustom;
+    }
+  }
+  function resolveCategoryFromForm() {
+    const sel = els.customCategory;
+    if (!sel) return "Other";
+    if (sel.value === NEW_CAT_VAL) {
+      const name = ((els.customNewCat && els.customNewCat.value) || "").trim().slice(0, 40);
+      if (!name) {
+        showToast("Name the new category");
+        if (els.customNewCat) els.customNewCat.focus();
+        return null;
+      }
+      ensureCustomCategory(name);
+      if (els.customNewCat) els.customNewCat.value = "";
+      refreshCategoryPicker(name);
+      return name;
+    }
+    return normalizeCategory(sel.value) || ensureCustomCategory(sel.value);
+  }
+  function grocerySearchQuery() {
+    const el = document.getElementById("grocery-search");
+    return el ? String(el.value || "").trim().toLowerCase() : "";
+  }
+  function buildShareListText() {
+    const items = allGroceryItems().filter((i) => !itemHaveIt(i.id) && !itemChecked(i.id));
+    const cats = allCategories();
+    const week = currentWeek();
+    const lines = [`Shopping list · week of ${week.title || state.weekTitle || ""}`];
+    let total = 0;
+    cats.forEach((cat) => {
+      const group = items.filter((i) => i.category === cat);
+      if (!group.length) return;
+      lines.push("", cat.toUpperCase());
+      group.forEach((it) => {
+        const p = itemPrice(it.id, it.price);
+        if (p != null) total += p;
+        lines.push(`- ${it.name}${p != null ? ` · est. ${formatMoney2(p)}` : ""}`);
+      });
+    });
+    lines.push("", `Est. total: ${formatMoney2(total)}`);
+    return lines.join("\n");
+  }
+  async function shareGroceryList() {
+    const text = buildShareListText();
+    const title = "Shopping list";
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text });
+        return;
+      }
+    } catch (err) {
+      if (err && err.name === "AbortError") return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("List copied");
+    } catch (_) {
+      copyText(text, "List copied");
+    }
+    const sms = document.getElementById("grocery-sms");
+    if (sms) {
+      sms.href = "sms:?&body=" + encodeURIComponent(text.slice(0, 1500));
+      sms.hidden = false;
+    }
+  }
+
   function renderGrocery() {
     refreshLiveForLocation();
     const items = allGroceryItems();
     const visible = visibleGroceryItems(items);
     let checkedVisible = 0;
-    const byCat = CATEGORIES.map((cat) => {
-      let groupItems = visible.filter((i) => i.category === cat);
-      if (state.shopMode && !state.hideChecked) {
-        groupItems = [...groupItems].sort((a, b) => Number(itemChecked(a.id)) - Number(itemChecked(b.id)));
-      }
-      return { cat, items: groupItems };
-    }).filter((group) => group.items.length);
+    const q = grocerySearchQuery();
+    const byCat = allCategories()
+      .map((cat) => {
+        let groupItems = visible.filter((i) => i.category === cat);
+        if (q) {
+          groupItems = groupItems.filter(
+            (i) =>
+              String(i.name || "")
+                .toLowerCase()
+                .includes(q) ||
+              String(i.category || "")
+                .toLowerCase()
+                .includes(q) ||
+              String(i.hint || "")
+                .toLowerCase()
+                .includes(q)
+          );
+        }
+        if (state.shopMode && !state.hideChecked) {
+          groupItems = [...groupItems].sort((a, b) => Number(itemChecked(a.id)) - Number(itemChecked(b.id)));
+        }
+        return { cat, items: groupItems };
+      })
+      .filter((group) => group.items.length);
 
     els.groceryList.innerHTML = "";
+
+    const tools = document.createElement("div");
+    tools.className = "grocery-tools";
+    tools.innerHTML = `
+      <label class="visually-hidden" for="grocery-search">Search list</label>
+      <input type="search" id="grocery-search" class="grocery-search" placeholder="Search list" value="${escapeAttr(q)}" autocomplete="off" />
+      <button type="button" class="share-list-link" id="grocery-share">Share list</button>
+      <a class="share-list-link" id="grocery-sms" hidden>Text list</a>
+    `;
+    els.groceryList.appendChild(tools);
+    const searchEl = tools.querySelector("#grocery-search");
+    if (searchEl) {
+      searchEl.addEventListener("input", () => {
+        renderGrocery();
+        const el = document.getElementById("grocery-search");
+        if (el) {
+          el.focus();
+          const v = el.value;
+          try {
+            el.setSelectionRange(v.length, v.length);
+          } catch (_) {}
+        }
+      });
+    }
+    const shareBtn = tools.querySelector("#grocery-share");
+    if (shareBtn) shareBtn.addEventListener("click", () => {
+      shareGroceryList();
+    });
 
     const tuckerNote = document.createElement("p");
     tuckerNote.className = "tucker-note";
@@ -4381,10 +4587,39 @@ function sidesBlockHTML(dayId, day) {
     els.groceryList.appendChild(totalBar);
 
     byCat.forEach((group) => {
-      const h = document.createElement("h3");
-      h.className = "category" + (group.cat === "Tucker lunchbox" ? " category-tucker" : "");
-      h.textContent = group.cat;
-      els.groceryList.appendChild(h);
+      const fold = document.createElement("details");
+      fold.className = "aisle-fold" + (group.cat === "Tucker lunchbox" ? " category-tucker" : "");
+      fold.dataset.aisle = group.cat;
+      const searching = Boolean(q);
+      fold.open = searching ? true : isAisleOpen(group.cat);
+      const sum = document.createElement("summary");
+      const customCat = isCustomCategory(group.cat);
+      sum.innerHTML = `<span class="aisle-sum-lab">${escapeHtml(group.cat)} · ${group.items.length}</span>${
+        customCat
+          ? `<button type="button" class="aisle-cat-del" data-del-cat="${escapeAttr(group.cat)}" aria-label="Delete category ${escapeAttr(group.cat)}">${DEL_ICO}</button>`
+          : ""
+      }${AISLE_CHEV}`;
+      fold.appendChild(sum);
+      fold.addEventListener("toggle", () => {
+        if (!grocerySearchQuery()) setAisleOpen(group.cat, fold.open);
+      });
+      const delCatBtn = sum.querySelector("[data-del-cat]");
+      if (delCatBtn) {
+        delCatBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const cat = delCatBtn.dataset.delCat;
+          const inCat = (state.custom || []).filter((c) => c.category === cat);
+          if (inCat.length && !confirm(`Remove category "${cat}" and its ${inCat.length} item${inCat.length > 1 ? "s" : ""}?`)) return;
+          state.custom = (state.custom || []).filter((c) => c.category !== cat);
+          setCustomCategories(getCustomCategories().filter((c) => c !== cat));
+          setAisleOpen(cat, false);
+          persist();
+          refreshCategoryPicker();
+          renderGrocery();
+          showToast("Category removed");
+        });
+      }
 
       const ul = document.createElement("ul");
       ul.className = "item-list";
@@ -4423,6 +4658,11 @@ function sidesBlockHTML(dayId, day) {
                     ? `<button type="button" class="meta-chip have-chip${have ? " is-on" : ""}" data-edit="have" aria-pressed="${have}">
                         ${have ? "Have it ✓" : "Have it"}
                       </button>`
+                    : ""
+                }
+                ${
+                  item.custom
+                    ? `<button type="button" class="meta-chip del-custom" data-edit="del" aria-label="Remove ${escapeAttr(item.name)}">${DEL_ICO}</button>`
                     : ""
                 }
               </div>
@@ -4489,6 +4729,21 @@ function sidesBlockHTML(dayId, day) {
             showToast(itemHaveIt(item.id) ? "Marked Have it — hidden from list" : "Back on the list");
           });
         }
+        const delBtn = li.querySelector('.meta-chip[data-edit="del"]');
+        if (delBtn) {
+          delBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            state.custom = (state.custom || []).filter((c) => c.id !== item.id);
+            delete state.checked[item.id];
+            delete state.prices[item.id];
+            delete state.qty[item.id];
+            delete state.notes[item.id];
+            persist();
+            renderGrocery();
+            showToast("Removed custom item");
+          });
+        }
         li.querySelector(".meta-save").addEventListener("click", () => {
           setQty(item.id, li.querySelector(".qty-input").value);
           setNote(item.id, li.querySelector(".note-input").value);
@@ -4498,7 +4753,8 @@ function sidesBlockHTML(dayId, day) {
         });
         ul.appendChild(li);
       });
-      els.groceryList.appendChild(ul);
+      fold.appendChild(ul);
+      els.groceryList.appendChild(fold);
     });
 
     if (!byCat.length) {
@@ -4506,7 +4762,9 @@ function sidesBlockHTML(dayId, day) {
       empty.className = "grocery-empty";
       empty.textContent = state.hideChecked
         ? "All visible items are checked (or Have-it hidden). Toggle Show checked / Hidden to review."
-        : "No grocery lines for this view.";
+        : q
+          ? "No items match your search."
+          : "No grocery lines for this view.";
       els.groceryList.appendChild(empty);
     }
 
@@ -5255,6 +5513,8 @@ function sidesBlockHTML(dayId, day) {
     });
   }
   function shuffleWeek() {
+    // Self-check: uniqueness — `exclude` Set + `used.includes` / `prevSet` ensure no meal key is
+    // assigned twice in one shuffle; previous shuffle set is preferred-avoided via SHUFFLE_PREV_KEY.
     const plan = currentPlan();
     if (!plan || !plan.days || !plan.days.length) {
       showToast("Pick a week template first");
@@ -5570,6 +5830,23 @@ function sidesBlockHTML(dayId, day) {
       }
     });
 
+    if (els.customCategory) {
+      els.customCategory.addEventListener("change", () => updateNewCatFieldVisibility());
+      refreshCategoryPicker(els.customCategory.value);
+    }
+    if (els.delCustomCat) {
+      els.delCustomCat.addEventListener("click", () => {
+        const cat = els.customCategory && els.customCategory.value;
+        if (!isCustomCategory(cat)) return;
+        if ((state.custom || []).some((c) => c.category === cat)) {
+          showToast("Category still has items");
+          return;
+        }
+        setCustomCategories(getCustomCategories().filter((c) => c !== cat));
+        refreshCategoryPicker("Pantry");
+        showToast("Category removed");
+      });
+    }
     els.addCustom.addEventListener("click", () => {
       const name = els.customName.value.trim();
       if (!name) {
@@ -5577,11 +5854,13 @@ function sidesBlockHTML(dayId, day) {
         els.customName.focus();
         return;
       }
+      const category = resolveCategoryFromForm();
+      if (!category) return;
       const id = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
       state.custom.push({
         id,
         name: name.slice(0, 80),
-        category: normalizeCategory(els.customCategory.value),
+        category,
       });
       if (els.customPrice && els.customPrice.value.trim()) {
         setPrice(id, els.customPrice.value);
@@ -5589,6 +5868,7 @@ function sidesBlockHTML(dayId, day) {
       }
       els.customName.value = "";
       persist();
+      refreshCategoryPicker(category);
       renderGrocery();
       showToast("Added to grocery list");
     });

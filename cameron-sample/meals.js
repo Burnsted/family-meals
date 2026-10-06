@@ -11,6 +11,8 @@ EQUIP:[
   {id:"stove",label:"Stovetop",emoji:"🍳"},
   {id:"oven",label:"Oven",emoji:"♨️"},
   {id:"micro",label:"Microwave",emoji:"📟"},
+  {id:"toaster",label:"Toaster",emoji:"🍞"},
+  {id:"fridge",label:"Fridge / freezer",emoji:"🧊"},
   {id:"airfryer",label:"Air fryer",emoji:"💨"},
   {id:"slow",label:"Slow cooker",emoji:"🍲"},
   {id:"rice",label:"Rice cooker",emoji:"🍚"},

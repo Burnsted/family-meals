@@ -363,6 +363,41 @@
   .wrap .rcpt-top,.hero .rcpt-top{display:flex;justify-content:flex-start;align-items:center;gap:8px;flex-wrap:wrap}
   .wrap .rcpt-top{justify-content:space-between}
   .rcpt-top .rcpt-right{display:inline-flex;align-items:center;gap:8px;margin-left:auto}
+  .bw-top{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:2px solid rgba(15,110,110,.35);border-radius:999px;background:linear-gradient(135deg,var(--teal,#0f6e6e),var(--tealD,#0a5555));color:#fff;font:inherit;font-weight:800;font-size:15px;padding:10px 14px;min-height:44px;cursor:pointer;box-shadow:0 4px 0 rgba(10,85,85,.35)}
+  .bw-top .ico{width:18px;height:18px;stroke:currentColor;flex-shrink:0}
+  body.light .bw-top{background:linear-gradient(135deg,var(--teal),var(--tealD));color:#fff;box-shadow:0 4px 0 rgba(10,85,85,.3)}
+  .aisle-fold{margin:8px 0 2px;border:0;padding:0}
+  .aisle-fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0;padding:8px 2px 6px;border-bottom:2px solid #dceee6;color:var(--tealD);font-size:16px;font-weight:800;min-height:44px;user-select:none}
+  .aisle-fold>summary::-webkit-details-marker{display:none}
+  .aisle-fold>summary::marker{content:""}
+  .aisle-fold .aisle-sum-lab{flex:1;min-width:0}
+  .aisle-fold .aisle-chev{width:18px;height:18px;flex-shrink:0;stroke:currentColor;transition:transform .15s ease}
+  .aisle-fold[open]>.summary .aisle-chev,.aisle-fold[open]>.aisle-sum .aisle-chev,.aisle-fold[open]>summary .aisle-chev{transform:rotate(180deg)}
+  .aisle-fold.store-fold>summary{background:var(--tealS);border-radius:12px;border-bottom:0;padding:8px 10px;margin-bottom:4px}
+  .aisle-fold.store-fold>summary small{display:block;font-weight:650;font-size:12px;color:var(--wsoft)}
+
+  .star-btn{appearance:none;border:2px solid rgba(15,110,110,.35);border-radius:14px;background:var(--white);color:var(--tealD);min-width:44px;min-height:44px;padding:6px 10px;display:inline-flex;align-items:center;gap:6px;font:inherit;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 3px 0 rgba(15,110,110,.12)}
+  .star-btn .ico{width:18px;height:18px;stroke:currentColor}
+  .week-log-strip{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 10px;padding:8px 10px;background:var(--wbg);border-radius:12px}
+  .week-log-strip .wls-days{display:flex;flex:1;gap:4px;flex-wrap:wrap}
+  .week-log-strip button{appearance:none;border:0;background:transparent;color:var(--wsoft);font:inherit;font-size:11px;font-weight:800;min-width:36px;min-height:40px;padding:4px 2px;cursor:pointer;text-align:center;line-height:1.15}
+  .week-log-strip button .wls-m{display:block;font-size:12px;color:var(--wink)}
+  .week-log-strip .wls-counts{font-size:12px;font-weight:800;color:var(--wsoft);width:100%}
+  .grocery-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px}
+  .grocery-search{flex:1 1 140px;min-height:44px;border-radius:12px;border:2px solid rgba(15,110,110,.28);background:var(--white);color:var(--wink);padding:8px 10px;font:inherit;font-weight:700}
+  .share-list-link,.share-app-link{appearance:none;border:0;background:transparent;color:var(--tealD);font:inherit;font-weight:800;font-size:14px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:6px}
+  .share-app-link .ico{width:16px;height:16px;stroke:currentColor}
+  .g-custom-add{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px;align-items:center}
+  .g-custom-add select,.g-custom-add input{min-height:44px;border-radius:12px;border:2px solid rgba(15,110,110,.28);background:var(--white);color:var(--wink);padding:8px 10px;font:inherit;font-weight:700}
+  .g-custom-add input[type="text"]{flex:1 1 140px}
+  .badge-list{list-style:none;margin:0;padding:0}
+  .badge-list li{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed rgba(23,48,66,.14)}
+  .badge-list .bico{width:28px;height:28px;flex-shrink:0;opacity:.35}
+  .badge-list li.on .bico{opacity:1;color:var(--tealD)}
+  .badge-list b{display:block;font-size:15px}
+  .badge-list small{display:block;color:var(--wsoft);font-weight:700;font-size:12px;margin-top:2px}
+  .xp-toast{position:fixed;left:50%;bottom:5.5rem;transform:translateX(-50%);z-index:80;background:#124f4f;color:#fff;padding:8px 14px;border-radius:999px;font-weight:800;font-size:13px;box-shadow:0 8px 20px rgba(0,0,0,.25);pointer-events:none}
+
   .sides-block{margin:8px 0 4px;text-align:left}
   .sides-lbl{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--wsoft);margin:6px 0 4px}
   .sides-row{display:flex;flex-wrap:wrap;gap:6px}
@@ -418,7 +453,10 @@
 <div class="wrap">
   <div class="rcpt-top">
     <button type="button" class="back-link" id="backBtn" aria-label="Back" hidden></button>
-    <span class="rcpt-right"><span class="emo" aria-hidden="true">📷</span><button class="rcpt-btn" data-rcpt="1">Upload receipt</button></span>
+    <span class="rcpt-right">
+      <button type="button" class="bw-top" id="bwTop" aria-label="Build my week"></button>
+      <span class="emo" aria-hidden="true">📷</span><button class="rcpt-btn" data-rcpt="1">Upload receipt</button>
+    </span>
   </div>
   <div class="top"><span id="appTitle">My Meal Picker</span><span id="count"></span></div>
   <div id="welcomeRoot"></div>
@@ -457,6 +495,7 @@ icons.mic=ICO(`<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><
 icons.mute=ICO(`<path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>`);
 icons.unmute=ICO(`<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>`);
 icons.backSm=ICO(`<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>`).replace('width="20" height="20"','width="16" height="16"');
+icons.star=ICO(`<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>`);
 
 /* === CAMERON FEATURES v1 === */
 /* === CAMERON FEATURES v2 PHOTO TILES === */
@@ -923,6 +962,8 @@ function openSettings(){const rules=getRules().join("\n"), set=getSettings(), ho
       <div class="dchips">${["bec","bagel","cereal","eggs_toast","bf_burrito"].filter(k=>BF_CFG.items[k]).map(k=>`<button type="button" data-bfe="${k}" class="${set.bfWeekend===k?"on":""}">${esc((BF_CFG.items[k]||{}).label||k)}</button>`).join("")}</div>
       <p class="set-sec">Holidays this week</p>
             ${hols.length?hols.map(h=>`<div class="hol-row"><span>${esc(h.name)}</span><div class="sw sm" role="switch" tabindex="0" aria-checked="${!!hol[h.id]}" data-hid="${h.id}"><span class="tg"></span></div><small>Cook normally</small></div>`).join(""):`<p class="muted2">No major holidays in this week.</p>`}
+      <p class="set-sec">Share</p>
+      <button type="button" class="sh-btn wide share-app-link" id="shareAppSettings" style="justify-content:center">${icons.copy} Share this app</button>
       <p class="set-sec">Welcome</p>
       <button type="button" class="sh-btn wide" id="setReplay">Replay welcome</button>
       <div class="sh-row2"><button type="button" class="sh-btn p" id="setSave">Save</button></div>`;
@@ -933,6 +974,7 @@ function openSettings(){const rules=getRules().join("\n"), set=getSettings(), ho
     inn.querySelectorAll(".sw[data-hid]").forEach(sw=>{const flip=()=>{const id=sw.dataset.hid;const o=getHolCook();o[id]=!o[id];setHolCook(o);draw()};
       sw.onclick=flip;sw.onkeydown=e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();flip()}}});
     const rp=inn.querySelector("#setReplay");if(rp)rp.onclick=()=>{closeSheet();startWelcome(true)};
+    const sa=inn.querySelector("#shareAppSettings");if(sa)sa.onclick=()=>shareThisApp();
     inn.querySelector("#setSave").onclick=()=>{const lines=inn.querySelector("#rEd").value.split("\n").map(s=>s.trim()).filter(Boolean);
       setRules(lines.length?lines:getRules());setSettings(set);closeSheet();if(W)renderWeek();toast("Settings saved")};
   };
@@ -1504,8 +1546,9 @@ function summary(){
     <button class="next" id="rs" style="margin-top:6px;background:var(--chip)">Start over</button></div>`;
   $("rs").onclick=()=>{reset();render()};
   $("abE").onclick=()=>{st.aboutReturn=true;pos=queue.indexOf("about");render();window.scrollTo(0,0)};
-  $("bw").onclick=()=>{buildWeek();document.body.classList.add("light");window.scrollTo(0,0)};
+  $("bw").onclick=()=>goBuildWeek();
 }
+function goBuildWeek(){buildWeek();document.body.classList.add("light");window.scrollTo(0,0)}
 /* ================= WEEK PLANNER ================= */
 const yes=id=>st.meals[id]==="yes";
 let W=null; // {days, items, have:Set, ck:Set}
@@ -1763,6 +1806,7 @@ function renderWeek(){
   <section class="hero">
     <div class="hero-top">
       <div><p class="kick">${titleHQ()}</p><h1 class="brand">${esc(titleWeek())}</h1></div>
+      <button type="button" class="star-btn" id="starBtn" aria-label="Stars">${icons.star}<span>0</span></button>
       <button type="button" class="gear ico-btn" id="setBtn" aria-label="Settings">${icons.gear}</button>
     </div>
     <div class="wl-row">
@@ -1781,6 +1825,7 @@ function renderWeek(){
   ${guideBox()}
   <details class="lt"><summary>💰 Meat money tips</summary><ul>${C.TIPS.meat.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>
   ${logBanner(days)}
+  ${typeof weekLogStrip==="function"?weekLogStrip(days):""}
   <div class="stitle" id="thisWk"><h2>This week${edited?'<span class="edited">edited</span>':""}</h2><span class="week-actions"><button type="button" class="shuffle-link" id="shuffleBtn" aria-label="Shuffle this week">${icons.shuffle}<span>Shuffle</span></button><button type="button" class="shuffle-link" id="custB" aria-label="Customize week">${icons.repeat}<span>Customize</span></button></span></div>
   ${days.map((d,i)=>{const m=MN(d.meal);const cut=d.cut?` · ${esc(d.cut)}`:"";
     return `<div class="day${dayCls(d)}" data-d="${i}" style="animation-delay:${i*.04}s">
@@ -1799,6 +1844,7 @@ function renderWeek(){
   ${ratingsPanel()}
   ${W.extra.length?`<div class="nextwk">🔄 Next week rotation: ${W.extra.map(g=>({pork:mv("pork"),brats:mv("brats"),chicken:"chicken",burger:"burgers",steak:"steak"}[g])).join(", ")}</div>`:""}
   <section class="gpanel"><div class="stitle" style="margin-top:0"><h2>Shopping list</h2><span>${nCk} checked</span></div>
+    <div class="grocery-tools"><label class="visually-hidden" for="grocery-search">Search list</label><input type="search" id="grocery-search" class="grocery-search" placeholder="Search list" value="${esc(W.gSearch||"")}" autocomplete="off" /><button type="button" class="share-list-link" id="grocery-share">Share list</button><a class="share-list-link" id="grocery-sms" hidden>Text list</a></div>
     <div class="byday" id="byDay">${["All",...DN].map((lab,ix)=>`<button type="button" data-fd="${ix===0?"":ix-1}" class="${(filt==null&&ix===0)||filt===ix-1?"on":""}">${lab}</button>`).join("")}</div>
     <div class="tot"><div class="${main==="Aldi"?"main":""}">All Aldi<b>${t.a.toFixed(2)}</b>est.${estStoreNote("Aldi")}</div>
       <div class="${main==="Publix"?"main":""}">All Publix<b>${t.p.toFixed(2)}</b>est.${estStoreNote("Publix")}</div>
@@ -1812,7 +1858,15 @@ function renderWeek(){
     ${budCmp(t.b,7)}
     <p class="emo" style="margin:8px 0 2px">🧊</p><p class="gnote freezer-tip">Freezer tip: split family packs into single bags when you get home; date each bag.</p>
     ${renderListItems(byA,filt,days)}
+    <div class="g-custom-add" id="gCustomAdd">
+      <select id="gCat" aria-label="Category">${[...AISLES.map(([k,lab])=>[k,lab]),...(typeof getCamCats==="function"?getCamCats():[]).map(c=>[c,c]),["__new__","+ New category…"]].map(([k,lab])=>`<option value="${esc(k)}" ${(W.gCat||"other")===k?"selected":""}>${esc(String(lab).replace(/^[^\w]+/," ").trim()||lab)}</option>`).join("")}</select>
+      <input id="gNewCat" type="text" maxlength="40" placeholder="Name the new category…" hidden />
+      <input id="gName" type="text" maxlength="80" placeholder="Add custom grocery item…" />
+      <input id="gQty" type="text" maxlength="20" placeholder="Qty" style="flex:0 0 72px" />
+      <button type="button" class="sbtn" id="gAdd">Add item</button>
+    </div>
     <p class="emo" style="margin:12px 0 2px">🌡</p><p class="gnote">One-time buy: instant-read thermometer (~$10–15; not in totals).</p>
+    <p style="margin:14px 0 0;text-align:center"><button type="button" class="share-app-link" id="shareAppBottom">${icons.copy}<span>Share this app</span></button> <a class="share-app-link" id="shareAppSms" hidden>Text link</a></p>
   </section>
   <a class="gh" href="${C.REPO.url}" target="_blank" rel="noopener"><b>🛠️ Your own repo, cameron-meals</b><span>Edit meals.js on GitHub to change your menu.</span></a>
   <button type="button" class="wbtn p ico-btn" id="bk">${icons.back} Back to my picks</button><button type="button" class="wbtn g" id="rs2">Start over</button>
@@ -1838,29 +1892,60 @@ function renderWeek(){
   $("calB").onclick=()=>openCal({sel:s0,onPick:(mon)=>{st.weekStart=mon.getTime();buildWeek()}});
   $("custB").onclick=openCustom;longPress($("thisWk"),openCustom);longPress($("wlab"),openCustom);const sh=$("shuffleBtn");if(sh)sh.onclick=e=>{e.stopPropagation();shuffleWeek()};
   $("bsP").onclick=openBudget;$("budP").onclick=openBudget;$("setBtn").onclick=openSettings;
+  const star=$("starBtn");if(star){try{refreshStarBtn()}catch(_){}star.onclick=e=>{e.stopPropagation();openBadgesSheet()}}
+  wk.querySelectorAll("[data-jumplog]").forEach(b=>b.onclick=e=>{e.stopPropagation();const i=+b.dataset.jumplog;W.open=i;renderWeek();const el2=$("week").querySelector('.day[data-d="'+i+'"]');if(el2)el2.scrollIntoView({behavior:"smooth",block:"center"})});
+  wk.querySelectorAll("details.aisle-fold").forEach(d=>d.addEventListener("toggle",()=>{if(typeof camSearchQ==="function"&&!camSearchQ())setCamAisleOpen(d.dataset.aisle,d.open)}));
+  const gs=$("grocery-search");if(gs){gs.addEventListener("input",()=>{W.gSearch=gs.value;renderWeek();const el=$("grocery-search");if(el){el.focus();try{el.setSelectionRange(el.value.length,el.value.length)}catch(_){}}})}
+  const gshare=$("grocery-share");if(gshare)gshare.onclick=()=>shareCamList();
+  const sab=$("shareAppBottom");if(sab)sab.onclick=()=>shareThisApp();
+  wk.querySelectorAll("[data-rmcustom]").forEach(b=>b.onclick=e=>{e.stopPropagation();setCamCustom(getCamCustom().filter(x=>x.id!==b.dataset.rmcustom));W.ck.delete(b.dataset.rmcustom);renderWeek();toast("Removed")});
+  const gCat=$("gCat"),gNew=$("gNewCat"),gName=$("gName"),gQty=$("gQty"),gAdd=$("gAdd");
+  if(gCat){gCat.onchange=()=>{W.gCat=gCat.value;if(gNew)gNew.hidden=gCat.value!=="__new__"};if(gNew)gNew.hidden=gCat.value!=="__new__"}
+  if(gAdd)gAdd.onclick=()=>{
+    const name=(gName&&gName.value||"").trim().slice(0,80);if(!name){toast("Type an item");return}
+    let aisle=gCat?gCat.value:"other";
+    if(aisle==="__new__"){const n=(gNew&&gNew.value||"").trim().slice(0,40);if(!n){toast("Name the category");return}const cats=getCamCats();if(!cats.includes(n)){cats.push(n);setCamCats(cats);awardCustomCat(n)}aisle=n}
+    const id="cg:"+Date.now().toString(36);const qty=(gQty&&gQty.value||"").trim().slice(0,20);
+    const items=getCamCustom();items.push({id,n:name,q:qty,aisle,a:null,p:null,custom:true,why:"custom add"});setCamCustom(items);
+    awardCustomItem(id);if(gName)gName.value="";if(gQty)gQty.value="";if(gNew)gNew.value="";W.gCat=aisle;renderWeek();toast("Added")
+  };
+  try{const bud=getBud();if(bud&&bud.on&&bud.amt!=null&&t.b<=bud.amt)awardBudgetOk(isoD(s0))}catch(_){}
   bindReceipt(wk);
 }
 function renderListItems(byA,filt,days){
+  const q=typeof camSearchQ==="function"?camSearchQ():"";
   const showFor=(it,dayIdx)=>{
     if(filt==null)return true;
     const d=days[dayIdx]; if(!d||d.kind==="hol")return false;
     const w=(it.why||"").toLowerCase();
     if(it.id&&it.id.startsWith("gg:")&&d.grab&&d.meal&&it.id.slice(3)===d.meal)return true;
-    if(dayActiveSides(d).some(sn=>sn&&w.includes(sn.toLowerCase())))return true;
+    if(typeof dayActiveSides==="function"&&dayActiveSides(d).some(sn=>sn&&w.includes(sn.toLowerCase())))return true;
     if(d.meal&&w.includes((M(d.meal)||{}).name?.toLowerCase()||""))return true;
     if(d.bf&&w.includes("breakfast"))return dayIdx===filt;
     return dayIdx===filt&&d.cook;
+  };
+  const match=it=>!q||String(it.n||"").toLowerCase().includes(q)||String(it.why||"").toLowerCase().includes(q)||String(it.aisle||"").toLowerCase().includes(q);
+  const openMap=typeof camAisleOpen==="function"?camAisleOpen():{};
+  const fold=(id,lab,count,body,store)=>{
+    if(!count)return "";
+    const open=q?true:!!openMap[id];
+    return `<details class="aisle-fold${store?" store-fold":""}" data-aisle="${esc(id)}" ${open?"open":""}><summary><span class="aisle-sum-lab">${lab} · ${count}</span>${CAM_AISLE_CHEV}</summary>${body}</details>`;
   };
   const grabGroups=listByStore().groups;
   let html="";
   Object.keys(grabGroups).sort().forEach(store=>{
     const loc=storeLocLabel(store);
-    html+=`<div class="store-h">${esc(store)}<small>${esc(loc)}</small></div>`;
-    grabGroups[store].filter(it=>!W.have.has(it.id)&&(filt==null||days.some((d,i)=>showFor(it,i)))).forEach(it=>{html+=listItemRow(it,filt,days)});
+    const items=grabGroups[store].filter(it=>!W.have.has(it.id)&&(filt==null||days.some((d,i)=>showFor(it,i)))&&match(it));
+    html+=fold("store:"+store,`${esc(store)}${loc?" · "+esc(loc):""}`,items.length,items.map(it=>listItemRow(it,filt,days)).join(""),true);
   });
-  AISLES.filter(([k])=>byA[k]).forEach(([k,lab])=>{
-    html+=`<h3 class="aisle">${lab}<small>${byA[k].length} items</small></h3>`;
-    byA[k].filter(it=>!it.listStore&&!W.have.has(it.id)&&(filt==null||days.some((d,i)=>showFor(it,i)))).forEach(it=>{html+=listItemRow(it,filt,days)});
+  const customs=(typeof getCamCustom==="function"?getCamCustom():[]).filter(c=>!W.have.has(c.id)&&match(c));
+  customs.forEach(c=>{const k=c.aisle||"other";(byA[k]=byA[k]||[]).push(c)});
+  const aisleList=AISLES.slice();
+  (typeof getCamCats==="function"?getCamCats():[]).forEach(c=>{if(!aisleList.some(([k])=>k===c))aisleList.push([c,c])});
+  aisleList.filter(([k])=>byA[k]&&byA[k].length).forEach(([k,lab])=>{
+    const items=byA[k].filter(it=>!it.listStore&&!W.have.has(it.id)&&(it.custom||filt==null||days.some((d,i)=>showFor(it,i)))&&match(it));
+    const seen=new Set();const uniq=items.filter(it=>{const id=it.id||it.n;if(seen.has(id))return false;seen.add(id);return true});
+    html+=fold(k,lab,uniq.length,uniq.map(it=>listItemRow(it,filt,days)).join(""),false);
   });
   return html;
 }
@@ -1873,7 +1958,7 @@ function listItemRow(it,filt,days){
     <div class="nm" data-ck="${esc(it.id)}">${esc(it.n)}<small>${esc(it.q)}${it.q?" · ":""}for ${esc(it.why)}</small>${tags}
       <div class="pr"><span class="${aw?"win":""}${isStale(it.sA)?" stale":""}">Aldi ${it.a==null?(it.custom?"est. ?":"n/a"):"est. "+$$(it.a)}</span>
       <span class="${pw?"win":""}${isStale(it.sP)?" stale":""}">Publix ${it.p==null?(it.custom?"est. ?":"n/a"):"est. "+$$(it.p)}</span>${it.custom?"":`<span class="src-l">${esc(srcPair(it))}</span>`}</div></div>
-    <button type="button" class="have" data-have="${esc(it.id)}">${W.have.has(it.id)?"↩ Need it":"Have it"}</button></div>`;
+    <button type="button" class="have" data-have="${esc(it.id)}">${W.have.has(it.id)?"↩ Need it":"Have it"}</button>${it.custom?`<button type="button" class="have" data-rmcustom="${esc(it.id)}" aria-label="Remove">${icons.del}</button>`:""}</div>`;
 }
 
 /* ---- shared v3 helpers: sheet, week calendar, long-press, photo share ---- */
@@ -1948,7 +2033,7 @@ function attachShare(o){
 function openReceipt(){
   const inn=openSheet(shTop("📷 Upload receipt")+`
     <p style="margin:0 0 10px;font-weight:700;font-size:15px">Snap your receipt (or a Publix app Purchases screenshot), then send it to Jarvis.</p>
-    <div class="sh-row2" style="margin-top:0;align-items:center"><span class="emo">📷</span><button class="sh-btn p" data-pick="cam">Take photo</button><span class="emo">🖼</span><button class="sh-btn" data-pick="lib">Choose photos</button></div>
+    <div class="sh-row2" style="margin-top:0;align-items:center"><span class="emo">📷</span><button class="sh-btn p" data-pick="cam">Take photo</button><span class="emo">🖼</span><button class="sh-btn" data-pick="lib">Upload receipt</button></div>
     <input type="file" accept="image/*" capture="environment" hidden data-in="cam"><input type="file" accept="image/*" multiple hidden data-in="lib">
     <div class="thumbs" data-th></div><div data-act></div>
     <p class="muted2"><b>Prices update after Jarvis reads it.</b> This page is a static site: nothing is uploaded from here. "Send to Jarvis" just opens your phone's share sheet so you can send the photo into the chat.</p>`,"Upload receipt");
@@ -2085,7 +2170,7 @@ function getRates(){try{const j=JSON.parse(localStorage.getItem(RKEY)||"{}");if(
   let changed=false;Object.keys(j).forEach(id=>{if(j[id]&&j[id].x){j[id]={r:-1,d:j[id].d||isoD(new Date())};changed=true}});
   if(changed)try{localStorage.setItem(RKEY,JSON.stringify(j))}catch(_){ }return j}catch(_){return {}}}
 function rateOf(id){const r=getRates()[id];return r?r.r:0}
-function setRate(id,r){const all=getRates();if(!r||(all[id]&&all[id].r===r))delete all[id];else{
+function setRate(id,r){try{if(r)awardRate(id)}catch(_){};const all=getRates();if(!r||(all[id]&&all[id].r===r))delete all[id];else{
     const sides=[];
     if(W){effDays(W.ov).forEach(d=>{if(d.meal===id)dayActiveSides(d).forEach(s=>{if(!sides.includes(s))sides.push(s)})})}
     all[id]={r,d:isoD(new Date()),sides};
@@ -2213,6 +2298,7 @@ function bindLog(root,days,map,after){map=map||{};after=after||renderWeek;
   const upd=(iso,f)=>{const L=getLog();const e=L.log[iso]||{m:map[iso]?map[iso].m:null,n:map[iso]?map[iso].n:""};f(e);if(e.s)L.log[iso]=e;else delete L.log[iso];setLog(L);return e};
   root.querySelectorAll("[data-ls]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();const v=b.dataset.ls;
     const e=upd(b.dataset.ld,e=>{if(e.s===v)e.s=null;else e.s=v});after();
+    if(e.s)try{awardLogDay(b.dataset.ld)}catch(_){};
     if(e.s==="made")toast(e.m&&!rateOf(e.m)?"✅ Logged as made. How was it? Rate it 👎 / 👍 / ❤️":"✅ Logged as made");else if(e.s)toast(e.s==="skip"?"⏭ Logged as skipped":"🍽 Logged as ate out")});
   const go3=root.querySelector("#lgGo");if(go3){go3.onclick=()=>openLogSheet(days);root.querySelector("#lgLater").onclick=()=>{const L=getLog();L.prompt=isoD(new Date());setLog(L);renderWeek()}}}
 function last3(days){const t=new Date(),out=[];for(let k=3;k>=1;k--){const d=addDays(t,-k),idx=(d.getDay()+6)%7,p=days[idx];
@@ -2245,13 +2331,181 @@ function weekReview(days){const L=getLog().log,s0=weekStartDate();
    <h3 class="aisle">Times made (all-time)</h3>${tm.length?`<ul class="tml">${tm.map(x=>`<li><span>${esc(mealName(x.k))}</span>${M(x.k)&&rateOf(x.k)?`<small>${RE[rateOf(x.k)]}</small>`:""}<b>×${x.made}</b></li>`).join("")}</ul>`:`<p class="hint">Nothing logged yet. Tap ✅ Made on a day after you cook it.</p>`}
    <h3 class="aisle">Suggestions</h3>${sug.length?`<ul class="sgl">${sug.join("")}</ul>`:`<p class="hint">Log a few days and simple tips show up here (like "Skipped twice: swap it?").</p>`}</section>`}
 
+
+/* ===== Items 35-40: collapse/search/share, custom grocery, XP, template share ===== */
+const XP_KEY="cameron-meals-xp-v1";
+const XP_AWARD_KEY="cameron-meals-xp-awards-v1";
+const CG_KEY="cameron-meals-custom-grocery-v1";
+const CC_KEY="cameron-meals-custom-cats-v1";
+const CA_OPEN_KEY="cameron-meals-aisle-open-v1";
+const CAM_SHARE_BASE="https://burnsted.github.io/cameron-meals/";
+const STD_EQUIP=["stove","oven","micro","toaster","fridge"];
+const CAM_AISLE_CHEV=`<svg class="aisle-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
+const BADGES=[
+  {id:"setup",name:"Set up",how:"Finish About me basics + confirm equipment"},
+  {id:"first_cook",name:"First cook",how:"Log a dinner as Made"},
+  {id:"full_week",name:"Full week logged",how:"Log 5+ days in one week"},
+  {id:"streak_3",name:"3-week streak",how:"Log 5+ days three weeks in a row"},
+  {id:"tried_5",name:"Tried 5 new meals",how:"Log Made on 5 different meals"},
+  {id:"rated_10",name:"Rated 10 meals",how:"Rate 10 meals"},
+  {id:"receipt_pro",name:"Receipt pro",how:"Upload a receipt 3 times"},
+  {id:"budget_keeper",name:"Budget keeper",how:"Finish a week under budget"}
+];
+function getXp(){try{const j=JSON.parse(localStorage.getItem(XP_KEY)||"null");if(j&&typeof j==="object")return{stars:+j.stars||0,badges:j.badges&&typeof j.badges==="object"?j.badges:{}}}catch(_){}return{stars:0,badges:{}}}
+function setXp(x){try{localStorage.setItem(XP_KEY,JSON.stringify(x))}catch(_){}}
+function getAwards(){try{const j=JSON.parse(localStorage.getItem(XP_AWARD_KEY)||"{}");return j&&typeof j==="object"?j:{}}catch(_){return{}}}
+function setAwards(a){try{localStorage.setItem(XP_AWARD_KEY,JSON.stringify(a))}catch(_){}}
+function xpToast(msg){let el=document.getElementById("xpToast");if(!el){el=document.createElement("div");el.id="xpToast";el.className="xp-toast";el.setAttribute("role","status");document.body.appendChild(el)}el.textContent=msg;el.hidden=false;clearTimeout(el._t);el._t=setTimeout(()=>{el.hidden=true},1600)}
+function refreshStarBtn(){const b=document.getElementById("starBtn");if(!b)return;const x=getXp();b.innerHTML=icons.star+"<span>"+x.stars+"</span>";b.setAttribute("aria-label",x.stars+" stars, open badges")}
+function awardOnce(key,stars,label){const a=getAwards();if(a[key])return false;a[key]=1;setAwards(a);const x=getXp();x.stars=(x.stars||0)+stars;setXp(x);xpToast(label||("+"+stars+" star"+(stars===1?"":"s")));refreshStarBtn();checkBadges();return true}
+function aboutComplete(){const ab=getAbout()||{},set=getSettings()||{},bud=getBud();
+  return{hasName:!!(ab.name&&String(ab.name).trim()),hasEquip:!!(st&&st.equip&&st.equip.size),hasCoffee:!!(st&&(st.equip.has("lavazza")||st.equip.has("nespresso")||st.equip.has("espresso")||(ab.coffee&&ab.coffee.brand))),hasStores:!!(st&&st.stores&&st.stores.size),hasBud:!!(bud&&bud.on),hasBf:!!(set.bfWeekday),hasEx:!!(ab.exercise||ab.ex||ab.activity)}}
+function aboutOk(){const a=aboutComplete();return a.hasName&&a.hasEquip&&a.hasStores&&a.hasBud&&a.hasBf}
+function madeMealIds(){const L=getLog().log||{},ids=new Set();Object.keys(L).forEach(iso=>{const e=L[iso];if(e&&e.s==="made"&&(e.m||e.n))ids.add(String(e.m||e.n))});return ids}
+function weekLogCount(weekStart){const L=getLog().log||{};let n=0;for(let i=0;i<7;i++){const iso=isoD(addDays(weekStart,i));if(L[iso]&&L[iso].s)n++}return n}
+function countRated(){try{const r=JSON.parse(localStorage.getItem("cameron-meals-rate-v1")||"{}");return Object.keys(r).filter(k=>r[k]&&r[k].r).length}catch(_){return 0}}
+function checkBadges(){const x=getXp();let unlocked=null;const mark=id=>{if(x.badges[id])return;x.badges[id]=1;unlocked=id};
+  if(aboutOk())mark("setup");
+  if(madeMealIds().size>=1)mark("first_cook");
+  try{if(W&&weekLogCount(weekStartDate())>=5){mark("full_week");awardOnce("bonus:week5:"+isoD(weekStartDate()),2,"+2 stars · week log bonus")}}catch(_){}
+  try{const s0=weekStartDate();let streak=0;for(let w=0;w<3;w++){if(weekLogCount(addDays(s0,-7*w))>=5)streak++;else break}if(streak>=3)mark("streak_3")}catch(_){}
+  if(madeMealIds().size>=5)mark("tried_5");
+  if(countRated()>=10)mark("rated_10");
+  const a=getAwards();if(Object.keys(a).filter(k=>k.startsWith("receipt:")).length>=3)mark("receipt_pro");
+  if(Object.keys(a).some(k=>k.startsWith("budget_ok:")))mark("budget_keeper");
+  setXp(x);refreshStarBtn();if(unlocked){const b=BADGES.find(z=>z.id===unlocked);xpToast("Badge: "+(b?b.name:unlocked))}}
+function awardLogDay(iso){if(!iso)return;awardOnce("log:"+iso,1,"+1 star");const e=(getLog().log||{})[iso];if(e&&e.s==="made"&&(e.m||e.n))awardOnce("made:"+(e.m||e.n),1,"+1 star · new meal")}
+function awardRate(id){if(id)awardOnce("rate:"+id,1,"+1 star")}
+function awardAboutField(field){awardOnce("about:"+field,1,"+1 star");checkBadges()}
+function awardCustomItem(id){awardOnce("custom:"+id,1,"+1 star")}
+function awardCustomCat(name){awardOnce("cat:"+name,1,"+1 star")}
+function awardReceipt(){awardOnce("receipt:"+isoD(new Date())+":"+Date.now(),1,"+1 star");checkBadges()}
+function awardBudgetOk(weekIso){awardOnce("budget_ok:"+weekIso,1,"+1 star");checkBadges()}
+function retroXp(){const a=getAwards();let dirty=false;const bump=k=>{if(a[k])return;a[k]=1;dirty=true;const x=getXp();x.stars++;setXp(x)};
+  const L=getLog().log||{};Object.keys(L).forEach(iso=>{if(L[iso]&&L[iso].s)bump("log:"+iso);if(L[iso]&&L[iso].s==="made"&&(L[iso].m||L[iso].n))bump("made:"+(L[iso].m||L[iso].n))});
+  try{const r=JSON.parse(localStorage.getItem("cameron-meals-rate-v1")||"{}");Object.keys(r).forEach(id=>{if(r[id]&&r[id].r)bump("rate:"+id)})}catch(_){}
+  const ab=aboutComplete();["hasName","hasEquip","hasStores","hasBud","hasBf"].forEach(f=>{if(ab[f])bump("about:"+f)});
+  if(dirty)setAwards(a);checkBadges();refreshStarBtn()}
+function openBadgesSheet(){const x=getXp();const inn=openSheet("","Badges");
+  inn.innerHTML=shTop("Badges")+`<p class="muted2" style="margin:0 0 8px">${x.stars} star${x.stars===1?"":"s"} · quiet progress</p><ul class="badge-list">${BADGES.map(b=>{const on=!!x.badges[b.id];return `<li class="${on?"on":""}">${icons.star.replace('class="ico"','class="ico bico"')}<div><b>${esc(b.name)}</b><small>${on?"Earned":esc(b.how)}</small></div></li>`}).join("")}</ul>`}
+function weekLogStrip(days){const L=getLog().log||{},s0=weekStartDate();let made=0,skip=0,out=0;
+  const cells=days.map((d,i)=>{const iso=isoD(addDays(s0,i)),e=L[iso]||{},stt=e.s||"";if(stt==="made")made++;else if(stt==="skip")skip++;else if(stt==="out")out++;
+    const mark=stt==="made"?"Made":stt==="skip"?"Skip":stt==="out"?"Out":"—";
+    return `<button type="button" data-jumplog="${i}" aria-label="${DN[i]} ${mark}"><span class="wls-m">${DN[i].slice(0,1)}</span>${mark}</button>`}).join("");
+  return `<div class="week-log-strip" aria-label="Week log summary"><div class="wls-days">${cells}</div><div class="wls-counts">Made ${made} · Skipped ${skip} · Ate out ${out}</div></div>`}
+function getCamCustom(){try{const j=JSON.parse(localStorage.getItem(CG_KEY)||"[]");return Array.isArray(j)?j:[]}catch(_){return[]}}
+function setCamCustom(arr){try{localStorage.setItem(CG_KEY,JSON.stringify(arr))}catch(_){}}
+function getCamCats(){try{const j=JSON.parse(localStorage.getItem(CC_KEY)||"[]");return Array.isArray(j)?j.filter(x=>typeof x==="string"&&x.trim()).map(x=>x.trim().slice(0,40)):[]}catch(_){return[]}}
+function setCamCats(a){try{localStorage.setItem(CC_KEY,JSON.stringify(a))}catch(_){}}
+function camAisleOpen(){try{const j=JSON.parse(localStorage.getItem(CA_OPEN_KEY)||"{}");return j&&typeof j==="object"?j:{}}catch(_){return{}}}
+function setCamAisleOpen(id,open){const m=camAisleOpen();if(open)m[id]=1;else delete m[id];try{localStorage.setItem(CA_OPEN_KEY,JSON.stringify(m))}catch(_){}}
+function camSearchQ(){const el=$("grocery-search");return el?String(el.value||"").trim().toLowerCase():""}
+async function shareCamList(){
+  const items=(W&&W.items?W.items:[]).filter(it=>!W.have.has(it.id)&&!W.ck.has(it.id));
+  const customs=getCamCustom().filter(c=>!W.have.has(c.id)&&!W.ck.has(c.id));
+  const all=[...items,...customs];const s0=weekStartDate();const lines=["Shopping list · week of "+fmtWeek(s0)];let total=0;
+  const aisleMap={};all.forEach(it=>{const k=it.aisle||"other";(aisleMap[k]=aisleMap[k]||[]).push(it)});
+  const labs=Object.fromEntries([...AISLES,...getCamCats().map(c=>[c,c])]);
+  Object.keys(aisleMap).forEach(k=>{lines.push("",String(labs[k]||k).toUpperCase());aisleMap[k].forEach(it=>{const p=it.a!=null&&(it.p==null||it.a<=it.p)?it.a:it.p;if(p!=null)total+=p;lines.push("- "+it.n+(p!=null?" · est. $"+Number(p).toFixed(2):""))})});
+  lines.push("","Est. total: $"+total.toFixed(2));const text=lines.join("\n");
+  try{if(navigator.share){await navigator.share({title:"Shopping list",text});return}}catch(err){if(err&&err.name==="AbortError")return}
+  try{await navigator.clipboard.writeText(text);toast("List copied")}catch(_){copyTxt(text,"List copied")}
+  const sms=$("grocery-sms");if(sms){sms.href="sms:?&body="+encodeURIComponent(text.slice(0,1500));sms.hidden=false}
+}
+/* Item 40 template share */
+function b64url(bytes){let s="";bytes.forEach(b=>s+=String.fromCharCode(b));return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+function fromB64url(str){str=str.replace(/-/g,"+").replace(/_/g,"/");while(str.length%4)str+="=";const bin=atob(str);const out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out}
+async function compressPayload(obj){
+  const json=JSON.stringify(obj);
+  try{if(window.CompressionStream){const stream=new Blob([json]).stream().pipeThrough(new CompressionStream("gzip"));const buf=new Uint8Array(await new Response(stream).arrayBuffer());return "g"+b64url(buf)}}catch(_){}
+  try{return "j"+btoa(unescape(encodeURIComponent(json))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}catch(_){return "j"+encodeURIComponent(json)}
+}
+async function decompressPayload(raw){
+  if(!raw)return null;
+  try{
+    if(raw.startsWith("g")&&window.DecompressionStream){const bytes=fromB64url(raw.slice(1));const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));const text=await new Response(stream).text();return JSON.parse(text)}
+    if(raw.startsWith("j")){const s=raw.slice(1);try{return JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/")))))}catch(_){return JSON.parse(decodeURIComponent(s))}}
+    return JSON.parse(decodeURIComponent(raw));
+  }catch(e){console.warn("template decode failed",e);return null}
+}
+function buildShareTemplate(dropPlan,dropRatings){
+  const set=getSettings()||{},bud=getBud()||{},rules=typeof getRules==="function"?getRules():[];
+  const ratings={};try{const r=JSON.parse(localStorage.getItem("cameron-meals-rate-v1")||"{}");Object.keys(r).forEach(k=>{if(r[k]&&(r[k].r===1||r[k].r===2||r[k].r===-1))ratings[k]={r:r[k].r}})}catch(_){}
+  const theme=document.documentElement.getAttribute("data-theme")||(document.body.classList.contains("light")?"light":"dark");
+  const tpl={v:1,stores:st?[...st.stores]:[],storeLoc:st&&st.storeLoc?st.storeLoc:{},main:st?st.main:"",budget:bud,breakfast:{bfWeekday:set.bfWeekday,bfAlt:set.bfAlt,bfWeekend:set.bfWeekend,grabNights:set.grabNights},rules,customCats:getCamCats(),customItems:getCamCustom(),theme,meals:st?st.meals:{},mealV:st?st.mealV:{},sides:st?[...st.sides]:[],picks:{}};
+  if(st&&st.picks)Object.keys(st.picks).forEach(k=>{tpl.picks[k]=[...(st.picks[k]||[])]});
+  // exclude equipment + coffee machines entirely
+  if(!dropPlan&&W){tpl.week={ov:W.ov||{},base:(W.base||[]).map(d=>({meal:d.meal,dinner:d.dinner,kind:d.kind,sideName:d.sideName,cook:d.cook,grab:d.grab,e:d.e,cut:d.cut}))}}
+  if(!dropRatings)tpl.ratings=ratings;
+  return tpl;
+}
+async function shareThisApp(){
+  let tpl=buildShareTemplate(false,false);
+  let payload=await compressPayload(tpl);
+  if(payload.length>6000){tpl=buildShareTemplate(true,false);payload=await compressPayload(tpl)}
+  if(payload.length>6000){tpl=buildShareTemplate(true,true);payload=await compressPayload(tpl)}
+  const url=CAM_SHARE_BASE+"#t="+payload;
+  const text="Here's my meal planner setup — it's yours to tweak. Your stuff saves on your own phone.";
+  try{if(navigator.share){await navigator.share({title:"Meal Picker",text,url});return}}catch(err){if(err&&err.name==="AbortError")return}
+  try{await navigator.clipboard.writeText(url);toast("Link copied")}catch(_){copyTxt(url,"Link copied")}
+  const sms=$("shareAppSms");if(sms){sms.href="sms:?&body="+encodeURIComponent(text+" "+url.slice(0,1200));sms.hidden=false}
+}
+function hasSavedCamData(){
+  try{if(localStorage.getItem("cameron-meals-state-v1")||localStorage.getItem("cameron-meals-rate-v1")||localStorage.getItem(CG_KEY))return true}catch(_){}
+  return !!(st&&((st.stores&&st.stores.size)||(st.meals&&Object.keys(st.meals).length)));
+}
+function applyStdEquip(){if(!st)return;st.equip=new Set(STD_EQUIP.filter(id=>(C.EQUIP||[]).some(e=>e.id===id)));st.coffee={brand:"",brandOther:"",machines:new Set(),drinks:new Set(),milk:"No milk",perWeek:7}}
+async function importTemplate(tpl,replace){
+  if(!tpl||typeof tpl!=="object")return;
+  if(replace){/* wipe sensitive */ try{localStorage.removeItem(XP_KEY);localStorage.removeItem(XP_AWARD_KEY)}catch(_){}}
+  if(!st)reset();
+  applyStdEquip();
+  if(Array.isArray(tpl.stores))st.stores=new Set(tpl.stores);
+  if(tpl.storeLoc)st.storeLoc=tpl.storeLoc;
+  if(tpl.main)st.main=tpl.main;
+  if(tpl.meals)st.meals=tpl.meals;
+  if(tpl.mealV)st.mealV=tpl.mealV;
+  if(Array.isArray(tpl.sides))st.sides=new Set(tpl.sides);
+  if(tpl.picks){st.picks={};Object.keys(tpl.picks).forEach(k=>st.picks[k]=new Set(tpl.picks[k]||[]))}
+  if(tpl.budget){try{localStorage.setItem("cameron-meals-budget-v1",JSON.stringify(tpl.budget))}catch(_){}}
+  if(tpl.breakfast){const set=getSettings();Object.assign(set,tpl.breakfast);setSettings(set)}
+  if(Array.isArray(tpl.rules)){try{setRules(tpl.rules)}catch(_){}}
+  if(Array.isArray(tpl.customCats))setCamCats(tpl.customCats);
+  if(Array.isArray(tpl.customItems))setCamCustom(tpl.customItems);
+  if(tpl.ratings){try{localStorage.setItem("cameron-meals-rate-v1",JSON.stringify(tpl.ratings))}catch(_){}}
+  if(tpl.theme){try{document.documentElement.setAttribute("data-theme",tpl.theme);localStorage.setItem("cm-theme",tpl.theme)}catch(_){}}
+  // clear name for friend
+  const ab=getAbout()||{};delete ab.name;delete ab.exercise;delete ab.ex;delete ab.activity;setAbout(ab);st.about=ab;
+  if(tpl.week&&tpl.week.base){/* rebuild week from template structure */}
+  toast("Template loaded — confirm your name & equipment");
+}
+async function handleTemplateHash(){
+  const m=location.hash.match(/^#t=(.+)$/);
+  if(!m)return;
+  const tpl=await decompressPayload(m[1]);
+  history.replaceState(null,"",location.pathname+location.search);
+  if(!tpl){toast("Could not read shared setup");return}
+  const apply=async(replace)=>{await importTemplate(tpl,replace);st._fromTemplate=true;st._needName=true;st._needEquipConfirm=true;refreshTitles();if(typeof startWelcome==="function")startWelcome(true);else render()};
+  if(hasSavedCamData()){
+    const inn=openSheet("","Shared setup");
+    inn.innerHTML=shTop("Shared setup")+`<p style="margin:0 0 12px;font-weight:700">Replace your setup with this template?</p><div class="sh-row2"><button class="sh-btn" id="tplKeep">Keep mine</button><button class="sh-btn p" id="tplRep">Replace</button></div>`;
+    inn.querySelector("#tplKeep").onclick=()=>closeSheet();
+    inn.querySelector("#tplRep").onclick=()=>{closeSheet();apply(true)};
+  }else apply(false);
+}
+
+
 initSheet();bindReceipt(document);
 reset();refreshTitles();
 const b0=$("backBtn");if(b0){b0.innerHTML=icons.backSm+'<span>Back</span>';b0.onclick=goBackApp}
+const bwTop=$("bwTop");if(bwTop){bwTop.innerHTML=icons.cal+'<span>Build my week</span>';bwTop.onclick=goBuildWeek}
 const _render=render;
 render=function(){_render();updateBackBtn();wireAllAutocomplete(card);refreshTitles()};
 render();
-setTimeout(()=>startWelcome(false),500);
+setTimeout(()=>{
+  const go=()=>{try{startWelcome(false)}catch(_){};try{retroXp()}catch(_){}};
+  if(typeof handleTemplateHash==="function")handleTemplateHash().then(go).catch(go);else go();
+},300);
 </script>
 </body>
 </html>

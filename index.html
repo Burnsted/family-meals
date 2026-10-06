@@ -170,7 +170,11 @@
           <option>Frozen</option>
           <option>Tucker lunchbox</option>
           <option>Other</option>
+          <option value="__new__">+ New category…</option>
         </select>
+        <label class="visually-hidden" for="custom-new-cat">New category name</label>
+        <input id="custom-new-cat" type="text" maxlength="40" placeholder="Name the new category…" hidden />
+        <button type="button" class="btn btn-secondary" id="del-custom-cat" hidden>Delete category</button>
         <label class="visually-hidden" for="custom-name">Custom grocery item</label>
         <input id="custom-name" type="text" maxlength="80" placeholder="Add custom grocery item…" />
         <label class="visually-hidden" for="custom-price">Optional price</label>
