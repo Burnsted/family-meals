@@ -734,6 +734,10 @@
     haveIt: {},
     custom: [],
     dayOverrides: {},
+    weekEdits: {},
+    budget: { on: true, amt: null, days: 7 },
+    store: "best",
+    ratings: {},
     shopMode: false,
     hideChecked: false,
     showHiddenHave: false,
@@ -746,6 +750,9 @@
   const els = {
     weekLabel: document.getElementById("week-label"),
     budgetBand: document.getElementById("budget-band"),
+    budgetCompare: document.getElementById("budget-compare"),
+    calBtn: document.getElementById("cal-btn"),
+    rcptBtn: document.getElementById("rcpt-btn"),
     estimateBand: document.getElementById("estimate-band"),
     houseNote: document.getElementById("house-note"),
     templateBtns: Array.from(document.querySelectorAll(".template-btn")),
@@ -836,13 +843,13 @@
       }));
   }
 
-  function dayOverride(dayId) {
-    const ov = state.dayOverrides[dayId];
+  function dayOverride(dayId, map) {
+    const ov = (map || state.dayOverrides)[dayId];
     return ov && typeof ov === "object" ? ov : null;
   }
 
-  function effectiveDay(templateDay) {
-    const ov = dayOverride(templateDay.id);
+  function effectiveDay(templateDay, map) {
+    const ov = dayOverride(templateDay.id, map);
     if (!ov) {
       return { ...templateDay, overrideType: null, swapped: false };
     }
@@ -985,6 +992,446 @@
     showToast._t = setTimeout(() => els.toast.classList.remove("show"), 2200);
   }
 
+/* ---- shared v3 helpers: sheet, week calendar, long-press, photo share ---- */
+  const MO3=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const MOFULL=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  function mondayOf(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
+  function addDays(d,n){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x}
+  function sameDay(a,b){return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate()}
+  function fmtWeek(mon){const e=addDays(mon,6);return `${MO3[mon.getMonth()]} ${mon.getDate()}–${mon.getMonth()===e.getMonth()?"":MO3[e.getMonth()]+" "}${e.getDate()}, ${e.getFullYear()}`}
+  function parseWeekLabel(str){
+    const m=/^\s*([A-Z][a-z]{2})[a-z]*\.?\s+(\d{1,2})\s*[–-]\s*(?:([A-Z][a-z]{2})[a-z]*\.?\s+)?(\d{1,2}),?\s+(\d{4})\s*$/.exec(String(str||""));
+    if(!m)return null;const sm=MO3.indexOf(m[1]);const em=m[3]?MO3.indexOf(m[3]):sm;if(sm<0||em<0)return null;
+    let y=+m[5];const sy=em<sm?y-1:y;const d=new Date(sy,sm,+m[2]);return isNaN(d)?null:mondayOf(d)}
+  function shEl(){return document.getElementById("sheet")}
+  function openSheet(html,label){const bg=shEl(),inn=document.getElementById("sheetIn");inn.innerHTML=html;if(label)inn.setAttribute("aria-label",label);bg.classList.add("open");bg.setAttribute("aria-hidden","false");const x=inn.querySelector("[data-x]");if(x)x.focus();return inn}
+  function closeSheet(){const bg=shEl();if(!bg)return;bg.classList.remove("open");bg.setAttribute("aria-hidden","true");const inn=document.getElementById("sheetIn");if(inn)inn.innerHTML=""}
+  function sheetOpen(){const bg=shEl();return bg&&bg.classList.contains("open")}
+  function initSheet(){const bg=shEl();if(!bg||bg._init)return;bg._init=1;
+    bg.addEventListener("click",e=>{if(e.target===bg||e.target.closest("[data-x]"))closeSheet()});
+    document.addEventListener("keydown",e=>{if(e.key==="Escape"&&sheetOpen()){e.stopPropagation();closeSheet()}},true)}
+  const shTop=(t)=>`<div class="sh-top"><h3>${t}</h3><button class="sh-x" data-x="1" aria-label="Close">✕</button></div>`;
+  /* Week calendar. opts: sel (Monday Date or null), onPick(monday, keepOpen) */
+  function openCal(opts){
+    const today=new Date();today.setHours(0,0,0,0);
+    let sel=opts.sel?mondayOf(opts.sel):null;
+    let view=new Date((sel||today).getFullYear(),(sel||today).getMonth(),1);
+    const inn=openSheet("", "Pick a week");
+    function draw(){
+      const first=view, gs=mondayOf(first);
+      const rows=[];for(let r=0;r<6;r++){const rm=addDays(gs,r*7);if(r>=4&&rm.getMonth()!==view.getMonth()&&rm>first)break;rows.push(rm)}
+      inn.innerHTML=shTop("📅 Pick a week")+`
+        <p class="cal-sel">${sel?"Selected: "+fmtWeek(sel):"Tap any day to pick its Mon–Sun week"}</p>
+        <div class="cal-nav"><button data-cm="-1" aria-label="Previous month">‹</button><b>${MOFULL[view.getMonth()]} ${view.getFullYear()}</b><button data-cm="1" aria-label="Next month">›</button></div>
+        <div class="cal-dow"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+        ${rows.map(rm=>`<div class="cal-row${sel&&sameDay(rm,sel)?" sel":""}">${[0,1,2,3,4,5,6].map(i=>{const d=addDays(rm,i);
+          return `<button class="cal-d${d.getMonth()!==view.getMonth()?" out":""}${sameDay(d,today)?" today":""}" data-day="${d.getFullYear()}-${d.getMonth()}-${d.getDate()}" aria-label="${MOFULL[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}${sameDay(d,today)?" (today)":""}">${d.getDate()}</button>`}).join("")}</div>`).join("")}
+        <div class="cal-foot"><button data-cw="-1">‹ Prev week</button><button class="now" data-now="1">This week</button><button data-cw="1">Next week ›</button></div>`;
+      inn.querySelectorAll("[data-cm]").forEach(b=>b.onclick=()=>{view=new Date(view.getFullYear(),view.getMonth()+(+b.dataset.cm),1);draw()});
+      inn.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{const [y,m,d]=b.dataset.day.split("-").map(Number);sel=mondayOf(new Date(y,m,d));opts.onPick(sel);closeSheet()});
+      inn.querySelectorAll("[data-cw]").forEach(b=>b.onclick=()=>{sel=addDays(sel||mondayOf(today),7*(+b.dataset.cw));view=new Date(sel.getFullYear(),sel.getMonth(),1);opts.onPick(sel,true);draw()});
+      inn.querySelector("[data-now]").onclick=()=>{sel=mondayOf(today);opts.onPick(sel);closeSheet()};
+    }
+    draw();
+  }
+  /* Long-press (~500ms). Short tap keeps normal click. Cancels if finger moves. */
+  function longPress(el,fn,ms){ms=ms||500;let t=null,x=0,y=0,fired=false;
+    el.classList.add("lp");
+    el.addEventListener("pointerdown",e=>{if(e.button>0)return;fired=false;x=e.clientX;y=e.clientY;clearTimeout(t);t=setTimeout(()=>{t=null;fired=true;try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}fn()},ms)});
+    const cancel=()=>{clearTimeout(t);t=null};
+    el.addEventListener("pointermove",e=>{if(t&&Math.hypot(e.clientX-x,e.clientY-y)>10)cancel()});
+    ["pointerup","pointerleave","pointercancel"].forEach(ev=>el.addEventListener(ev,cancel));
+    el.addEventListener("contextmenu",e=>e.preventDefault());
+    el.addEventListener("click",e=>{if(fired){e.preventDefault();e.stopImmediatePropagation();fired=false}},true)}
+  /* Photo picker + Web Share. Nothing is uploaded anywhere. */
+  function attachShare(o){
+    const files=o.files;
+    const draw=()=>{
+      o.thumbs.innerHTML=files.map(f=>`<img alt="photo" src="${f._url}">`).join("");
+      if(!files.length){o.act.innerHTML="";return}
+      const can=!!(navigator.canShare&&navigator.share&&navigator.canShare({files}));
+      o.act.innerHTML=can?`<button class="${o.btnClass||"sbtn"}" data-share="1">${o.shareLabel}</button><p class="shr-msg" data-msg></p>`
+        :`<p class="shr-msg">${o.fallback}</p>`;
+      const sb=o.act.querySelector("[data-share]");
+      if(sb)sb.onclick=async()=>{const msg=o.act.querySelector("[data-msg]");
+        try{await navigator.share({files,title:o.title,text:o.text});msg.textContent="Shared. "+(o.after||"")}
+        catch(err){msg.textContent=err&&err.name==="AbortError"?"Share cancelled. Tap again when ready.":o.fallback}};
+    };
+    o.inputs.forEach(inp=>inp.addEventListener("change",()=>{[...inp.files].forEach(f=>{f._url=URL.createObjectURL(f);files.push(f)});inp.value="";draw()}));
+    draw();
+  }
+  function openReceipt(){
+    const inn=openSheet(shTop("📷 Upload receipt")+`
+      <p style="margin:0 0 10px;font-weight:700;font-size:15px">Snap your receipt (or a Publix app Purchases screenshot), then send it to Jarvis.</p>
+      <div class="sh-row2" style="margin-top:0"><button class="sh-btn p" data-pick="cam">📷 Take photo</button><button class="sh-btn" data-pick="lib">🖼 Choose photos</button></div>
+      <input type="file" accept="image/*" capture="environment" hidden data-in="cam"><input type="file" accept="image/*" multiple hidden data-in="lib">
+      <div class="thumbs" data-th></div><div data-act></div>
+      <p class="muted2"><b>Prices update after Jarvis reads it.</b> This page is a static site: nothing is uploaded from here. "Send to Jarvis" just opens your phone's share sheet so you can send the photo into the chat.</p>`,"Upload receipt");
+    inn.querySelector('[data-pick="cam"]').onclick=()=>inn.querySelector('[data-in="cam"]').click();
+    inn.querySelector('[data-pick="lib"]').onclick=()=>inn.querySelector('[data-in="lib"]').click();
+    attachShare({inputs:[...inn.querySelectorAll("[data-in]")],thumbs:inn.querySelector("[data-th]"),act:inn.querySelector("[data-act]"),files:[],
+      btnClass:"sh-btn p wide",shareLabel:"Send to Jarvis",title:"Receipt",text:"Receipt for the meal-planner prices",
+      after:"Prices update after Jarvis reads it.",fallback:"Your browser can't open the share sheet from here. Save the photo (long-press → Save) and send it to Jarvis in chat."});
+  }
+  function srcLabel(e){if(!e)return "est.";const md=s=>{const d=new Date(s+"T12:00:00");return isNaN(d)?"":MO3[d.getMonth()]+" "+d.getDate()};
+    if(e.source==="receipt")return "receipt "+md(e.checked);
+    if(e.source==="ad"||e.source==="weekly-ad")return "ad"+(e.sale_ends?" thru "+md(e.sale_ends):"");
+    if(e.source==="online-listing")return "online "+md(e.checked);
+    if(e.source==="shelf-photo")return "shelf "+md(e.checked);
+    return "est. · checked "+md(e.checked||"2026-10-05")}
+  function isStale(e){if(!e||!e.checked)return false;const d=new Date(e.checked+"T12:00:00");return !isNaN(d)&&(Date.now()-d.getTime())>60*864e5}
+  function fmtDateLong(s){const d=new Date(s+"T12:00:00");return isNaN(d)?s:`${MO3[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`}
+  
+  const FAM_PRICES = {"rotisserie": {"n": "Rotisserie chicken", "q": "1 whole", "a": 4.99, "p": 7.99, "note": "Publix deli price varies; Aldi when stocked"}, "chicken": {"n": "Chicken breasts, boneless skinless", "q": "~2.5 lb", "a": 5.73, "p": 13.83, "note": "Aldi ~$2.29/lb · Publix ~$5.53/lb (St. Pete listings, Oct 2026)"}, "beef": {"n": "Ground beef 80/20", "q": "~1.5 lb", "a": 7.94, "p": 13.28, "note": "Aldi ~$5.29/lb · Publix ~$8.85/lb (listings, Oct 2026)"}, "salmon": {"n": "Salmon fillets", "q": "~1 lb", "a": 9.99, "p": 12.99}, "tilapia": {"n": "Tilapia fillets", "q": "~1 lb", "a": 4.99, "p": 7.99}, "sausage": {"n": "Sausage (breakfast or smoked)", "q": "1 pack", "a": 2.79, "p": 4.99}, "eggs": {"n": "Large eggs", "q": "1 dozen", "a": 1.85, "p": 2.19, "note": "Aldi Goldhen · Publix 12 ct (listings, Oct 2026)"}, "potatoes": {"n": "Potatoes", "q": "5 lb bag", "a": 2.99, "p": 4.99}, "onion": {"n": "Yellow onions", "q": "3 lb bag", "a": 2.49, "p": 3.99}, "salad": {"n": "Salad bag", "q": "1 bag", "a": 1.99, "p": 3.49}, "fruit": {"n": "Fruit (bananas + apples)", "q": "~6 bananas + 3 lb apples", "a": 4.99, "p": 6.99}, "peppers": {"n": "Bell peppers", "q": "3 pk", "a": 2.99, "p": 4.49}, "broccoli": {"n": "Broccoli crowns", "q": "~1 lb", "a": 1.79, "p": 2.99}, "veg": {"n": "Veg for sides", "q": "1 bag / bunch", "a": 1.99, "p": 2.99}, "cheese": {"n": "Shredded cheese", "q": "8 oz", "a": 2.29, "p": 3.49}, "milk": {"n": "Milk", "q": "1 gallon", "a": 3.09, "p": 4.69}, "tortillas": {"n": "Flour tortillas", "q": "10 ct", "a": 1.99, "p": 3.29}, "alfredo": {"n": "Alfredo sauce + pasta", "q": "1 jar + 1 lb box", "a": 2.94, "p": 5.08}, "chili-cans": {"n": "Chili beans + diced tomatoes", "q": "2 + 2 cans", "a": 3.2, "p": 5.36}, "rice": {"n": "Long grain rice", "q": "2 lb bag", "a": 1.79, "p": 2.49}, "buns": {"n": "Hamburger buns", "q": "8 ct", "a": 1.55, "p": 4.41, "note": "Aldi L'oven Fresh · Publix Bakery (listings, Oct 2026)"}, "t-yogurt": {"n": "Chobani yogurt cups", "q": "multipack", "a": null, "p": 6.99, "brand": "Chobani", "al": 3.3, "note": "Aldi look-alike yogurt ~$3.30"}, "t-cheese": {"n": "Polly-O string cheese", "q": "12 ct", "a": null, "p": 5.99, "brand": "Polly-O", "al": 2.89, "note": "Aldi look-alike string cheese ~$2.89"}, "t-pretzels": {"n": "Pretzels / Pringles", "q": "1 bag or can", "a": 1.49, "p": 2.79}, "t-fruit-snack": {"n": "Fruit snacks", "q": "10 ct box", "a": 1.99, "p": 3.49}, "t-beef-stick": {"n": "Natural beef sticks", "q": "multipack", "a": 3.49, "p": 5.99}, "t-juice": {"n": "Apple & Eve apple juice boxes", "q": "8 pk", "a": null, "p": 3.99, "brand": "Apple & Eve", "al": 1.99, "note": "Aldi look-alike juice boxes ~$1.99"}};
+
+  const PRICE_SOURCES = [
+    ["Aldi chicken breast family pack $2.29/lb (online listing)", "https://www.aldi.us/store/aldi/products/19554637-fresh-family-pack-chicken-breasts-per-lb"],
+    ["Aldi ground beef 80/20 $5.29/lb (online listing)", "https://www.aldi.us/store/aldi/products/17771077-ground-beef-80-20-1-per-lb"],
+    ["Aldi eggs $1.85/dozen (online listing)", "https://www.aldi.us/store/aldi/products/115095-goldhen-grade-a-large-eggs-12-ct"],
+    ["Aldi hamburger buns $1.55 (online listing)", "https://www.aldi.us/store/aldi/products/20873280-l-oven-fresh-hamburger-buns-12-oz"],
+    ["Publix chicken breast 4 lb+ $5.53/lb (online listing)", "https://delivery.publix.com/store/publix/products/387470-publix-chicken-all-natural-boneless-skinless-chicken-breast-per-lb"],
+    ["Publix ground beef $8.85/lb (online listing)", "https://delivery.publix.com/store/publix/products/380937-publix-market-ground-beef-1-15-lb"],
+    ["Publix eggs 12 ct $2.19 (online listing)", "https://delivery.publix.com/store/publix/products/324877-publix-eggs-large-12-ct"],
+    ["Publix bakery buns 8 ct $4.41 (online listing)", "https://delivery.publix.com/store/publix/products/321487-publix-original-hamburger-buns-8-ct"],
+  ];
+  const PRICE_META = { updated: "2026-10-05", loaded: false };
+  const LIVE_PRICES = {};
+  Object.keys(FAM_PRICES).forEach((k) => {
+    LIVE_PRICES[k] = { ...FAM_PRICES[k], sA: { source: "estimate", checked: "2026-10-05" }, sP: { source: "estimate", checked: "2026-10-05" } };
+  });
+  function loadPricesJson() {
+    if (!window.fetch) return;
+    fetch("prices.json", { cache: "no-cache" })
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((j) => {
+        if (!j || !j.items) return;
+        Object.keys(j.items).forEach((key) => {
+          if (key.indexOf("fam-") !== 0) return;
+          const k = key.slice(4);
+          const it = j.items[key];
+          const P = LIVE_PRICES[k] || (LIVE_PRICES[k] = { n: it.name, q: it.size || "", a: null, p: null });
+          if (it.size) P.q = it.size;
+          if (it.brand) { P.brand = it.brand; P.al = it.aldi_lookalike ?? null; }
+          (it.prices || []).forEach((e) => {
+            if (e.store === "aldi-vero" && e.price !== undefined) { P.a = e.price; P.sA = e; }
+            if (e.store === "publix-vero" && e.price !== undefined) { P.p = e.price; P.sP = e; }
+          });
+        });
+        if (j.updated) PRICE_META.updated = j.updated;
+        PRICE_META.loaded = true;
+        renderGrocery();
+      })
+      .catch(() => {});
+  }
+  function priceKeyFor(item) {
+    if (!item || item.custom) return null;
+    return String(item.id).replace(/^swap-[a-z]+-/, "").replace(/^w\d[ab]?-/, "");
+  }
+  function storePriceFor(item) {
+    const k = priceKeyFor(item);
+    return k && LIVE_PRICES[k] ? LIVE_PRICES[k] : null;
+  }
+  function formatMoney2(n) {
+    return `$${(Number(n) || 0).toFixed(2)}`;
+  }
+  function storeTotals(items) {
+    const t = { a: 0, p: 0, b: 0, aLeft: 0, pLeft: 0, bLeft: 0, na: 0, np: 0, cu: 0, own: 0 };
+    items.forEach((item) => {
+      const own = itemPrice(item.id, item.price);
+      const left = !itemChecked(item.id);
+      let a, p, b;
+      if (own !== null) {
+        a = p = b = own;
+        t.own += 1;
+      } else {
+        const sp = storePriceFor(item);
+        if (!sp || (sp.a == null && sp.p == null && sp.al == null)) { t.cu += 1; return; }
+        a = sp.a != null ? sp.a : sp.al != null ? sp.al : sp.p;
+        p = sp.p != null ? sp.p : sp.a;
+        const aldiWins = sp.a != null && (sp.p == null || sp.a <= sp.p);
+        b = aldiWins ? sp.a : sp.p;
+        if (aldiWins) t.na += 1; else t.np += 1;
+      }
+      t.a += a; t.p += p; t.b += b;
+      if (left) { t.aLeft += a; t.pLeft += p; t.bLeft += b; }
+    });
+    return t;
+  }
+  function storePriceRow(item) {
+    const sp = storePriceFor(item);
+    if (!sp) return item.custom && itemPrice(item.id) === null ? `<div class="pr"><span>Store est. ? · add your $</span></div>` : "";
+    const aw = sp.a != null && (sp.p == null || sp.a <= sp.p);
+    const pw = sp.p != null && !aw;
+    const aTxt = sp.a != null ? `Aldi est. ${formatMoney2(sp.a)}` : sp.al != null ? `Aldi n/a (look-alike est. ${formatMoney2(sp.al)})` : "Aldi n/a";
+    const pTxt = sp.p != null ? `Publix est. ${formatMoney2(sp.p)}` : "Publix n/a";
+    const la = srcLabel(sp.sA), lp = srcLabel(sp.sP);
+    return `<div class="pr">${sp.q ? `<span class="qty-l">${escapeHtml(sp.q)}</span>` : ""}<span class="${aw ? "win" : ""}${isStale(sp.sA) ? " stale" : ""}">${escapeHtml(aTxt)}</span><span class="${pw ? "win" : ""}${isStale(sp.sP) ? " stale" : ""}">${escapeHtml(pTxt)}</span>${aw || pw ? `<span class="win">${aw ? "Aldi" : "Publix"} cheaper</span>` : ""}<span class="src-l">${escapeHtml(la === lp ? la : `Aldi ${la} · Publix ${lp}`)}</span></div>`;
+  }
+  function storePriceText(item) {
+    const sp = storePriceFor(item);
+    if (!sp) return "";
+    const a = sp.a != null ? `Aldi est. ${formatMoney2(sp.a)}` : sp.al != null ? `Aldi look-alike est. ${formatMoney2(sp.al)}` : "Aldi n/a";
+    const p = sp.p != null ? `Publix est. ${formatMoney2(sp.p)}` : "Publix n/a";
+    return `${a} / ${p}`;
+  }
+  /* budget */
+  function normalizeBudget(b) {
+    const out = { on: true, amt: null, days: 7 };
+    if (!b || typeof b !== "object") return out;
+    out.on = b.on !== false && b.on !== 0;
+    const a = Number(b.amt);
+    out.amt = b.amt === null || b.amt === undefined || b.amt === "" || !Number.isFinite(a) || a <= 0 ? null : Math.round(a * 100) / 100;
+    const d = Math.round(Number(b.days));
+    out.days = Number.isFinite(d) && d >= 1 && d <= 366 ? d : 7;
+    return out;
+  }
+  function normalizeStore(v) {
+    return v === "aldi" || v === "publix" ? v : "best";
+  }
+  function budgetLine(plan) {
+    const b = state.budget;
+    if (!b.on) return "Budget: off";
+    if (b.amt == null) return `Budget band ${plan.budget}`;
+    return `Budget ${formatMoney(b.amt)} / ${b.days} days`;
+  }
+  function renderBudgetCompare(tots) {
+    const el = els.budgetCompare;
+    if (!el) return;
+    const b = state.budget;
+    if (!b.on || b.amt == null) { el.hidden = true; return; }
+    const days = currentPlan().days.length || 7;
+    const scaled = (b.amt * days) / b.days;
+    const total = state.store === "aldi" ? tots.a : state.store === "publix" ? tots.p : tots.b;
+    const lab = state.store === "aldi" ? "All Aldi" : state.store === "publix" ? "All Publix" : "Best split";
+    const diff = scaled - total;
+    el.hidden = false;
+    el.className = `bcmp ${diff >= 0 ? "under" : "over"}`;
+    el.innerHTML = `${diff >= 0 ? `✓ Under budget by ${formatMoney2(diff)}` : `✗ Over budget by ${formatMoney2(-diff)}`}<small>${lab} est. ${formatMoney2(total)} vs your ${formatMoney2(scaled)} for ${days} days (${formatMoney(b.amt)} / ${b.days} days)</small>`;
+  }
+  function openBudgetEditor() {
+    const b = state.budget;
+    const inn = openSheet(shTop("💵 Budget") + `
+      <div class="sw" role="switch" tabindex="0" aria-checked="${b.on}" id="bSw"><span>Budget ${b.on ? "on" : "off"}<br><small style="font-weight:650">Off = no budget shown or compared</small></span><span class="tg"></span></div>
+      <label class="fld" for="bAmt">Budget amount ($)</label><input class="inp" id="bAmt" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 120" value="${b.amt == null ? "" : b.amt}">
+      <label class="fld" for="bDays">How many days it covers</label><input class="inp" id="bDays" type="number" inputmode="numeric" min="1" max="366" value="${b.days}">
+      <div class="dchips">${[3, 5, 7, 14].map((n) => `<button type="button" data-dd="${n}" class="${b.days === n ? "on" : ""}">${n} days</button>`).join("")}</div>
+      <div class="sh-row2"><button type="button" class="sh-btn" id="bClr">Back to default band</button><button type="button" class="sh-btn p" id="bSave">Save</button></div>
+      <p class="muted2">Compared with the grocery total (Best split unless you tap another store total), scaled to the 7-day plan: e.g. $120 / 14 days = $60 for 7 days. Saved on this phone and in the share link.</p>`, "Budget");
+    const sw = inn.querySelector("#bSw");
+    const flip = () => {
+      state.budget.on = !state.budget.on;
+      sw.setAttribute("aria-checked", String(state.budget.on));
+      sw.firstElementChild.firstChild.textContent = "Budget " + (state.budget.on ? "on" : "off");
+      persist();
+      renderAll();
+    };
+    sw.addEventListener("click", flip);
+    sw.addEventListener("keydown", (e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); flip(); } });
+    inn.querySelectorAll("[data-dd]").forEach((x) => x.addEventListener("click", () => {
+      inn.querySelector("#bDays").value = x.dataset.dd;
+      inn.querySelectorAll("[data-dd]").forEach((y) => y.classList.toggle("on", y === x));
+    }));
+    inn.querySelector("#bSave").addEventListener("click", () => {
+      const a = parseFloat(String(inn.querySelector("#bAmt").value).replace(/[$,\s]/g, ""));
+      state.budget = normalizeBudget({ on: true, amt: Number.isFinite(a) && a > 0 ? a : null, days: inn.querySelector("#bDays").value });
+      persist(); closeSheet(); renderAll();
+      showToast(state.budget.amt == null ? "Budget band back to default" : `Budget ${formatMoney(state.budget.amt)} / ${state.budget.days} days saved`);
+    });
+    inn.querySelector("#bClr").addEventListener("click", () => {
+      state.budget = { on: true, amt: null, days: 7 };
+      persist(); closeSheet(); renderAll();
+    });
+  }
+  /* per-week edits (long-press customizer) */
+  function normalizeWeekEdits(src) {
+    const out = {};
+    if (!src || typeof src !== "object" || Array.isArray(src)) return out;
+    Object.keys(src).forEach((key) => {
+      if (!/^[12][AB]$/.test(key)) return;
+      const m = normalizeDayOverrides(src[key]);
+      if (Object.keys(m).length) out[key] = m;
+    });
+    return out;
+  }
+  function linkWeekEdits(st) {
+    if (!st.weekEdits || typeof st.weekEdits !== "object") st.weekEdits = {};
+    const key = `${st.week}${st.plan}`;
+    if (!st.weekEdits[key]) st.weekEdits[key] = st.dayOverrides && Object.keys(st.dayOverrides).length ? st.dayOverrides : {};
+    st.dayOverrides = st.weekEdits[key];
+  }
+  function compactOverrides(map) {
+    const acc = {};
+    Object.keys(map || {}).forEach((dayId) => {
+      const ov = map[dayId];
+      if (!ov) return;
+      if (ov.type === "leftovers") acc[dayId] = { t: "l" };
+      else if (ov.type === "eatout") acc[dayId] = { t: "e" };
+      else if (ov.type === "pick" && ov.key) acc[dayId] = { t: "p", k: ov.key };
+    });
+    return acc;
+  }
+  function openWeekCustom(weekId, planId) {
+    const week = WEEKS[weekId];
+    const plan = week && week.plans[planId];
+    if (!plan) return;
+    const key = `${weekId}${planId}`;
+    let draft = JSON.parse(JSON.stringify((state.weekEdits || {})[key] || {}));
+    let moveFrom = null;
+    let swapOpen = null;
+    const ownKey = (dayId) => dinnerKey(weekId, planId, dayId);
+    const desc = (dayId) => draft[dayId] || { type: "pick", key: ownKey(dayId) };
+    const norm = () => Object.keys(draft).forEach((d) => { if (draft[d].type === "pick" && draft[d].key === ownKey(d)) delete draft[d]; });
+    const options = sortBySuggest(allTemplateDinners().filter((d) => !isDown(d.day.dinner)));
+    const inn = openSheet("", `Customize ${week.label} ${planId}`);
+    const draw = () => {
+      inn.innerHTML = shTop(`Customize ${escapeHtml(week.label)} · ${planId}`) + `
+        <p class="muted2" style="margin:0 0 0.5rem">Only changes this week. Keep, swap, leftovers or eat out, or tap <b>⇅ Move</b> on two days to trade their dinners. Groceries update when you save.</p>
+        ${plan.days.map((td) => {
+          const o = draft[td.id];
+          const day = effectiveDay(td, draft);
+          const t = o ? o.type : "keep";
+          const lunch = day.adultLunch && day.adultLunch !== "—" && !/adult lunch → —/.test(day.adultLunch) ? day.adultLunch : "";
+          return `<div class="cz${o ? " ch" : ""}${moveFrom === td.id ? " mv" : ""}">
+            <div class="cz-h"><span>${escapeHtml(td.day)}</span><span>${o ? "changed" : ""}</span></div>
+            <div class="cz-d">${day.mealEmoji} ${isFav(day.dinner) ? "⭐ " : ""}${escapeHtml(day.dinner)}</div>
+            ${lunch ? `<div class="cz-l">${escapeHtml(lunch)}</div>` : ""}
+            <div class="cz-o">
+              <button type="button" data-a="keep" data-d="${td.id}" class="${!o ? "on" : ""}">Keep</button>
+              <button type="button" data-a="swap" data-d="${td.id}" class="${(t === "pick" && !(o && o.key && parseDinnerKey(o.key) && parseDinnerKey(o.key).weekId === weekId && parseDinnerKey(o.key).planId === planId)) || swapOpen === td.id ? "on" : ""}">Swap ▾</button>
+              <button type="button" data-a="leftovers" data-d="${td.id}" class="${t === "leftovers" ? "on" : ""}">Leftovers</button>
+              <button type="button" data-a="eatout" data-d="${td.id}" class="${t === "eatout" ? "on" : ""}">Eat out</button>
+              <button type="button" data-a="move" data-d="${td.id}" class="mvb${moveFrom === td.id ? " on" : ""}">${moveFrom === null ? "⇅ Move" : moveFrom === td.id ? "Cancel" : "⇅ Swap w/ " + escapeHtml(plan.days.find((x) => x.id === moveFrom).short)}</button>
+            </div>
+            ${swapOpen === td.id ? `<div class="cz-list">${options.map((d) => `<button type="button" data-pick="${escapeAttr(d.key)}" data-d="${td.id}">${isFav(d.day.dinner) ? "⭐ " : ""}${escapeHtml(d.day.dinner)}<small>${escapeHtml(d.label)}</small></button>`).join("")}</div>` : ""}
+          </div>`;
+        }).join("")}
+        <div class="sh-row2"><button type="button" class="sh-btn" id="czR">Reset this week</button><button type="button" class="sh-btn p" id="czS">Save</button></div>`;
+      inn.querySelectorAll("[data-a]").forEach((b) => b.addEventListener("click", () => {
+        const d = b.dataset.d;
+        const a = b.dataset.a;
+        if (a === "keep") { delete draft[d]; swapOpen = null; }
+        else if (a === "leftovers") draft[d] = { type: "leftovers" };
+        else if (a === "eatout") draft[d] = { type: "eatout" };
+        else if (a === "swap") swapOpen = swapOpen === d ? null : d;
+        else if (a === "move") {
+          if (moveFrom === null) moveFrom = d;
+          else if (moveFrom === d) moveFrom = null;
+          else { const x = desc(moveFrom); const y = desc(d); draft[moveFrom] = y; draft[d] = x; moveFrom = null; }
+        }
+        norm();
+        draw();
+      }));
+      inn.querySelectorAll("[data-pick]").forEach((b) => b.addEventListener("click", () => {
+        draft[b.dataset.d] = { type: "pick", key: b.dataset.pick };
+        swapOpen = null;
+        norm();
+        draw();
+      }));
+      inn.querySelector("#czR").addEventListener("click", () => {
+        state.weekEdits[key] = {};
+        linkWeekEdits(state);
+        persist(); closeSheet(); renderAll();
+        showToast(`${week.label} ${planId} back to the template`);
+      });
+      inn.querySelector("#czS").addEventListener("click", () => {
+        norm();
+        state.weekEdits[key] = draft;
+        if (key === `${state.week}${state.plan}`) state.dayOverrides = draft;
+        persist(); closeSheet(); renderAll();
+        showToast(key === `${state.week}${state.plan}` ? "Week saved — groceries updated" : `Saved ${week.label} ${planId} edits — tap that card to load it`);
+      });
+    };
+    draw();
+  }
+  /* prep / cook badge beside the big emoji */
+  function prepCookFor(day) {
+    if (day.overrideType === "eatout") return null;
+    if (day.overrideType === "leftovers") return [2, 5, true];
+    const d = String(day.dinner || "").toLowerCase();
+    const rules = [
+      [/potato bar/, 10, 45], [/rotisserie/, 5, 10], [/taco rebuild/, 10, 10], [/taco/, 10, 15],
+      [/alfredo|pasta bake/, 10, 25], [/salmon/, 5, 15], [/tilapia/, 5, 12], [/chili/, 15, 60],
+      [/breakfast-for-dinner/, 5, 15], [/sheet-pan/, 15, 35], [/quesadilla/, 10, 10],
+      [/oven chicken/, 10, 30], [/burger/, 10, 12],
+    ];
+    for (const [re, p, c] of rules) if (re.test(d)) return [p, c, false];
+    return [10, 20, false];
+  }
+  function prepCookBadge(day) {
+    const pc = prepCookFor(day);
+    if (!pc) return "";
+    const mins = (n) => (n >= 60 ? `~${Math.round(n / 60)} hr` : `~${n} min`);
+    return `<span class="pc" aria-label="Prep ${pc[0]} minutes, ${pc[2] ? "reheat" : "cook"} ${pc[1]} minutes"><span>🔪 Prep ${mins(pc[0])}</span><span>🔥 ${pc[2] ? "Reheat" : "Cook"} ${mins(pc[1])}</span></span>`;
+  }
+  /* ratings: 👎 tried it, no · 👍 good · 👍👍 favorite (keyed by dinner name) */
+  function rateKey(name) {
+    return String(name || "").trim().toLowerCase().slice(0, 80);
+  }
+  function normalizeRatings(src) {
+    const out = {};
+    if (!src || typeof src !== "object" || Array.isArray(src)) return out;
+    Object.keys(src).forEach((k) => {
+      const v = src[k];
+      const r = Number(v && v.r);
+      if (r === -1 || r === 1 || r === 2) out[rateKey(k)] = { r, d: typeof v.d === "string" ? v.d.slice(0, 10) : "", n: typeof v.n === "string" ? v.n.slice(0, 80) : k };
+    });
+    return out;
+  }
+  function ratingOf(name) {
+    const v = (state.ratings || {})[rateKey(name)];
+    return v ? v.r : 0;
+  }
+  function isFav(name) { return ratingOf(name) === 2; }
+  function isDown(name) { return ratingOf(name) === -1; }
+  function sortBySuggest(list) {
+    return list.map((d, i) => [d, i]).sort((x, y) => (ratingOf(y[0].day.dinner) - ratingOf(x[0].day.dinner)) || x[1] - y[1]).map((x) => x[0]);
+  }
+  function setRating(name, r) {
+    const k = rateKey(name);
+    if (!state.ratings) state.ratings = {};
+    if (!r || (state.ratings[k] && state.ratings[k].r === r)) delete state.ratings[k];
+    else {
+      const t = new Date();
+      state.ratings[k] = { r, d: `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`, n: String(name).slice(0, 80) };
+    }
+    persist();
+    renderAll();
+  }
+  function rateRowHTML(name) {
+    const r = ratingOf(name);
+    return `<div class="rate-row" role="group" aria-label="Rate this dinner after you make it"><span>Made it? Rate it:</span>
+      <button type="button" data-rate="-1" aria-pressed="${r === -1}" title="Tried it, no">👎</button>
+      <button type="button" data-rate="1" aria-pressed="${r === 1}" title="Good">👍</button>
+      <button type="button" data-rate="2" aria-pressed="${r === 2}" title="Favorite">👍👍</button></div>`;
+  }
+  function bindRateRow(root, name) {
+    root.querySelectorAll("[data-rate]").forEach((b) => b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const r = Number(b.dataset.rate);
+      setRating(name, r);
+      showToast(ratingOf(name) === 0 ? "Rating cleared" : r === -1 ? "👎 Hidden from Swap picks (restore in My ratings)" : r === 2 ? "⭐ Favorite — suggested first" : "👍 Saved");
+    }));
+  }
+  function renderRatings() {
+    const box = document.getElementById("my-ratings");
+    if (!box) return;
+    const all = Object.keys(state.ratings || {}).map((k) => ({ k, ...state.ratings[k] }));
+    const grp = (r) => all.filter((x) => x.r === r).sort((a, b) => (b.d || "").localeCompare(a.d || ""));
+    const row = (x, restore) => `<li><span>${escapeHtml(x.n || x.k)}</span><small>${x.d ? escapeHtml(x.d) : ""}</small>${restore ? `<button type="button" class="chip-btn" data-restore="${escapeAttr(x.k)}">Restore</button>` : `<button type="button" class="chip-btn" data-clear="${escapeAttr(x.k)}">Clear</button>`}</li>`;
+    const fav = grp(2), good = grp(1), down = grp(-1);
+    box.innerHTML = all.length
+      ? `${fav.length ? `<h3>⭐ Favorites (👍👍)</h3><ul>${fav.map((x) => row(x)).join("")}</ul>` : ""}
+         ${good.length ? `<h3>👍 Good</h3><ul>${good.map((x) => row(x)).join("")}</ul>` : ""}
+         ${down.length ? `<h3>👎 Removed meals</h3><p class="muted2" style="margin-top:0">Hidden from Swap picks and suggestions. Tap Restore to bring one back.</p><ul>${down.map((x) => row(x, true)).join("")}</ul>` : ""}`
+      : `<p class="muted2">No ratings yet. After you make a dinner, tap 👎 / 👍 / 👍👍 on its day card.</p>`;
+    box.querySelectorAll("[data-restore],[data-clear]").forEach((b) => b.addEventListener("click", () => {
+      delete state.ratings[b.dataset.restore || b.dataset.clear];
+      persist();
+      renderAll();
+      showToast(b.dataset.restore ? "Restored to Swap picks" : "Rating cleared");
+    }));
+  }
+
   function persist() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -1072,6 +1519,11 @@
     base.qty = normalizeStringMap(parsed.qty, 40);
     base.notes = normalizeStringMap(parsed.notes, 80);
     base.dayOverrides = normalizeDayOverrides(parsed.dayOverrides);
+    base.weekEdits = normalizeWeekEdits(parsed.weekEdits);
+    base.budget = normalizeBudget(parsed.budget);
+    base.store = normalizeStore(parsed.store);
+    base.ratings = normalizeRatings(parsed.ratings);
+    linkWeekEdits(base);
     if (parsed.prices && typeof parsed.prices === "object" && !Array.isArray(parsed.prices)) {
       Object.keys(parsed.prices).forEach((id) => {
         const n = Number(parsed.prices[id]);
@@ -1122,6 +1574,18 @@
         else if (ov.type === "pick" && ov.key) acc[dayId] = { t: "p", k: ov.key };
         return acc;
       }, {}),
+      we: Object.keys(state.weekEdits || {}).reduce((acc, key) => {
+        const c = compactOverrides(state.weekEdits[key]);
+        if (Object.keys(c).length) acc[key] = c;
+        return acc;
+      }, {}),
+      bg: state.budget && (state.budget.amt != null || !state.budget.on || state.budget.days !== 7)
+        ? [state.budget.on ? 1 : 0, state.budget.amt, state.budget.days]
+        : undefined,
+      st: state.store !== "best" ? state.store : undefined,
+      rt: Object.keys(state.ratings || {}).length
+        ? Object.keys(state.ratings).reduce((acc, k) => { acc[k] = [state.ratings[k].r, state.ratings[k].d]; return acc; }, {})
+        : undefined,
       $: Object.keys(state.prices).reduce((acc, id) => {
         const n = Number(state.prices[id]);
         if (Number.isFinite(n) && n >= 0) acc[id] = n;
@@ -1163,6 +1627,20 @@
       next.qty = normalizeStringMap(payload.q, 40);
       next.notes = normalizeStringMap(payload.n, 80);
       next.dayOverrides = normalizeDayOverrides(payload.o);
+      next.weekEdits = normalizeWeekEdits(payload.we);
+      if (Array.isArray(payload.bg)) {
+        next.budget = normalizeBudget({ on: payload.bg[0] !== 0, amt: payload.bg[1], days: payload.bg[2] });
+      }
+      next.store = normalizeStore(payload.st);
+      if (payload.rt && typeof payload.rt === "object") {
+        const r = {};
+        Object.keys(payload.rt).forEach((k) => {
+          const v = payload.rt[k];
+          if (Array.isArray(v)) r[k] = { r: v[0], d: v[1] };
+        });
+        next.ratings = normalizeRatings(r);
+      }
+      linkWeekEdits(next);
       if (payload.$ && typeof payload.$ === "object") {
         Object.keys(payload.$).forEach((id) => {
           const n = Number(payload.$[id]);
@@ -1250,7 +1728,25 @@
     });
 
     const plan = currentPlan();
-    els.budgetBand.textContent = `Budget band ${plan.budget}`;
+    const bud = state.budget || { on: true, amt: null, days: 7 };
+    els.budgetBand.textContent = !bud.on
+      ? "Budget off"
+      : bud.amt == null
+        ? `Budget band ${plan.budget}`
+        : `Budget ${formatMoney(bud.amt)} / ${bud.days} day${bud.days === 1 ? "" : "s"}`;
+    els.budgetBand.classList.toggle("is-off", !bud.on);
+    els.budgetBand.classList.toggle("is-set", bud.on && bud.amt != null);
+    els.templateBtns.forEach((btn) => {
+      const key = `${btn.dataset.week}${btn.dataset.plan}`;
+      const n = Object.keys((state.weekEdits || {})[key] || {}).length;
+      let badge = btn.querySelector(".edited-badge");
+      if (n && !badge) {
+        badge = document.createElement("span");
+        badge.className = "edited-badge";
+        badge.textContent = "edited";
+        btn.appendChild(badge);
+      } else if (!n && badge) badge.remove();
+    });
     if (els.houseNote) {
       els.houseNote.textContent = plan.houseNote || "";
       els.houseNote.hidden = !plan.houseNote;
@@ -1297,15 +1793,17 @@
           </div>
         </div>
         <button type="button" class="day-body day-body-btn" aria-label="${escapeAttr(day.day)}: ${escapeAttr(day.dinner)}. Tap for recipe.">
-          <span class="meal-emoji" aria-hidden="true">${day.mealEmoji}</span>
-          <p class="day-dinner">${escapeHtml(day.dinner)}</p>
+          <span class="emo-row"><span class="meal-emoji" aria-hidden="true">${day.mealEmoji}</span>${prepCookBadge(day)}</span>
+          <p class="day-dinner">${isFav(day.dinner) ? '<span class="fav-badge">⭐ favorite</span> ' : ""}${escapeHtml(day.dinner)}</p>
           ${swapBadge}
           ${tedLine}
           ${adultLine}
           <p class="tap-hint">Day note · tap for recipe</p>
         </button>
+        ${day.overrideType === "eatout" ? "" : rateRowHTML(day.dinner)}
       `;
       card.querySelector(".day-body-btn").addEventListener("click", () => openRecipe(day));
+      bindRateRow(card, day.dinner);
       card.querySelector(".swap-btn").addEventListener("click", (e) => {
         e.stopPropagation();
         openSwapPicker(templateDay.id);
@@ -1321,10 +1819,10 @@
     swapTargetDayId = dayId;
     const current = effectiveDay(templateDay);
     els.swapTitle.textContent = `Swap ${templateDay.day}`;
-    const dinners = allTemplateDinners().filter((d) => {
-      // Skip the night already on this template day (same week/plan/day)
-      return !(d.weekId === state.week && d.planId === state.plan && d.day.id === dayId);
-    });
+    const dinners = sortBySuggest(allTemplateDinners().filter((d) => {
+      // Skip the night already on this template day (same week/plan/day); hide 👎 meals
+      return !(d.weekId === state.week && d.planId === state.plan && d.day.id === dayId) && !isDown(d.day.dinner);
+    }));
     const currentKey = dinnerKey(state.week, state.plan, dayId);
     const ov = dayOverride(dayId);
     els.swapBody.innerHTML = `
@@ -1349,7 +1847,7 @@
           .map((d) => {
             const on = ov && ov.type === "pick" && ov.key === d.key;
             return `<button type="button" class="swap-option${on ? " is-on" : ""}" data-swap-type="pick" data-swap-key="${escapeAttr(d.key)}">
-              <span class="swap-option-title">${escapeHtml(d.day.dinner)}</span>
+              <span class="swap-option-title">${isFav(d.day.dinner) ? "⭐ " : ""}${escapeHtml(d.day.dinner)}</span>
               <span class="swap-option-sub">${escapeHtml(d.label)}${d.day.tedNote ? " · Ted leftover sub" : ""}</span>
             </button>`;
           })
@@ -1485,15 +1983,12 @@
   }
 
   function renderEstimate(items) {
-    const { left, all, pricedLeft, pricedAll } = estimateTotals(items);
     if (!els.estimateBand) return;
-    if (pricedAll === 0) {
-      els.estimateBand.textContent = "Est. — add $";
-      els.estimateBand.title = "Optional: type a $ estimate on any grocery line";
-      return;
-    }
-    els.estimateBand.textContent = `Est. left ${formatMoney(left)}`;
-    els.estimateBand.title = `${pricedLeft} unchecked priced · trip total if all priced ${formatMoney(all)} (${pricedAll} lines)`;
+    const t = storeTotals(items);
+    const left = state.store === "aldi" ? t.aLeft : state.store === "publix" ? t.pLeft : t.bLeft;
+    const lab = state.store === "aldi" ? "All Aldi" : state.store === "publix" ? "All Publix" : "Best split";
+    els.estimateBand.textContent = `Est. left ${formatMoney2(left)}`;
+    els.estimateBand.title = `${lab} estimate for unchecked lines (Have-it lines excluded)`;
   }
 
   function renderGroceryControls(items) {
@@ -1551,14 +2046,25 @@
       "Tucker lunchbox: same kit every school day (Mon–Fri). Count packs Sun night; restock midweek. Not dinner leftovers. Tap Have it if stocked.";
     els.groceryList.appendChild(tuckerNote);
 
+    const tots = storeTotals(items.filter((i) => !itemHaveIt(i.id)));
     const totalBar = document.createElement("div");
-    totalBar.className = "estimate-bar";
-    const totals = estimateTotals(items.filter((i) => !itemHaveIt(i.id)));
-    totalBar.innerHTML =
-      totals.pricedAll === 0
-        ? `<strong>Running $ estimate:</strong> optional — tap a line’s $ box while you shop.`
-        : `<strong>Running $ estimate:</strong> ${formatMoney(totals.left)} still to buy` +
-          ` <span>· ${formatMoney(totals.all)} if all priced lines counted</span>`;
+    totalBar.className = "store-totals";
+    const col = (id, label, val, left) =>
+      `<button type="button" class="${id === "best" ? "best" : ""}" data-store="${id}" aria-pressed="${state.store === id}">${state.store === id ? "⭐ " : ""}${label}<b>${formatMoney2(val)}</b><small>est. · ${formatMoney2(left)} left</small></button>`;
+    totalBar.innerHTML = `
+      <div class="tot" role="group" aria-label="Which store total to use">
+        ${col("aldi", "All Aldi", tots.a, tots.aLeft)}${col("publix", "All Publix", tots.p, tots.pLeft)}${col("best", "Best split", tots.b, tots.bLeft)}
+      </div>
+      <p class="pchk">Prices last checked ${escapeHtml(fmtDateLong(PRICE_META.updated))}${PRICE_META.loaded ? "" : " (built-in estimates)"} · tap a total to use it · grey = older than 60 days</p>
+      <p class="gnote">Best split = Aldi for ${tots.na} item${tots.na === 1 ? "" : "s"}, Publix for ${tots.np} (exact name brands like Chobani, Polly-O, Apple &amp; Eve that Aldi doesn’t carry). All Aldi swaps in Aldi look-alikes, so Best split can come out higher than All Aldi.${tots.cu ? ` ${tots.cu} custom item${tots.cu > 1 ? "s" : ""} without a price (add your $).` : ""}${tots.own ? ` ${tots.own} line${tots.own > 1 ? "s" : ""} use your own $.` : ""}</p>
+      <p class="gnote rc">🧾 Send a receipt photo or Publix app Purchases screenshot to update prices.</p>`;
+    totalBar.querySelectorAll("[data-store]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.store = normalizeStore(btn.dataset.store);
+        persist();
+        renderGrocery();
+      });
+    });
     els.groceryList.appendChild(totalBar);
 
     byCat.forEach((group) => {
@@ -1606,6 +2112,7 @@
                     : ""
                 }
               </div>
+              ${storePriceRow(item)}
               <div class="meta-edit" hidden>
                 <label class="visually-hidden" for="${escapeAttr(qtyId)}">Quantity</label>
                 <input id="${escapeAttr(qtyId)}" class="meta-input qty-input" type="text" maxlength="40" placeholder="e.g. 2 lb" value="${escapeAttr(qty)}" />
@@ -1623,9 +2130,9 @@
                 min="0"
                 step="0.01"
                 inputmode="decimal"
-                placeholder=""
+                placeholder="your"
                 value="${price === null ? "" : String(price)}"
-                aria-label="Optional price for ${escapeAttr(item.name)}"
+                aria-label="Your own price for ${escapeAttr(item.name)} (overrides store estimates)"
               />
             </label>
           </div>
@@ -1689,9 +2196,16 @@
       els.groceryList.appendChild(empty);
     }
 
+    const foot = document.createElement("p");
+    foot.className = "price-foot";
+    foot.innerHTML = `All prices are <b>estimates</b> for Vero Beach / Treasure Coast-area Aldi &amp; Publix as of Oct 2026 (from prices.json when it loads). Check in store; sales and BOGOs change weekly. A few per-lb numbers started from the stores’ online listings (Instacart-powered, can differ from the shelf).
+      <details style="margin-top:4px"><summary>Price sources</summary>${PRICE_SOURCES.map(([l, u]) => `<a href="${escapeAttr(u)}" target="_blank" rel="noopener">${escapeHtml(l)}</a>`).join("<br>")}</details>`;
+    els.groceryList.appendChild(foot);
+
     void checkedVisible;
     renderGroceryControls(items);
     renderEstimate(items.filter((i) => !itemHaveIt(i.id)));
+    renderBudgetCompare(tots);
   }
 
   function openRecipe(day) {
@@ -1749,10 +2263,12 @@
     });
     const lines = [
       `Burns Family grocery — ${state.weekTitle} (${week.label} · ${plan.label})`,
-      `Budget band ${plan.budget}`,
-      totals.pricedAll
-        ? `Running $ estimate: ${formatMoney(totals.left)} left · ${formatMoney(totals.all)} all priced`
-        : "",
+      budgetLine(plan),
+      (() => {
+        const t = storeTotals(items);
+        return `Est. totals: All Aldi ${formatMoney2(t.a)} · All Publix ${formatMoney2(t.p)} · Best split ${formatMoney2(t.b)} (Vero-area estimates, Oct 2026)`;
+      })(),
+      totals.pricedAll ? `Your own $ entered: ${formatMoney(totals.all)} on ${totals.pricedAll} line(s)` : "",
       plan.houseNote || "",
       "Dinners: " + dinnerLines.join(" · "),
       "Tucker lunchbox = yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice",
@@ -1776,7 +2292,8 @@
         const qtyBit = qty ? ` — ${qty}` : "";
         const noteBit = note ? ` (${note})` : "";
         const hint = item.hint ? ` [${item.hint}]` : "";
-        lines.push(`${mark} ${item.name}${qtyBit}${noteBit}${priceBit}${hint}`);
+        const sp = storePriceText(item);
+        lines.push(`${mark} ${item.name}${qtyBit}${noteBit}${priceBit ? ` (your$${priceBit.trim().slice(1)})` : ""}${sp ? ` — ${sp}` : ""}${hint}`);
       });
       lines.push("");
     });
@@ -1821,6 +2338,7 @@
     renderTemplates();
     renderCalendar();
     renderGrocery();
+    renderRatings();
   }
 
   function loadTemplate(weekId, planId, announce) {
@@ -1831,7 +2349,7 @@
     state.plan = nextPlan;
     state.weekTitle = WEEKS[nextWeek].title;
     if (changed) {
-      state.dayOverrides = {};
+      linkWeekEdits(state);
     }
     persist();
     renderAll();
@@ -1850,6 +2368,7 @@
     } else {
       state = defaultState();
     }
+    linkWeekEdits(state);
     // Migrate legacy localStorage keys / normalize shape into current STORAGE_KEY.
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -1861,6 +2380,25 @@
       });
     });
 
+    initSheet();
+    if (els.rcptBtn) els.rcptBtn.addEventListener("click", openReceipt);
+    if (els.calBtn) {
+      els.calBtn.addEventListener("click", () => {
+        openCal({
+          sel: parseWeekLabel(state.weekTitle),
+          onPick: (mon) => {
+            state.weekTitle = fmtWeek(mon);
+            els.weekLabel.value = state.weekTitle;
+            persist();
+            showToast(`Week set to ${state.weekTitle}`);
+          },
+        });
+      });
+    }
+    els.budgetBand.addEventListener("click", openBudgetEditor);
+    els.templateBtns.forEach((btn) => {
+      longPress(btn, () => openWeekCustom(btn.dataset.week, btn.dataset.plan));
+    });
     els.weekLabel.addEventListener("change", () => {
       state.weekTitle = els.weekLabel.value.trim() || currentWeek().title;
       persist();
@@ -1962,6 +2500,7 @@
     renderAll();
     writeShareToUrl(false);
     updateWakeLock();
+    loadPricesJson();
   }
 
   if (document.readyState === "loading") {
