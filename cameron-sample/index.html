@@ -32,6 +32,7 @@
   .addrow{display:flex;gap:8px;margin:0 0 18px}
   .addrow input{flex:1;border-radius:12px;border:2px solid var(--chip);background:#0b1222;color:var(--ink);padding:12px;font-size:16px}
   .addrow button{border:0;border-radius:12px;background:var(--chip);color:#fff;padding:0 16px;font-size:16px;cursor:pointer}
+  .chip.pick.off{text-decoration:none;color:var(--ink)}
   .chip.main{background:#f59e0b;border-color:#f59e0b}
   .next:disabled{opacity:.4}
 </style>
@@ -83,7 +84,7 @@ function render(){
 function storeScreen(){
   const all=[...STORES,...extra];
   card.innerHTML=`<div class="emoji">🛒</div><h1>Where do you shop?</h1><p class="sub">Tap every store you use.</p>
-    <div class="chips">${all.map(x=>`<span class="chip${stores.has(x)?"":" off"}" data-x="${x}">${x}</span>`).join("")}</div>
+    <div class="chips">${all.map(x=>`<span class="chip pick${stores.has(x)?"":" off"}" data-x="${x}">${x}</span>`).join("")}</div>
     <div class="addrow"><input id="own" placeholder="Other store…" maxlength="30"><button id="add">Add</button></div>
     <button class="next" id="nx" ${stores.size?"":"disabled"}>Next →</button>`;
   card.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{const x=c.dataset.x;stores.has(x)?stores.delete(x):stores.add(x);storeScreen()});
@@ -94,7 +95,7 @@ function storeScreen(){
 }
 function mainScreen(){
   card.innerHTML=`<div class="emoji">⭐</div><h1>Which one most?</h1><p class="sub">Prices and the grocery list lean toward this store.</p>
-    <div class="chips">${[...stores].map(x=>`<span class="chip${mainStore===x?" main":" off"}" data-x="${x}">${x}</span>`).join("")}</div>
+    <div class="chips">${[...stores].map(x=>`<span class="chip pick${mainStore===x?" main":" off"}" data-x="${x}">${x}</span>`).join("")}</div>
     <button class="next" id="nx" ${mainStore?"":"disabled"}>Start meals →</button>`;
   card.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{mainStore=c.dataset.x;mainScreen()});
   document.getElementById("nx").onclick=()=>{if(!mainStore)return;stage="ask";render()};
