@@ -992,7 +992,7 @@ function planBreakfast(mon){
   return days;
 }
 function bfLine(bf){if(!bf)return "";
-  const pr=bfPrice(bf); return `Breakfast: ${esc(bf.label)} · ${calTxt(bf.kcal)}${pr?` · ~${pr}`:""}`}
+  return `Breakfast: ${esc(bf.label)} · ${calTxt(bf.kcal)}`}
 function bfPrice(bf){if(!bf)return "";const a=bf.a!=null?bf.a:0,p=bf.p!=null?bf.p:0;const v=Math.min(a||p||0,p||a||0)||a||p;
   return v?`$${v.toFixed(2)}`:""}
 
