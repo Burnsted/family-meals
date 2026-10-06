@@ -250,11 +250,12 @@
   .gbox b{color:var(--wink)}.gbox small{display:block;font-weight:650;font-size:12px;margin-top:3px}
   .nut{margin:6px 0 0;font-size:12px;font-weight:800;color:var(--tealD)}
 
-  .rate{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px;font-size:12px;font-weight:800;color:var(--wsoft)}
-  .rate button{min-width:46px;min-height:40px;border-radius:12px;border:2px solid rgba(15,110,110,.25);background:var(--wbg);font-size:16px;cursor:pointer}
-  .rate button[aria-pressed="true"]{background:var(--tealS);border-color:var(--teal)}
-  .rate .rate-del{min-width:44px;min-height:44px;padding:4px;margin-left:auto;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--wsoft);flex-shrink:0}
-  .rate .rate-del:hover,.rate .rate-del:active,.rate .rate-del[aria-pressed]{background:transparent;border:0;box-shadow:none}
+  .rate{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:8px;font-size:12px;font-weight:800;color:var(--wsoft)}
+  .rate button{min-width:44px;min-height:44px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;font-size:20px;line-height:1;cursor:pointer;opacity:.4;transform:scale(1);transition:opacity .12s,transform .12s}
+  .rate button[aria-pressed="true"]{opacity:1;transform:scale(1.15);background:transparent;border:0;box-shadow:none}
+  .rate button:hover,.rate button:active{background:transparent;border:0;box-shadow:none}
+  .rate .rate-del{min-width:44px;min-height:44px;padding:4px;margin-left:auto;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--wsoft);flex-shrink:0;opacity:1;transform:none;font-size:inherit}
+  .rate .rate-del:hover,.rate .rate-del:active,.rate .rate-del[aria-pressed]{background:transparent;border:0;box-shadow:none;opacity:1;transform:none}
   .rate .rate-del .ico{display:block}
   .favb{display:inline-block;font-size:12px;font-weight:800;background:#ffe4e6;color:#9f1239;border-radius:999px;padding:2px 8px;vertical-align:middle}
   .rpanel ul{list-style:none;margin:0;padding:0}.rpanel li{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed rgba(23,48,66,.12);font-weight:800}
