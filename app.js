@@ -4450,23 +4450,28 @@ function sidesBlockHTML(dayId, day) {
     lines.push("", `Est. total: ${formatMoney2(total)}`);
     return lines.join("\n");
   }
-  async function shareGroceryList() {
-    const text = buildShareListText();
-    const title = "Shopping list";
+  async function shareListText(text, title) {
     try {
       if (navigator.share) {
-        await navigator.share({ title, text });
+        await navigator.share({ title: title || "Shopping list", text });
         return;
       }
     } catch (err) {
       if (err && err.name === "AbortError") return;
     }
     try {
-      await navigator.clipboard.writeText(text);
-      showToast("List copied");
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        throw 0;
+      }
+      showToast("Copied");
     } catch (_) {
-      copyText(text, "List copied");
+      copyText(text, "Copied");
     }
+  }
+  async function shareGroceryList() {
+    await shareListText(buildShareListText(), "Shopping list");
   }
 
   function renderGrocery() {
@@ -4506,7 +4511,7 @@ function sidesBlockHTML(dayId, day) {
     tools.innerHTML = `
       <label class="visually-hidden" for="grocery-search">Search list</label>
       <input type="search" id="grocery-search" class="grocery-search" placeholder="Search list" value="${escapeAttr(q)}" autocomplete="off" />
-      <button type="button" class="share-list-link" id="grocery-share">Share list</button>
+      <button type="button" class="share-list-link" id="grocery-share" aria-label="Share list"><svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
     `;
     els.groceryList.appendChild(tools);
     const searchEl = tools.querySelector("#grocery-search");
@@ -6154,9 +6159,7 @@ function sidesBlockHTML(dayId, day) {
       showCopyPhoto(t, "Share link copied.");
     });
     els.copyGrocery.addEventListener("click", () => {
-      const t = groceryText();
-      copyText(t, "Grocery list copied for iMessage/SMS");
-      showCopyPhoto(t, "Grocery list copied.");
+      shareListText(groceryText(), "Grocery list");
     });
     els.shopMode.addEventListener("click", () => {
       state.shopMode = !state.shopMode;
