@@ -127,7 +127,13 @@
     const key = ARTS[keyOrText] ? keyOrText : keyFromText(keyOrText);
     let html = ARTS[key] || ARTS.default;
     if (size === "lg") {
-      html = html.replace('width="40" height="40"', 'width="72" height="72"').replace('class="food-art"', 'class="food-art food-art-lg"');
+      html = html
+        .replace('width="40" height="40"', 'width="72" height="72"')
+        .replace('class="food-art"', 'class="food-art food-art-lg"');
+    } else if (size === "board") {
+      html = html
+        .replace('width="40" height="40"', 'width="140" height="140"')
+        .replace('class="food-art"', 'class="food-art food-art-board"');
     }
     return html;
   }

@@ -111,7 +111,7 @@
         category: "Tucker lunchbox",
         name: "Natural beef sticks (red/white pack) ×5+",
         price: "",
-        hint: "Likely need — buy ahead for the week",
+        hint: "Likely need. buy ahead for the week",
         staple: true,
       },
       {
@@ -137,7 +137,7 @@
         title: "Leftovers",
         have: "whatever’s already cooked",
         steps: ["Use what’s already cooked.", "Nothing new to buy for this night."],
-        enjoy: "Clear the fridge — one less cook.",
+        enjoy: "Clear the fridge. one less cook.",
         buy: "none",
       },
     },
@@ -146,12 +146,12 @@
       dinner: "Eat out / takeout",
       icon: "🚗",
       mealEmoji: "🥡",
-      adultLunch: "adult lunch → —",
+      adultLunch: "adult lunch open",
       tedNote: "",
       recipe: {
         title: "Eat out / takeout",
         have: "appetite + a plan",
-        steps: ["Pick a spot or order takeout.", "Skip cooking — grocery lines for this night come off the list."],
+        steps: ["Pick a spot or order takeout.", "Skip cooking. grocery lines for this night come off the list."],
         enjoy: "Night off the kitchen.",
         buy: "none",
       },
@@ -161,12 +161,12 @@
       dinner: "Pick a meal",
       icon: "❔",
       mealEmoji: "❔",
-      adultLunch: "adult lunch → —",
+      adultLunch: "adult lunch open",
       tedNote: "",
       recipe: {
         title: "Pick a meal",
         have: "an open night",
-        steps: ["This night is open — tap Swap to choose a dinner.", "Nothing from this night is on the grocery list yet."],
+        steps: ["This night is open. tap Swap to choose a dinner.", "Nothing from this night is on the grocery list yet."],
         enjoy: "Your call.",
         buy: "none",
       },
@@ -180,14 +180,14 @@
       icon: "🛒",
       mealEmoji: "🛍",
       tag: "🛍 Grab & go",
-      adultLunch: "adult lunch → —",
+      adultLunch: "adult lunch open",
       tedNote: "",
       calories: 650,
       mealCalories: 720,
       recipe: {
         title: "Publix rotisserie + bagged salad",
         have: "plates + dressing if home",
-        steps: ["Pick up a Publix rotisserie and a bagged salad.", "Plate and eat — minimal dishes."],
+        steps: ["Pick up a Publix rotisserie and a bagged salad.", "Plate and eat. minimal dishes."],
         enjoy: "Busy night, still a real dinner.",
         buy: "Publix rotisserie + bagged salad",
       },
@@ -202,7 +202,7 @@
       icon: "🛒",
       mealEmoji: "🛍",
       tag: "🛍 Grab & go",
-      adultLunch: "adult lunch → —",
+      adultLunch: "adult lunch open",
       tedNote: "",
       calories: 700,
       mealCalories: 780,
@@ -223,7 +223,7 @@
       icon: "🛒",
       mealEmoji: "🛍",
       tag: "🛍 Grab & go",
-      adultLunch: "adult lunch → —",
+      adultLunch: "adult lunch open",
       tedNote: "",
       calories: 620,
       mealCalories: 740,
@@ -244,7 +244,7 @@
       icon: "🛒",
       mealEmoji: "🛍",
       tag: "🛍 Grab & go",
-      adultLunch: "adult lunch → —",
+      adultLunch: "adult lunch open",
       tedNote: "",
       calories: 680,
       mealCalories: 750,
@@ -262,12 +262,12 @@
   };
 
   const DEFAULT_HOUSE_RULES = [
-    "Family of 4 — cost-effective, low cook time.",
+    "Family of 4. cost-effective, low cook time.",
     "Chicken: oven breasts or rotisserie; Chicken Alfredo is a yes. No spaghetti / meat sauce right now.",
     "Chili: weekend daytime only, at most 1 of 4 weeks per option.",
     "Fish nights: salmon or tilapia for Samantha; Ted gets a leftover sub (not fish).",
     "Taco leftovers go to the next dinner (not lunch).",
-    "Tucker school lunch Mon–Fri is a fixed kit (not leftovers): yogurt, cheese stick, pretzels/Pringles, fruit snack, beef stick, apple juice.",
+    "Tucker school lunch Mon to Fri is a fixed kit (not leftovers): yogurt, cheese stick, pretzels or Pringles, fruit snack, beef stick, apple juice.",
     "Adults may use dinner leftovers for lunch.",
   ];
 
@@ -280,15 +280,15 @@
     1: {
       id: "1",
       label: "Week 1",
-      title: "Oct 5–11, 2026",
-      range: "Oct 5–11",
+      title: "Oct 5 to 11, 2026",
+      range: "Oct 5 to 11",
       plans: {
         A: {
           id: "A",
           label: "Option A",
           blurb: "Tacos · Alfredo · salmon · weekend chili",
-          budget: "~$100–130",
-          houseNote: "Weekend chili Sat (daytime / football). One chili cook — leftover Sun lunch optional.",
+          budget: "about $100 to $130",
+          houseNote: "Weekend chili Sat (daytime / football). One chili cook. leftover Sun lunch optional.",
           days: [
             {
               id: "mon",
@@ -331,11 +331,11 @@
               icon: "🌮",
               mealEmoji: "🧀",
               dinner: "Taco rebuild (nachos / bowls / quesadillas)",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Taco rebuild",
                 have: "leftover taco meat, chips/tortillas/rice, cheese, salsa",
-                steps: ["Rebuild from taco meat — nachos, bowls, or quesadillas."],
+                steps: ["Rebuild from taco meat. nachos, bowls, or quesadillas."],
                 enjoy: "New shape, same taco night.",
                 buy: "none",
               },
@@ -366,17 +366,17 @@
               icon: "🐟",
               mealEmoji: "🐟",
               dinner: "Salmon (Samantha) + rice + veg",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               tedNote: "Ted: leftover Alfredo or rotisserie/chicken (not fish)",
               recipe: {
                 title: "Salmon night (Samantha)",
                 have: "rice, veg; leftover Alfredo/chicken for Ted",
                 steps: [
                   "Bake/pan salmon for Samantha (+ kids who want it); rice + veg.",
-                  "Ted pulls leftover Alfredo or rotisserie/chicken — no fish.",
+                  "Ted pulls leftover Alfredo or rotisserie/chicken. no fish.",
                 ],
-                enjoy: "Two plates, one kitchen — Sam’s fish + Ted’s leftover sub.",
-                buy: "salmon fillets (Fri — Sam)",
+                enjoy: "Two plates, one kitchen. Sam’s fish + Ted’s leftover sub.",
+                buy: "salmon fillets (Fri. Sam)",
               },
             },
             {
@@ -393,10 +393,10 @@
                 steps: [
                   "Daytime cook: beef, onion, tomatoes, beans, broth, chili powder/cumin.",
                   "Cheese + Doritos on top. Company-friendly.",
-                  "Leftover Sun lunch for who wants it — do NOT cook chili twice.",
+                  "Leftover Sun lunch for who wants it. do NOT cook chili twice.",
                 ],
-                enjoy: "Football / company energy — one weekend pot only.",
-                buy: "ground beef ~1–1.5 lb (chili +/or tacos); onion",
+                enjoy: "Football / company energy. one weekend pot only.",
+                buy: "ground beef ~1 to 1.5 lb (chili +/or tacos); onion",
               },
             },
             {
@@ -423,8 +423,8 @@
             ...tuckerGroceries("w1"),
             { id: "w1a-rotisserie", category: "Meat", name: "Rotisserie", price: "", hint: "", days: ["mon"] },
             { id: "w1a-chicken", category: "Meat", name: "Chicken breasts ~2 lb (Alfredo)", price: "", hint: "", days: ["thu"] },
-            { id: "w1a-beef", category: "Meat", name: "Ground beef ~1–1.5 lb (chili +/or tacos)", price: "", hint: "", days: ["tue", "sat"] },
-            { id: "w1a-salmon", category: "Meat", name: "Salmon fillets (Fri — Samantha)", price: "", hint: "Ted skips fish — leftover sub that night", days: ["fri"] },
+            { id: "w1a-beef", category: "Meat", name: "Ground beef ~1 to 1.5 lb (chili +/or tacos)", price: "", hint: "", days: ["tue", "sat"] },
+            { id: "w1a-salmon", category: "Meat", name: "Salmon fillets (Fri. Samantha)", price: "", hint: "Ted skips fish. leftover sub that night", days: ["fri"] },
             { id: "w1a-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "", days: ["sun"] },
             { id: "w1a-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "", days: ["sun"], staple: true },
             { id: "w1a-potatoes", category: "Produce", name: "Potatoes / rice sides", price: "", hint: "", days: ["mon", "fri"], staple: true },
@@ -434,7 +434,7 @@
             { id: "w1a-cheese", category: "Dairy", name: "Taco cheese if low", price: "", hint: "Skip if stocked", days: ["tue"], staple: true },
             { id: "w1a-milk", category: "Dairy", name: "Milk top-up if needed", price: "", hint: "", staple: true },
             { id: "w1a-tortillas", category: "Pantry", name: "Tortillas / salsa if low", price: "", hint: "Skip if stocked", days: ["tue", "wed"], staple: true },
-            { id: "w1a-alfredo", category: "Pantry", name: "Alfredo + pasta if low", price: "", hint: "Often already stocked — skip", days: ["thu"], staple: true },
+            { id: "w1a-alfredo", category: "Pantry", name: "Alfredo + pasta if low", price: "", hint: "Often already stocked. skip", days: ["thu"], staple: true },
             { id: "w1a-chili-cans", category: "Pantry", name: "Chili beans/tomatoes if pantry empty", price: "", hint: "Weekend chili only this plan", days: ["sat"], staple: true },
           ],
         },
@@ -442,7 +442,7 @@
           id: "B",
           label: "Option B",
           blurb: "Chicken-heavy · tilapia · burgers · no chili",
-          budget: "~$100–130",
+          budget: "about $100 to $130",
           houseNote: "No chili this week (Week 1 A has the weekend chili). Skip chili ingredients.",
           days: [
             {
@@ -484,11 +484,11 @@
               icon: "🍗",
               mealEmoji: "🍚",
               dinner: "Oven chicken thighs/breasts + rice + salad",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Oven chicken + rice",
                 have: "chicken, rice, salad",
-                steps: ["Oven chicken + rice + salad — extra chicken variety."],
+                steps: ["Oven chicken + rice + salad. extra chicken variety."],
                 enjoy: "Rest chicken before slicing.",
                 buy: "enough chicken for Mon + Wed",
               },
@@ -500,14 +500,14 @@
               icon: "🐟",
               mealEmoji: "🐟",
               dinner: "Tilapia (Samantha) + rice + veg",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               tedNote: "Ted: leftover chicken/quesadilla (not fish)",
               recipe: {
                 title: "Tilapia night (Samantha)",
                 have: "rice, veg; leftover chicken/quesadilla for Ted",
                 steps: [
                   "Seasoned tilapia bake/pan for Samantha; rice + veg.",
-                  "Ted eats leftover chicken/quesadilla — no fish.",
+                  "Ted eats leftover chicken/quesadilla. no fish.",
                 ],
                 enjoy: "Sam’s fish night; Ted’s leftover sub ready from earlier in the week.",
                 buy: "tilapia Thu",
@@ -520,7 +520,7 @@
               icon: "🛒",
               mealEmoji: "🥪",
               dinner: "Rotisserie or leftover chicken sandwiches + salad",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Busy-night chicken sandwiches",
                 have: "bread/bagels, salad; rotisserie or leftover chicken",
@@ -536,12 +536,12 @@
               icon: "🍔",
               mealEmoji: "🍔",
               dinner: "Burger night + simple sides",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Burger night",
                 have: "ground beef; chips/pickles optional",
                 steps: ["Burger patties; buns optional; chips/pickles."],
-                enjoy: "Simple sides are enough — no chili this week.",
+                enjoy: "Simple sides are enough. no chili this week.",
                 buy: "burger beef Sat; buns optional",
               },
             },
@@ -568,7 +568,7 @@
           groceries: [
             ...tuckerGroceries("w1"),
             { id: "w1b-chicken", category: "Meat", name: "Chicken breasts (enough Mon + Wed)", price: "", hint: "", days: ["mon", "wed"] },
-            { id: "w1b-tilapia", category: "Meat", name: "Tilapia (Thu — Samantha)", price: "", hint: "Ted skips fish — leftover chicken/quesadilla", days: ["thu"] },
+            { id: "w1b-tilapia", category: "Meat", name: "Tilapia (Thu. Samantha)", price: "", hint: "Ted skips fish. leftover chicken/quesadilla", days: ["thu"] },
             { id: "w1b-rotisserie", category: "Meat", name: "Rotisserie if no leftover chicken (Fri)", price: "", hint: "", days: ["fri"] },
             { id: "w1b-beef", category: "Meat", name: "Burger beef (Sat)", price: "", hint: "Skip chili ingredients this week", days: ["sat"] },
             { id: "w1b-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "", days: ["sun"] },
@@ -589,14 +589,14 @@
     2: {
       id: "2",
       label: "Week 2",
-      title: "Oct 12–18, 2026",
-      range: "Oct 12–18",
+      title: "Oct 12 to 18, 2026",
+      range: "Oct 12 to 18",
       plans: {
         A: {
           id: "A",
           label: "Option A",
           blurb: "Tacos · Alfredo · salmon · sausage · no chili",
-          budget: "~$100–130",
+          budget: "about $100 to $130",
           houseNote: "No chili this week (Week 1 A already had weekend chili). Potato bar without chili.",
           days: [
             {
@@ -606,7 +606,7 @@
               icon: "🥘",
               mealEmoji: "🍗",
               dinner: "Sheet-pan chicken + potatoes + broccoli",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Sheet-pan chicken",
                 have: "oil, salt, garlic powder, paprika",
@@ -638,7 +638,7 @@
               icon: "🌮",
               mealEmoji: "🧀",
               dinner: "Taco rebuild",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Taco rebuild",
                 have: "leftover taco meat, chips/rice/tortillas, cheese",
@@ -654,7 +654,7 @@
               icon: "💛",
               mealEmoji: "🍝",
               dinner: "Chicken Alfredo (double batch)",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Chicken Alfredo",
                 have: "Alfredo, pasta, chicken, Parmesan",
@@ -673,14 +673,14 @@
               icon: "🐟",
               mealEmoji: "🐟",
               dinner: "Salmon (Samantha) + rice + salad",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               tedNote: "Ted: leftover Alfredo (not fish)",
               recipe: {
                 title: "Salmon night (Samantha)",
                 have: "rice, salad; leftover Alfredo for Ted",
                 steps: [
                   "Salmon for Samantha; rice + salad.",
-                  "Ted = Alfredo leftover — no fish.",
+                  "Ted = Alfredo leftover. no fish.",
                 ],
                 enjoy: "Two plates, one night.",
                 buy: "salmon Fri",
@@ -693,12 +693,12 @@
               icon: "🌭",
               mealEmoji: "🌭",
               dinner: "Sausage sheet-pan + potatoes + peppers",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Sausage sheet-pan",
                 have: "oil, salt, garlic powder, paprika",
-                steps: ["Sausage + potatoes + peppers — daytime-friendly sheet pan."],
-                enjoy: "No chili this week — sheet pan is the weekend cook.",
+                steps: ["Sausage + potatoes + peppers. daytime-friendly sheet pan."],
+                enjoy: "No chili this week. sheet pan is the weekend cook.",
                 buy: "sausage Sat; peppers",
               },
             },
@@ -717,7 +717,7 @@
                   "Baked potatoes + toppings (no chili).",
                   "Pack Tucker’s fixed Mon lunchbox kit (not dinner leftovers).",
                 ],
-                enjoy: "Everyone builds their own — no chili toppings this week.",
+                enjoy: "Everyone builds their own. no chili toppings this week.",
                 buy: "potatoes if not bought Mon",
               },
             },
@@ -726,7 +726,7 @@
             ...tuckerGroceries("w2"),
             { id: "w2a-chicken", category: "Meat", name: "Chicken breasts", price: "", hint: "", days: ["mon", "thu"] },
             { id: "w2a-beef", category: "Meat", name: "Taco beef/chicken if needed", price: "", hint: "", days: ["tue"] },
-            { id: "w2a-salmon", category: "Meat", name: "Salmon (Fri — Samantha)", price: "", hint: "Ted = Alfredo leftover", days: ["fri"] },
+            { id: "w2a-salmon", category: "Meat", name: "Salmon (Fri. Samantha)", price: "", hint: "Ted = Alfredo leftover", days: ["fri"] },
             { id: "w2a-sausage", category: "Meat", name: "Sausage (Sat sheet-pan)", price: "", hint: "", days: ["sat"] },
             { id: "w2a-potatoes", category: "Produce", name: "Potatoes (Mon + Sun bar)", price: "", hint: "", days: ["mon", "sun"] },
             { id: "w2a-broccoli", category: "Produce", name: "Broccoli", price: "", hint: "", days: ["mon"] },
@@ -744,8 +744,8 @@
           id: "B",
           label: "Option B",
           blurb: "Chicken · quesadillas · tilapia · weekend chili",
-          budget: "~$100–130",
-          houseNote: "Weekend chili Sat only this week (not Week 1 B). One daytime pot — leftover Sun lunch optional.",
+          budget: "about $100 to $130",
+          houseNote: "Weekend chili Sat only this week (not Week 1 B). One daytime pot. leftover Sun lunch optional.",
           days: [
             {
               id: "mon",
@@ -754,7 +754,7 @@
               icon: "🍗",
               mealEmoji: "🍚",
               dinner: "Oven chicken + rice + salad",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Oven chicken + rice",
                 have: "chicken breasts, rice, salad",
@@ -770,7 +770,7 @@
               icon: "🫓",
               mealEmoji: "🫓",
               dinner: "Quesadilla night",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Quesadilla night",
                 have: "tortillas, cheese, chicken",
@@ -786,14 +786,14 @@
               icon: "🐟",
               mealEmoji: "🐟",
               dinner: "Tilapia (Samantha) + rice + veg",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               tedNote: "Ted: leftover chicken/quesadilla (not fish)",
               recipe: {
                 title: "Tilapia night (Samantha)",
                 have: "rice, veg; leftover chicken/quesadilla for Ted",
                 steps: [
                   "Tilapia for Samantha; rice + veg.",
-                  "Ted leftover chicken/quesadilla — no fish.",
+                  "Ted leftover chicken/quesadilla. no fish.",
                 ],
                 enjoy: "Sam’s fish; Ted’s leftover sub.",
                 buy: "tilapia",
@@ -806,11 +806,11 @@
               icon: "💛",
               mealEmoji: "🍝",
               dinner: "Chicken Alfredo or chicken + pasta bake",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Chicken pasta night",
                 have: "pasta, Alfredo or bake ingredients, chicken",
-                steps: ["Alfredo or simple chicken pasta bake — keep chicken heavy."],
+                steps: ["Alfredo or simple chicken pasta bake. keep chicken heavy."],
                 enjoy: "Comfort pasta midweek.",
                 buy: "Alfredo if doing pasta; chicken",
               },
@@ -822,7 +822,7 @@
               icon: "🛒",
               mealEmoji: "🍗",
               dinner: "Rotisserie + salad (busy)",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Rotisserie busy night",
                 have: "salad, dressing",
@@ -843,10 +843,10 @@
                 title: "Weekend chili (daytime pot)",
                 have: "beans, tomatoes, broth, chili spices",
                 steps: [
-                  "Chili daytime pot — one cook for the weekend.",
-                  "Leftover Sun lunch for who wants it — not a second cook.",
+                  "Chili daytime pot. one cook for the weekend.",
+                  "Leftover Sun lunch for who wants it. not a second cook.",
                 ],
-                enjoy: "Football / company — this week’s only chili.",
+                enjoy: "Football / company. this week’s only chili.",
                 buy: "chili beef + beans/tomatoes",
               },
             },
@@ -873,9 +873,9 @@
           groceries: [
             ...tuckerGroceries("w2"),
             { id: "w2b-chicken", category: "Meat", name: "Chicken (Mon/Thu pasta)", price: "", hint: "", days: ["mon", "thu"] },
-            { id: "w2b-tilapia", category: "Meat", name: "Tilapia (Wed — Samantha)", price: "", hint: "Ted = leftover chicken/quesadilla", days: ["wed"] },
+            { id: "w2b-tilapia", category: "Meat", name: "Tilapia (Wed. Samantha)", price: "", hint: "Ted = leftover chicken/quesadilla", days: ["wed"] },
             { id: "w2b-rotisserie", category: "Meat", name: "Rotisserie (Fri)", price: "", hint: "", days: ["fri"] },
-            { id: "w2b-beef", category: "Meat", name: "Chili beef (Sat weekend pot)", price: "", hint: "Weekend chili only — not midweek", days: ["sat"] },
+            { id: "w2b-beef", category: "Meat", name: "Chili beef (Sat weekend pot)", price: "", hint: "Weekend chili only. not midweek", days: ["sat"] },
             { id: "w2b-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "", days: ["sun"] },
             { id: "w2b-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "", days: ["sun"], staple: true },
             { id: "w2b-salad", category: "Produce", name: "Salad", price: "", hint: "", days: ["mon"] },
@@ -894,14 +894,14 @@
     3: {
       id: "3",
       label: "Week 3",
-      title: "Oct 19–25, 2026",
-      range: "Oct 19–25",
+      title: "Oct 19 to 25, 2026",
+      range: "Oct 19 to 25",
       plans: {
         A: {
           id: "A",
           label: "Option A",
           blurb: "Pork · tacos · tilapia · grab & go · no chili",
-          budget: "~$100–130",
+          budget: "about $100 to $130",
           houseNote: "No chili this week. Grab-and-go Fri. Taco leftovers → Wed dinner.",
           days: [
             {
@@ -943,11 +943,11 @@
               icon: "🌮",
               mealEmoji: "🧀",
               dinner: "Taco rebuild (nachos / bowls / quesadillas)",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Taco rebuild",
                 have: "leftover taco meat, chips/tortillas/rice, cheese, salsa",
-                steps: ["Rebuild from taco meat — nachos, bowls, or quesadillas."],
+                steps: ["Rebuild from taco meat. nachos, bowls, or quesadillas."],
                 enjoy: "Taco leftovers become tonight’s dinner.",
                 buy: "none",
               },
@@ -964,7 +964,7 @@
                 title: "Pork chop night",
                 have: "oil, salt, garlic, potatoes, salad",
                 steps: ["Pan or oven pork chops; potatoes + salad."],
-                enjoy: "Pork variety week — not chicken every night.",
+                enjoy: "Pork variety week. not chicken every night.",
                 buy: "pork chops; potatoes if low",
               },
             },
@@ -975,14 +975,14 @@
               icon: "🐟",
               mealEmoji: "🐟",
               dinner: "Tilapia (Samantha) + rice + veg",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               tedNote: "Ted: leftover pork or chicken (not fish)",
               recipe: {
                 title: "Tilapia night (Samantha)",
                 have: "rice, veg; leftover pork/chicken for Ted",
                 steps: [
                   "Seasoned tilapia for Samantha; rice + veg.",
-                  "Ted pulls leftover pork or chicken — no fish.",
+                  "Ted pulls leftover pork or chicken. no fish.",
                 ],
                 enjoy: "Sam’s fish + Ted’s leftover sub.",
                 buy: "tilapia Fri",
@@ -995,12 +995,12 @@
               icon: "🛒",
               mealEmoji: "🛍",
               dinner: "Grab & go: Publix rotisserie + bagged salad",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               grabGo: true,
               recipe: {
                 title: "Grab & go rotisserie night",
                 have: "plates + dressing if home",
-                steps: ["Pick up Publix rotisserie + bagged salad.", "Plate and eat — minimal dishes."],
+                steps: ["Pick up Publix rotisserie + bagged salad.", "Plate and eat. minimal dishes."],
                 enjoy: "Busy Saturday off the stove.",
                 buy: "Publix rotisserie + bagged salad",
               },
@@ -1030,7 +1030,7 @@
             { id: "w3a-chicken", category: "Meat", name: "Chicken breasts (Mon)", price: "", hint: "", days: ["mon"] },
             { id: "w3a-beef", category: "Meat", name: "Taco beef if needed", price: "", hint: "", days: ["tue"] },
             { id: "w3a-pork", category: "Meat", name: "Pork chops (Thu)", price: "", hint: "", days: ["thu"] },
-            { id: "w3a-tilapia", category: "Meat", name: "Tilapia (Fri — Samantha)", price: "", hint: "Ted skips fish — leftover pork/chicken", days: ["fri"] },
+            { id: "w3a-tilapia", category: "Meat", name: "Tilapia (Fri. Samantha)", price: "", hint: "Ted skips fish. leftover pork/chicken", days: ["fri"] },
             { id: "w3a-rotisserie", category: "Meat", name: "Publix rotisserie (Sat grab & go)", price: "", hint: "🛍 Grab & go", days: ["sat"] },
             { id: "w3a-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "", days: ["sun"] },
             { id: "w3a-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "", days: ["sun"], staple: true },
@@ -1049,7 +1049,7 @@
           id: "B",
           label: "Option B",
           blurb: "Alfredo · burgers · salmon · weekend chili",
-          budget: "~$100–130",
+          budget: "about $100 to $130",
           houseNote: "Weekend chili Sat only this week for Option B new weeks. One daytime pot.",
           days: [
             {
@@ -1078,7 +1078,7 @@
               icon: "🍔",
               mealEmoji: "🍔",
               dinner: "Burger night + simple sides",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Burger night",
                 have: "ground beef; chips/pickles optional",
@@ -1110,14 +1110,14 @@
               icon: "🐟",
               mealEmoji: "🐟",
               dinner: "Salmon (Samantha) + rice + salad",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               tedNote: "Ted: leftover Alfredo or chicken (not fish)",
               recipe: {
                 title: "Salmon night (Samantha)",
                 have: "rice, salad; leftover Alfredo/chicken for Ted",
                 steps: [
                   "Bake/pan salmon for Samantha; rice + salad.",
-                  "Ted = leftover Alfredo or chicken — no fish.",
+                  "Ted = leftover Alfredo or chicken. no fish.",
                 ],
                 enjoy: "Two plates, one night.",
                 buy: "salmon Thu",
@@ -1130,7 +1130,7 @@
               icon: "🛒",
               mealEmoji: "🥪",
               dinner: "Rotisserie or leftover chicken sandwiches + salad",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Busy-night chicken sandwiches",
                 have: "bread/bagels, salad; rotisserie or leftover chicken",
@@ -1153,10 +1153,10 @@
                 steps: [
                   "Daytime cook: beef, onion, tomatoes, beans, broth, chili powder/cumin.",
                   "Cheese + Doritos on top. Company-friendly.",
-                  "Leftover Sun lunch for who wants it — do NOT cook chili twice.",
+                  "Leftover Sun lunch for who wants it. do NOT cook chili twice.",
                 ],
                 enjoy: "This week’s only chili for Option B new weeks.",
-                buy: "ground beef ~1–1.5 lb; onion",
+                buy: "ground beef ~1 to 1.5 lb; onion",
               },
             },
             {
@@ -1183,7 +1183,7 @@
             ...tuckerGroceries("w3"),
             { id: "w3b-chicken", category: "Meat", name: "Chicken breasts (Mon Alfredo + Wed sheet-pan)", price: "", hint: "", days: ["mon", "wed"] },
             { id: "w3b-beef", category: "Meat", name: "Burger beef + chili beef", price: "", hint: "", days: ["tue", "sat"] },
-            { id: "w3b-salmon", category: "Meat", name: "Salmon (Thu — Samantha)", price: "", hint: "Ted = Alfredo/chicken leftover", days: ["thu"] },
+            { id: "w3b-salmon", category: "Meat", name: "Salmon (Thu. Samantha)", price: "", hint: "Ted = Alfredo/chicken leftover", days: ["thu"] },
             { id: "w3b-rotisserie", category: "Meat", name: "Rotisserie if no leftovers (Fri)", price: "", hint: "", days: ["fri"] },
             { id: "w3b-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "", days: ["sun"] },
             { id: "w3b-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "", days: ["sun"], staple: true },
@@ -1205,14 +1205,14 @@
     4: {
       id: "4",
       label: "Week 4",
-      title: "Oct 26–Nov 1, 2026",
-      range: "Oct 26–Nov 1",
+      title: "Oct 26 to Nov 1, 2026",
+      range: "Oct 26 to Nov 1",
       plans: {
         A: {
           id: "A",
           label: "Option A",
           blurb: "Sausage · quesadillas · chicken · tilapia · pizza night",
-          budget: "~$100–130",
+          budget: "about $100 to $130",
           houseNote: "No chili this week. Frozen pizza grab-and-go Fri.",
           days: [
             {
@@ -1222,7 +1222,7 @@
               icon: "🌭",
               mealEmoji: "🌭",
               dinner: "Sausage sheet-pan + potatoes + peppers",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Sausage sheet-pan",
                 have: "oil, salt, garlic powder, paprika",
@@ -1270,14 +1270,14 @@
               icon: "🐟",
               mealEmoji: "🐟",
               dinner: "Tilapia (Samantha) + rice + veg",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               tedNote: "Ted: leftover chicken/quesadilla (not fish)",
               recipe: {
                 title: "Tilapia night (Samantha)",
                 have: "rice, veg; leftover chicken/quesadilla for Ted",
                 steps: [
                   "Tilapia for Samantha; rice + veg.",
-                  "Ted leftover chicken/quesadilla — no fish.",
+                  "Ted leftover chicken/quesadilla. no fish.",
                 ],
                 enjoy: "Sam’s fish; Ted’s leftover sub.",
                 buy: "tilapia Thu",
@@ -1290,7 +1290,7 @@
               icon: "🛒",
               mealEmoji: "🛍",
               dinner: "Grab & go: frozen pizza night",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               grabGo: true,
               recipe: {
                 title: "Frozen pizza night",
@@ -1307,12 +1307,12 @@
               icon: "🍔",
               mealEmoji: "🍔",
               dinner: "Burger night + simple sides",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Burger night",
                 have: "ground beef; chips/pickles optional",
                 steps: ["Burger patties; buns optional; chips/pickles."],
-                enjoy: "Weekend burgers — no chili this week.",
+                enjoy: "Weekend burgers. no chili this week.",
                 buy: "burger beef Sat; buns optional",
               },
             },
@@ -1340,7 +1340,7 @@
             ...tuckerGroceries("w4"),
             { id: "w4a-sausage-sheet", category: "Meat", name: "Smoked sausage (Mon sheet-pan)", price: "", hint: "", days: ["mon"] },
             { id: "w4a-chicken", category: "Meat", name: "Chicken breasts (Tue quesadilla + Wed)", price: "", hint: "", days: ["tue", "wed"] },
-            { id: "w4a-tilapia", category: "Meat", name: "Tilapia (Thu — Samantha)", price: "", hint: "Ted skips fish", days: ["thu"] },
+            { id: "w4a-tilapia", category: "Meat", name: "Tilapia (Thu. Samantha)", price: "", hint: "Ted skips fish", days: ["thu"] },
             { id: "w4a-beef", category: "Meat", name: "Burger beef (Sat)", price: "", hint: "", days: ["sat"] },
             { id: "w4a-sausage", category: "Meat", name: "Breakfast sausage (Sun)", price: "", hint: "", days: ["sun"] },
             { id: "w4a-eggs", category: "Meat", name: "Eggs (if low)", price: "", hint: "", days: ["sun"], staple: true },
@@ -1361,7 +1361,7 @@
           id: "B",
           label: "Option B",
           blurb: "Rotisserie · tacos · Alfredo · salmon · no chili",
-          budget: "~$100–130",
+          budget: "about $100 to $130",
           houseNote: "No chili this week (Week 3 B has the weekend chili). Taco leftovers → Wed dinner.",
           days: [
             {
@@ -1403,7 +1403,7 @@
               icon: "🌮",
               mealEmoji: "🧀",
               dinner: "Taco rebuild",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Taco rebuild",
                 have: "leftover taco meat, chips/rice/tortillas, cheese",
@@ -1419,7 +1419,7 @@
               icon: "💛",
               mealEmoji: "🍝",
               dinner: "Chicken Alfredo (double batch)",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               recipe: {
                 title: "Chicken Alfredo",
                 have: "Alfredo, pasta, chicken, Parmesan",
@@ -1438,14 +1438,14 @@
               icon: "🐟",
               mealEmoji: "🐟",
               dinner: "Salmon (Samantha) + rice + salad",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               tedNote: "Ted: leftover Alfredo (not fish)",
               recipe: {
                 title: "Salmon night (Samantha)",
                 have: "rice, salad; leftover Alfredo for Ted",
                 steps: [
                   "Salmon for Samantha; rice + salad.",
-                  "Ted = Alfredo leftover — no fish.",
+                  "Ted = Alfredo leftover. no fish.",
                 ],
                 enjoy: "Two plates, one night.",
                 buy: "salmon Fri",
@@ -1458,7 +1458,7 @@
               icon: "🛒",
               mealEmoji: "🛍",
               dinner: "Grab & go: Publix subs",
-              adultLunch: "adult lunch → —",
+              adultLunch: "adult lunch open",
               grabGo: true,
               recipe: {
                 title: "Publix subs night",
@@ -1493,7 +1493,7 @@
             { id: "w4b-rotisserie", category: "Meat", name: "Rotisserie (Mon)", price: "", hint: "", days: ["mon"] },
             { id: "w4b-beef", category: "Meat", name: "Taco beef/chicken if needed", price: "", hint: "", days: ["tue"] },
             { id: "w4b-chicken", category: "Meat", name: "Chicken breasts (Alfredo)", price: "", hint: "", days: ["thu"] },
-            { id: "w4b-salmon", category: "Meat", name: "Salmon (Fri — Samantha)", price: "", hint: "Ted = Alfredo leftover", days: ["fri"] },
+            { id: "w4b-salmon", category: "Meat", name: "Salmon (Fri. Samantha)", price: "", hint: "Ted = Alfredo leftover", days: ["fri"] },
             { id: "w4b-subs", category: "Meat", name: "Publix subs ×4 (Sat grab & go)", price: "", hint: "🛍 Grab & go", days: ["sat"] },
             { id: "w4b-potatoes", category: "Produce", name: "Potatoes (Mon sides + Sun bar)", price: "", hint: "", days: ["mon", "sun"] },
             { id: "w4b-salad", category: "Produce", name: "Salad if needed", price: "", hint: "", days: ["mon", "fri"] },
@@ -1840,12 +1840,12 @@
       dinner: label,
       icon: holiday.emoji || "🎉",
       mealEmoji: holiday.emoji || "🎉",
-      adultLunch: "adult lunch → —",
+      adultLunch: "adult lunch open",
       tedNote: "",
       recipe: {
         title: label,
         have: "a holiday off the plan",
-        steps: ["Big cooking holiday — left blank on purpose.", "Nothing from this night is on the shopping list or in the budget."],
+        steps: ["Big cooking holiday. left blank on purpose.", "Nothing from this night is on the shopping list or in the budget."],
         enjoy: "Enjoy the holiday.",
         buy: "none",
       },
@@ -1901,7 +1901,7 @@
         dinner: "Removed from this week",
         icon: "🚫",
         mealEmoji: "🚫",
-        adultLunch: "adult lunch → —",
+        adultLunch: "adult lunch open",
         tedNote: "",
         recipe: { title: "Removed from this week", have: "a free night", steps: ["This night was removed from the week.", "Its grocery lines are off the list. Tap Swap to pick something."], enjoy: "Night off.", buy: "none" },
       };
@@ -2090,9 +2090,9 @@
   function mondayOf(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
   function addDays(d,n){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x}
   function sameDay(a,b){return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate()}
-  function fmtWeek(mon){const e=addDays(mon,6);return `${MO3[mon.getMonth()]} ${mon.getDate()}–${mon.getMonth()===e.getMonth()?"":MO3[e.getMonth()]+" "}${e.getDate()}, ${e.getFullYear()}`}
+  function fmtWeek(mon){const e=addDays(mon,6);return `${MO3[mon.getMonth()]} ${mon.getDate()} to ${mon.getMonth()===e.getMonth()?"":MO3[e.getMonth()]+" "}${e.getDate()}, ${e.getFullYear()}`}
   function parseWeekLabel(str){
-    const m=/^\s*([A-Z][a-z]{2})[a-z]*\.?\s+(\d{1,2})\s*[–-]\s*(?:([A-Z][a-z]{2})[a-z]*\.?\s+)?(\d{1,2}),?\s+(\d{4})\s*$/.exec(String(str||""));
+    const m=/^\s*([A-Z][a-z]{2})[a-z]*\.?\s+(\d{1,2})\s*[ to -]\s*(?:([A-Z][a-z]{2})[a-z]*\.?\s+)?(\d{1,2}),?\s+(\d{4})\s*$/.exec(String(str||""));
     if(!m)return null;const sm=MO3.indexOf(m[1]);const em=m[3]?MO3.indexOf(m[3]):sm;if(sm<0||em<0)return null;
     let y=+m[5];const sy=em<sm?y-1:y;const d=new Date(sy,sm,+m[2]);return isNaN(d)?null:mondayOf(d)}
   function shEl(){return document.getElementById("sheet")}
@@ -2112,7 +2112,7 @@
       const first=view, gs=mondayOf(first);
       const rows=[];for(let r=0;r<6;r++){const rm=addDays(gs,r*7);if(r>=4&&rm.getMonth()!==view.getMonth()&&rm>first)break;rows.push(rm)}
       inn.innerHTML=shTop("📅 Pick a week")+`
-        <p class="cal-sel">${sel?"Selected: "+fmtWeek(sel):"Tap any day to pick its Mon–Sun week"}</p>
+        <p class="cal-sel">${sel?"Selected: "+fmtWeek(sel):"Tap any day to pick its Mon to Sun week"}</p>
         <div class="cal-nav"><button data-cm="-1" aria-label="Previous month">‹</button><b>${MOFULL[view.getMonth()]} ${view.getFullYear()}</b><button data-cm="1" aria-label="Next month">›</button></div>
         <p class="month-hold-hint">Hold a week to customize</p>
         <div class="cal-dow"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
@@ -2311,7 +2311,7 @@
     if (!LIVE_PRICES[k]) LIVE_PRICES[k] = { ...FAM_PRICES[k], sA: { source: "estimate", checked: "2026-10-05" }, sP: { source: "estimate", checked: "2026-10-05" }, locA: false, locP: false };
   });
 
-  /* ---- Extra swap ideas (More batches) — est. prices via FAM_PRICES keys only ---- */
+  /* ---- Extra swap ideas (More batches). est. prices via FAM_PRICES keys only ---- */
   function exLine(pk, category, name) {
     const meta = FAM_PRICES[pk] || LIVE_PRICES[pk];
     return {
@@ -2343,7 +2343,7 @@
       recipe: opts.recipe || {
         title: dinner,
         have: opts.have || "pantry basics",
-        steps: opts.steps || ["Shop the grocery lines for this night.", "Cook simply — low time, family of 4."],
+        steps: opts.steps || ["Shop the grocery lines for this night.", "Cook simply. low time, family of 4."],
         enjoy: opts.enjoy || "Easy night.",
         buy: opts.buy || "see grocery lines (est.)",
       },
@@ -2442,7 +2442,7 @@
     "extra-sloppy-joe-bowls": makeExtra("extra-sloppy-joe-bowls", {
       dinner: "Sloppy joe bowls over rice (no spaghetti)",
       calories: 550, mealCalories: 710,
-      steps: ["Brown beef with onion.", "Simmer with pantry sauce — serve over rice, not spaghetti.", "Side salad."],
+      steps: ["Brown beef with onion.", "Simmer with pantry sauce. serve over rice, not spaghetti.", "Side salad."],
       groceries: [exLine("beef", "Meat"), exLine("onion", "Produce"), exLine("rice", "Pantry"), exLine("salad", "Produce")],
     }),
     "extra-loaded-nachos": makeExtra("extra-loaded-nachos", {
@@ -2482,13 +2482,13 @@
     }),
     "extra-tilapia-broccoli": makeExtra("extra-tilapia-broccoli", {
       dinner: "Tilapia (Samantha) + rice + broccoli",
-      tedNote: "Ted: leftover chicken or quesadilla — not fish",
+      tedNote: "Ted: leftover chicken or quesadilla. not fish",
       calories: 340, mealCalories: 520,
       groceries: [exLine("tilapia", "Meat"), exLine("rice", "Pantry"), exLine("broccoli", "Produce"), exLine("chicken", "Meat", "Leftover sub for Ted (optional)")],
     }),
     "extra-salmon-asparagus": makeExtra("extra-salmon-asparagus", {
       dinner: "Salmon (Samantha) + rice + asparagus",
-      tedNote: "Ted: leftover sub — not fish",
+      tedNote: "Ted: leftover sub. not fish",
       calories: 400, mealCalories: 580,
       groceries: [exLine("salmon", "Meat"), exLine("rice", "Pantry"), exLine("asparagus", "Produce")],
     }),
@@ -2497,7 +2497,7 @@
       weekendOnly: true,
       dinner: "Weekend chili pot (daytime) + salad + corn",
       calories: 480, mealCalories: 640,
-      steps: ["Weekend daytime only — football/company.", "Brown beef; simmer beans/tomatoes.", "Tucker lunch kit stays fixed — chili is dinner, not lunchbox."],
+      steps: ["Weekend daytime only. football/company.", "Brown beef; simmer beans/tomatoes.", "Tucker lunch kit stays fixed. chili is dinner, not lunchbox."],
       groceries: [exLine("beef", "Meat"), exLine("chili-cans", "Pantry"), exLine("onion", "Produce"), exLine("salad", "Produce"), exLine("veg", "Produce", "Corn")],
     }),
     "extra-white-chili-weekend": makeExtra("extra-white-chili-weekend", {
@@ -2896,7 +2896,7 @@ function sidesBlockHTML(dayId, day) {
   function renderBudgetCompare(tots) {
     const el = els.budgetCompare;
     if (!el) return;
-    // Kept for compatibility but hidden — hero sentence + bar replace Est. left / compare.
+    // Kept for compatibility but hidden. hero sentence + bar replace Est. left / compare.
     el.hidden = true;
     void tots;
   }
@@ -2905,17 +2905,22 @@ function sidesBlockHTML(dayId, day) {
     if (!els.estimateBand) return;
     const t = storeTotals(items);
     const total = state.store === "aldi" ? t.a : state.store === "publix" ? t.p : t.b;
+    const priced = (items || []).filter((i) => itemPrice(i.id, i.price) != null).length;
+    if (!priced) {
+      els.estimateBand.innerHTML = "";
+      return;
+    }
     const b = state.budget;
     const y = scaledBudgetAmount();
     let sentence;
     if (!b.on) {
-      sentence = `Groceries this week: about ${formatMoney2(total)}`;
+      sentence = `Groceries this week: $${total.toFixed(2)}`;
     } else if (y == null) {
-      sentence = `Groceries this week: about ${formatMoney2(total)} (${budgetLine(currentPlan())})`;
+      sentence = `Groceries this week: $${total.toFixed(2)}`;
     } else {
       const z = y - total;
-      if (z >= 0) sentence = `Groceries this week: about ${formatMoney2(total)} of your ${formatMoney2(y)} budget, ${formatMoney2(z)} to spare`;
-      else sentence = `Groceries this week: about ${formatMoney2(total)} of your ${formatMoney2(y)} budget, <span class="over-amt">${formatMoney2(-z)} over</span>`;
+      if (z >= 0) sentence = `Groceries this week: $${total.toFixed(2)} of your $${y.toFixed(2)} budget, $${z.toFixed(2)} to spare`;
+      else sentence = `Groceries this week: $${total.toFixed(2)} of your $${y.toFixed(2)} budget, <span class="over-amt">$${(-z).toFixed(2)} over</span>`;
     }
     els.estimateBand.innerHTML = sentence;
 
@@ -3033,7 +3038,7 @@ function sidesBlockHTML(dayId, day) {
           const o = draft[td.id];
           const day = effectiveDay(td, draft);
           const t = o ? o.type : "keep";
-          const lunch = day.adultLunch && day.adultLunch !== "—" && !/adult lunch → —/.test(day.adultLunch) ? day.adultLunch : "";
+          const lunch = day.adultLunch && day.adultLunch !== "—" && !/adult lunch open/.test(day.adultLunch) ? day.adultLunch : "";
           return `<div class="cz${o ? " ch" : ""}${moveFrom === td.id ? " mv" : ""}">
             <div class="cz-h"><span>${escapeHtml(td.day)}</span><span>${o ? "changed" : ""}</span></div>
             <div class="cz-d">${day.mealEmoji} ${isFav(day.dinner) ? "❤️ " : ""}${escapeHtml(day.dinner)}</div>
@@ -3083,13 +3088,13 @@ function sidesBlockHTML(dayId, day) {
         activeMonth().weekEdits[key] = draft;
         if (key === `${state.week}${state.plan}`) state.dayOverrides = draft;
         persist(); closeSheet(); renderAll();
-        showToast(key === `${state.week}${state.plan}` ? "Week saved — groceries updated" : `Saved ${week.label} ${planId} edits — tap that card to load it`);
+        showToast(key === `${state.week}${state.plan}` ? "Week saved. groceries updated" : `Saved ${week.label} ${planId} edits. tap that card to load it`);
       });
     };
     draw();
   }
 
-  /* calories — USDA FoodData Central typical-serving rough values, ~est */
+  /* calories. USDA FoodData Central typical-serving rough values, ~est */
   function round10(n) {
     return Math.round(Number(n) / 10) * 10;
   }
@@ -3206,8 +3211,8 @@ function sidesBlockHTML(dayId, day) {
       return `<div class="rate-row rate-row-del-only" role="group" aria-label="Remove dinner">${del}</div>`;
     }
     return `<div class="rate-row" role="group" aria-label="Rate this dinner">
-      <button type="button" data-rate="-1" aria-label="Thumbs down — never suggest again" aria-pressed="${r === -1}" title="Tried it, no">👎</button>
-      <button type="button" data-rate="1" aria-label="Thumbs up — good" aria-pressed="${r === 1}" title="Good">👍</button>
+      <button type="button" data-rate="-1" aria-label="Thumbs down. never suggest again" aria-pressed="${r === -1}" title="Tried it, no">👎</button>
+      <button type="button" data-rate="1" aria-label="Thumbs up. good" aria-pressed="${r === 1}" title="Good">👍</button>
       <button type="button" data-rate="2" aria-label="Favorite" aria-pressed="${r === 2}" title="Favorite">⭐</button>
       ${del}</div>`;
   }
@@ -3216,7 +3221,7 @@ function sidesBlockHTML(dayId, day) {
       e.stopPropagation();
       const r = Number(b.dataset.rate);
       setRating(name, r);
-      showToast(ratingOf(name) === 0 ? "Rating cleared" : r === -1 ? "👎 Never suggest again — Restore anytime in Removed meals" : r === 2 ? "⭐ Favorite — suggested first" : "👍 Saved");
+      showToast(ratingOf(name) === 0 ? "Rating cleared" : r === -1 ? "👎 Never suggest again. Restore anytime in Removed meals" : r === 2 ? "⭐ Favorite. suggested first" : "👍 Saved");
     }));
   }
   function renderRatings() {
@@ -3290,7 +3295,7 @@ function sidesBlockHTML(dayId, day) {
         const dinner = effectiveDay(currentPlan().days.find((d) => d.id === dayId)).dinner;
         const k = rateKey(dinner);
         if (!state.ratings[k]) {
-          /* nudge only via gentle banner / review — don't auto-rate */
+          /* nudge only via gentle banner / review. don't auto-rate */
         }
       }
       persist();
@@ -3346,12 +3351,12 @@ function sidesBlockHTML(dayId, day) {
     });
     const suggestions = [];
     Object.keys(skipCounts).forEach((n) => {
-      if (skipCounts[n] >= 1) suggestions.push(`Skipped: ${n} — swap it?`);
+      if (skipCounts[n] >= 1) suggestions.push(`Skipped: ${n}. swap it?`);
     });
     // Across mealLog, if same dinner skipped twice historically via ratings down
     Object.keys(state.ratings || {}).forEach((k) => {
       const r = state.ratings[k];
-      if (r && r.r === -1) suggestions.push(`Skipped / disliked: ${r.n || k} — swap it?`);
+      if (r && r.r === -1) suggestions.push(`Skipped / disliked: ${r.n || k}. swap it?`);
     });
     const uniqSug = [...new Set(suggestions)].slice(0, 4);
     const hasAny = made + skipped + topRated.length > 0;
@@ -3400,10 +3405,10 @@ function sidesBlockHTML(dayId, day) {
       state.weekEdits[key] = state.dayOverrides;
       if (state.plan) month.picks[state.week] = state.plan;
       // Mid-flow draft is always full state in localStorage (Steve soft-bar).
-      // Lock-in is a marker on the same object — never a separate wipe.
+      // Lock-in is a marker on the same object. never a separate wipe.
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch (_) {}
-    // Do NOT rewrite location.hash here — share URL is export-only.
+    // Do NOT rewrite location.hash here. share URL is export-only.
     // Auto hash sync was remounting via hashchange + lossy encode/decode wipe.
   }
 
@@ -3579,7 +3584,7 @@ function sidesBlockHTML(dayId, day) {
         if (Array.isArray(arr)) base.daySides[d] = arr.map(String).filter(Boolean).slice(0, 6);
       });
     }
-    // Lock + standing grocery + meat alts — must survive reload (was dropped → remount wipe)
+    // Lock + standing grocery + meat alts. must survive reload (was dropped → remount wipe)
     base.weekLocked = Boolean(parsed.weekLocked);
     base.lockedWeek = parsed.lockedWeek && typeof parsed.lockedWeek === "object" ? parsed.lockedWeek : null;
     base.focusDayId = typeof parsed.focusDayId === "string" ? parsed.focusDayId : null;
@@ -3588,6 +3593,17 @@ function sidesBlockHTML(dayId, day) {
     base.itemAlts = parsed.itemAlts && typeof parsed.itemAlts === "object" ? parsed.itemAlts : {};
     base.meatAlts = parsed.meatAlts && typeof parsed.meatAlts === "object" ? parsed.meatAlts : {};
     base.openAltId = null;
+    // If locked package carried customs and state.custom empty, restore them
+    if (base.lockedWeek && Array.isArray(base.lockedWeek.custom) && base.lockedWeek.custom.length &&
+        (!Array.isArray(parsed.custom) || !parsed.custom.length)) {
+      parsed.custom = base.lockedWeek.custom;
+    }
+    if (base.lockedWeek && Array.isArray(base.lockedWeek.stockProduce) && !base.stockProduce.length) {
+      base.stockProduce = base.lockedWeek.stockProduce;
+    }
+    if (base.lockedWeek && Array.isArray(base.lockedWeek.munchies) && !base.munchies.length) {
+      base.munchies = base.lockedWeek.munchies;
+    }
     linkWeekEdits(base);
     if (parsed.prices && typeof parsed.prices === "object" && !Array.isArray(parsed.prices)) {
       Object.keys(parsed.prices).forEach((id) => {
@@ -3603,6 +3619,7 @@ function sidesBlockHTML(dayId, day) {
           const price = itemPriceFromAny(c.price);
           if (price !== null) base.prices[id] = price;
           if (typeof c.qty === "string" && c.qty.trim()) base.qty[id] = c.qty.trim().slice(0, 40);
+          else if (c.qty != null && String(c.qty).trim()) base.qty[id] = String(c.qty).trim().slice(0, 40);
           if (typeof c.note === "string" && c.note.trim()) base.notes[id] = c.note.trim().slice(0, 80);
           const rawCat = typeof c.category === "string" ? c.category.trim().slice(0, 40) : "Other";
           const category = CATEGORIES.includes(rawCat) || LEGACY_CATEGORY[rawCat]
@@ -3612,9 +3629,33 @@ function sidesBlockHTML(dayId, day) {
             id,
             name: c.name.trim().slice(0, 80),
             category,
+            qty: typeof c.qty === "string" ? c.qty.slice(0, 40) : c.qty != null ? String(c.qty).slice(0, 40) : (base.qty[id] || "1"),
+            section: typeof c.section === "string" ? c.section : "Menu extras",
+            price: price,
           };
         });
     }
+    // Restore standing lists with full fields (customs persist FAIL fix)
+    const stockSrc = (Array.isArray(parsed.stockProduce) && parsed.stockProduce.length)
+      ? parsed.stockProduce
+      : base.stockProduce;
+    const munchSrc = (Array.isArray(parsed.munchies) && parsed.munchies.length)
+      ? parsed.munchies
+      : base.munchies;
+    if (window.StandingLists) {
+      base.stockProduce = window.StandingLists.normalizeStandingItems(stockSrc, "stock");
+      base.munchies = window.StandingLists.normalizeStandingItems(munchSrc, "munch");
+    } else {
+      base.stockProduce = Array.isArray(stockSrc) ? stockSrc : [];
+      base.munchies = Array.isArray(munchSrc) ? munchSrc : [];
+    }
+    // Mirror prices from standing items into state.prices so totals include them
+    [...base.stockProduce, ...base.munchies, ...base.custom].forEach((it) => {
+      if (it && it.price != null && isFinite(Number(it.price)) && !Object.prototype.hasOwnProperty.call(base.prices, it.id)) {
+        base.prices[it.id] = Math.round(Number(it.price) * 100) / 100;
+      }
+      if (it && it.qty && !base.qty[it.id]) base.qty[it.id] = String(it.qty).slice(0, 40);
+    });
     return base;
   }
 
@@ -3874,7 +3915,7 @@ function sidesBlockHTML(dayId, day) {
       if (deleted) {
         const empty = document.createElement("div");
         empty.className = "month-empty-slot";
-        empty.innerHTML = `<button type="button" data-restore-week="${weekId}">Empty — tap A or B below to fill</button>
+        empty.innerHTML = `<button type="button" data-restore-week="${weekId}">Empty. tap A or B below to fill</button>
           <div class="month-ab">
             <button type="button" class="month-opt" data-week="${weekId}" data-plan="A">A · ${escapeHtml(week.plans.A.blurb)}</button>
             <button type="button" class="month-opt" data-week="${weekId}" data-plan="B">B · ${escapeHtml(week.plans.B.blurb)}</button>
@@ -3965,7 +4006,7 @@ function sidesBlockHTML(dayId, day) {
     linkWeekEdits(state);
     persist();
     renderAll();
-    showToast(`Duplicated into ${monthLabel(toKey)} — original ${monthLabel(fromKey)} untouched`);
+    showToast(`Duplicated into ${monthLabel(toKey)}. original ${monthLabel(fromKey)} untouched`);
   }
 
   function renderTemplates() {
@@ -4020,9 +4061,9 @@ function sidesBlockHTML(dayId, day) {
         (day.holiday || day.overrideType === "holiday" ? " day-card-holiday" : "") +
         (day.overrideType === "pickmeal" ? " day-card-pickmeal" : "");
       const adultLine =
-        day.adultLunch && day.adultLunch !== "—" && !/adult lunch → —/.test(day.adultLunch)
+        day.adultLunch && day.adultLunch !== "—" && !/adult lunch open/.test(day.adultLunch)
           ? `<p class="day-lunch">${escapeHtml(day.adultLunch)}</p>`
-          : `<p class="day-lunch day-lunch-muted">adult lunch → —</p>`;
+          : `<p class="day-lunch day-lunch-muted">adult lunch open</p>`;
       const tedLine = day.tedNote
         ? `<p class="day-ted">${escapeHtml(day.tedNote)}</p>`
         : "";
@@ -4068,7 +4109,7 @@ function sidesBlockHTML(dayId, day) {
         ${typeof mealLogHTML === "function" ? mealLogHTML(templateDay.id, day) : ""}
       `;
       day._sideDayId = templateDay.id;
-      // Meat alt chevron on day card only (not strip chips) — Steve bar
+      // Meat alt chevron on day card only (not strip chips). Steve bar
       try {
         const IA = window.ItemAlts;
         const meatHost = card.querySelector("[data-day-meat]");
@@ -4116,7 +4157,7 @@ function sidesBlockHTML(dayId, day) {
           }
         }
       } catch (_) {}
-      // re-render calorie badges with side id (already in HTML — patch cal line)
+      // re-render calorie badges with side id (already in HTML. patch cal line)
       card.querySelector(".day-body-btn").addEventListener("click", () => openRecipe(day));
       bindRateRow(card, day.dinner);
       if (typeof bindSidesBlock === "function") bindSidesBlock(card);
@@ -4279,8 +4320,8 @@ function sidesBlockHTML(dayId, day) {
       const take = (arr, n) => {
         while (arr.length && batch.length < n) batch.push(arr.shift());
       };
-      // 10–15 items: mostly dinners, plus breakfast + adult lunch each tap
-      const target = 12 + Math.floor(Math.random() * 4); // 12–15
+      // 10 to 15 items: mostly dinners, plus breakfast + adult lunch each tap
+      const target = 12 + Math.floor(Math.random() * 4); // 12 to 15
       take(dinnersLeft, Math.min(9, target - 3));
       take(breakfasts, 2);
       take(lunches, 2);
@@ -4324,24 +4365,24 @@ function sidesBlockHTML(dayId, day) {
       showToast("Restored template dinner");
     } else if (type === "leftovers") {
       state.dayOverrides[dayId] = { type: "leftovers" };
-      showToast("Swapped to Leftovers — groceries updated");
+      showToast("Swapped to Leftovers. groceries updated");
     } else if (type === "eatout") {
       state.dayOverrides[dayId] = { type: "eatout" };
-      showToast("Swapped to Eat out — groceries updated");
+      showToast("Swapped to Eat out. groceries updated");
     } else if (type === "grabgo" && key && GRAB_GO[key]) {
       state.dayOverrides[dayId] = { type: "grabgo", key };
-      showToast("Grab & go — groceries updated");
+      showToast("Grab & go. groceries updated");
     } else if (type === "pick" && key && (parseDinnerKey(key) || GRAB_GO[key] || (typeof EXTRA_DINNERS !== "undefined" && EXTRA_DINNERS[key]))) {
       if (GRAB_GO[key]) state.dayOverrides[dayId] = { type: "grabgo", key };
       else {
         const ex = typeof EXTRA_DINNERS !== "undefined" ? EXTRA_DINNERS[key] : null;
         if (ex && ex.weekendOnly && !/^(sat|sun)$/.test(dayId)) {
-          showToast("Chili stays weekend-only — pick Sat or Sun");
+          showToast("Chili stays weekend-only. pick Sat or Sun");
           return;
         }
         state.dayOverrides[dayId] = { type: "pick", key };
       }
-      showToast("Dinner swapped — groceries updated");
+      showToast("Dinner swapped. groceries updated");
     } else {
       return;
     }
@@ -4714,30 +4755,28 @@ function sidesBlockHTML(dayId, day) {
     const tuckerNote = document.createElement("p");
     tuckerNote.className = "tucker-note";
     tuckerNote.textContent =
-      "Tucker lunchbox — same kit Mon–Fri. Tap Have it if stocked.";
+      "Tucker lunchbox. same kit Mon to Fri. Tap Have it if stocked.";
     els.groceryList.appendChild(tuckerNote);
 
     const tots = storeTotals(items.filter((i) => !itemHaveIt(i.id)));
     const totalBar = document.createElement("div");
     totalBar.className = "store-totals";
     const loc = state.location || "Vero Beach";
-    const col = (id, label, val, left) =>
-      `<button type="button" class="${id === "best" ? "best" : ""}" data-store="${id}" aria-pressed="${state.store === id}">${label}<b>${formatMoney2(val)}</b><small>est. · ${formatMoney2(left)} left</small></button>`;
-    // Prefer cheapest of Aldi/Publix for the single est. total display
+    // Prefer cheapest of Aldi/Publix for the single $ total display
     const useStore = tots.a <= tots.p ? "aldi" : "publix";
     state.store = useStore;
     const estVal = useStore === "publix" ? tots.p : tots.a;
-    const estLeft = useStore === "publix" ? tots.pLeft : tots.aLeft;
     const estLab = useStore === "publix" ? "Publix" : "Aldi";
-    const budAmt = scaledBudgetAmount();
-    const checkedDiffers = Number.isFinite(estLeft) && Math.abs(estVal - estLeft) > 0.009;
-    const leftBit = checkedDiffers ? ` · ${formatMoney2(estLeft)} left to buy` : "";
-    const budBit = budAmt != null ? ` · budget ${formatMoney(budAmt)} for the week` : "";
-    totalBar.innerHTML = `
-      <div class="tot" role="group" aria-label="Estimated total">
-        <div class="best">Est. ${formatMoney2(estVal)}${budBit}${leftBit}<small> · ${estLab}</small></div>
+    const pricedCount = (items || []).filter((i) => !itemHaveIt(i.id) && itemPrice(i.id, i.price) != null).length;
+    if (pricedCount) {
+      totalBar.innerHTML = `
+      <div class="tot" role="group" aria-label="Store total">
+        <div class="best">$${estVal.toFixed(2)} at ${escapeHtml(estLab)}</div>
       </div>
-      <p class="pchk">${escapeHtml(state.storeName || "Aldi")} · ${escapeHtml(loc)} · Prices ${escapeHtml(fmtDateLong(PRICE_META.updated))}${PRICE_META.loaded ? "" : " (estimates)"}</p>`;
+      <p class="pchk">${escapeHtml(state.storeName || "Aldi")} · ${escapeHtml(loc)}</p>`;
+    } else {
+      totalBar.innerHTML = `<p class="pchk">${escapeHtml(state.storeName || "Aldi")} · ${escapeHtml(loc)}</p>`;
+    }
     totalBar.querySelectorAll("[data-store]").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.store = normalizeStore(btn.dataset.store);
@@ -5052,11 +5091,11 @@ function sidesBlockHTML(dayId, day) {
             const was = itemHaveIt(item.id);
             if (was) {
               setHaveIt(item.id, false);
-              showToast("Still need it — back on the list");
+              showToast("Still need it. Back on the list");
             } else {
               setHaveIt(item.id, true, item);
               const hint = haveItHint(item.id);
-              showToast(hint ? ("Have it — " + hint) : "Have it — hidden for a while");
+              showToast(hint ? ("Have it. " + hint) : "Have it. Hidden for a while");
             }
             if (!Object.keys(state.haveIt || {}).length) state.showHiddenHave = false;
             persist();
@@ -5106,8 +5145,7 @@ function sidesBlockHTML(dayId, day) {
 
     const foot = document.createElement("p");
     foot.className = "price-foot";
-    foot.innerHTML = `All prices are <b>estimates</b> for ${escapeHtml(state.location || "Vero Beach")} Aldi &amp; Publix (from prices.json when it loads). Check in store; sales and BOGOs change weekly.
-      <details style="margin-top:4px"><summary>Price sources</summary>${PRICE_SOURCES.map(([l, u]) => `<a href="${escapeAttr(u)}" target="_blank" rel="noopener">${escapeHtml(l)}</a>`).join("<br>")}</details>`;
+    foot.innerHTML = `${escapeHtml(state.location || "Vero Beach")} · Aldi and Publix · ${escapeHtml(fmtDateLong(PRICE_META.updated))}`;
     els.groceryList.appendChild(foot);
 
     void checkedVisible;
@@ -5121,10 +5159,10 @@ function sidesBlockHTML(dayId, day) {
 
   function openRecipe(day) {
     const r = day.recipe;
-    els.modalTitle.textContent = `${day.day} — ${r.title}`;
+    els.modalTitle.textContent = `${day.day}. ${r.title}`;
     els.modalLunch.textContent = day.tedNote
       ? day.tedNote
-      : day.adultLunch && day.adultLunch !== "—" && !/adult lunch → —/.test(day.adultLunch)
+      : day.adultLunch && day.adultLunch !== "—" && !/adult lunch open/.test(day.adultLunch)
         ? day.adultLunch
         : "Tucker: fixed school lunchbox (not dinner leftovers)";
     const tedBlock = day.tedNote
@@ -5152,7 +5190,7 @@ function sidesBlockHTML(dayId, day) {
       </div>
       <div class="recipe-block">
         <h4>Tucker school lunch</h4>
-        <p>Fixed kit Mon–Fri: yogurt + cheese stick + pretzels/Pringles + fruit snack + beef stick + apple juice. Not dinner leftovers.</p>
+        <p>Fixed kit Mon to Fri: yogurt + cheese stick + pretzels or Pringles + fruit snack + beef stick + apple juice. Not dinner leftovers.</p>
       </div>
     `;
     els.modal.classList.add("open");
@@ -5175,7 +5213,7 @@ function sidesBlockHTML(dayId, day) {
       return `${day.short}: ${day.dinner}${day.tedNote ? ` (${day.tedNote})` : ""}`;
     });
     const lines = [
-      `Burns Family grocery — ${state.weekTitle} (${week.label} · ${plan.label})`,
+      `Burns Family grocery. ${state.weekTitle} (${week.label} · ${plan.label})`,
       `${state.storeName || "Aldi"} · ${state.location || "Vero Beach"}`,
       budgetLine(plan),
       (() => {
@@ -5184,7 +5222,7 @@ function sidesBlockHTML(dayId, day) {
       })(),
       totals.pricedAll ? `Your own $ entered: ${formatMoney(totals.all)} on ${totals.pricedAll} line(s)` : "",
       "Dinners: " + dinnerLines.join(" · "),
-      "Tucker lunchbox = yogurt + cheese + pretzels/Pringles + fruit snack + beef stick + juice",
+      "Tucker lunchbox = yogurt + cheese + pretzels or Pringles + fruit snack + beef stick + juice",
       "Chili = weekend daytime only when on the plan.",
       "",
     ].filter((line, i, arr) => line !== "" || (i > 0 && arr[i - 1] !== ""));
@@ -5201,11 +5239,11 @@ function sidesBlockHTML(dayId, day) {
         const priceBit = price === null ? "" : ` ${formatMoney(price)}`;
         const qty = itemQty(item.id);
         const note = itemNote(item.id);
-        const qtyBit = qty ? ` — ${qty}` : "";
+        const qtyBit = qty ? `. ${qty}` : "";
         const noteBit = note ? ` (${note})` : "";
         const hint = item.hint ? ` [${item.hint}]` : "";
         const sp = storePriceText(item);
-        lines.push(`${mark} ${item.name}${qtyBit}${noteBit}${priceBit ? ` (your$${priceBit.trim().slice(1)})` : ""}${sp ? ` — ${sp}` : ""}${hint}`);
+        lines.push(`${mark} ${item.name}${qtyBit}${noteBit}${priceBit ? ` (your$${priceBit.trim().slice(1)})` : ""}${sp ? `. ${sp}` : ""}${hint}`);
       });
       lines.push("");
     });
@@ -5229,7 +5267,7 @@ function sidesBlockHTML(dayId, day) {
       }
       showToast(okMessage);
     } catch (_) {
-      showToast("Couldn’t copy — long-press and copy manually");
+      showToast("Couldn’t copy. long-press and copy manually");
     }
   }
 
@@ -5264,7 +5302,7 @@ function sidesBlockHTML(dayId, day) {
     const td = currentPlan().days.find((d) => d.id === dayId);
     if (!td) return;
     if (dayOverride(dayId) && dayOverride(dayId).type === "removed") {
-      showToast("Already off this week — tap Swap to pick something");
+      showToast("Already off this week. tap Swap to pick something");
       return;
     }
     const prev = state.dayOverrides[dayId] ? JSON.parse(JSON.stringify(state.dayOverrides[dayId])) : null;
@@ -5276,7 +5314,7 @@ function sidesBlockHTML(dayId, day) {
       else delete state.dayOverrides[dayId];
       persist();
       renderAll();
-      showToast("Undone — it's back on the week");
+      showToast("Undone. it's back on the week");
     });
   }
   function openDeleteDay(dayId) { removeDayFromWeek(dayId); }
@@ -5342,7 +5380,7 @@ function sidesBlockHTML(dayId, day) {
         </section>
         <section class="set-block">
           <h4>Big cooking holidays</h4>
-          <p class="muted2">Left blank — no meal, nothing on the list, not in the budget. Toggle “cook normally” to treat as a regular day.</p>
+          <p class="muted2">Left blank. no meal, nothing on the list, not in the budget. Toggle “cook normally” to treat as a regular day.</p>
           <ul class="hol-list">${hol.map((h, i) => `<li>
             <span>${h.emoji || "🎉"} ${escapeHtml(h.name)}</span>
             <label><input type="checkbox" data-hol-cook="${i}" ${h.cook ? "checked" : ""}/> cook normally</label>
@@ -5557,8 +5595,8 @@ function sidesBlockHTML(dayId, day) {
         render: (box) => {
           box.innerHTML = `<p class="welcome-q">${escapeHtml(steps[2].ask)}</p>
             <div class="welcome-opts">
-              <button type="button" class="welcome-opt" data-h="blank">Yes — leave blank</button>
-              <button type="button" class="welcome-opt" data-h="cook">No — cook normally</button>
+              <button type="button" class="welcome-opt" data-h="blank">Yes. leave blank</button>
+              <button type="button" class="welcome-opt" data-h="cook">No. cook normally</button>
             </div>`;
           box.querySelectorAll("[data-h]").forEach((b) => b.onclick = () => {
             const cook = b.dataset.h === "cook";
@@ -5645,7 +5683,7 @@ function sidesBlockHTML(dayId, day) {
       closeWelcome();
       persist();
       renderAll();
-      showToast("You're set — welcome!");
+      showToast("You're set. welcome!");
       if (openSet) openSettings();
     }
 
@@ -5914,7 +5952,7 @@ function sidesBlockHTML(dayId, day) {
     },
   };
   function shuffleWeek() {
-    // Self-check: uniqueness — `exclude` Set + `used.includes` / `prevSet` ensure no meal key is
+    // Self-check: uniqueness. `exclude` Set + `used.includes` / `prevSet` ensure no meal key is
     // assigned twice in one shuffle; previous shuffle set is preferred-avoided via SHUFFLE_PREV_KEY.
     const plan = currentPlan();
     if (!plan || !plan.days || !plan.days.length) {
@@ -5993,7 +6031,7 @@ function sidesBlockHTML(dayId, day) {
       }
     }
 
-    // Structure from ORIGINAL base week template only — never leftovers Shuffle created.
+    // Structure from ORIGINAL base week template only. never leftovers Shuffle created.
     // Cook dinners that mention "leftover" ingredients (e.g. taco rebuild) stay cook slots.
     // Leftovers nights are only: template leftover labels, then taco → next-day (item 20).
     const isTplLeft = (td) => {
@@ -6048,11 +6086,11 @@ function sidesBlockHTML(dayId, day) {
     try { localStorage.setItem(SHUFFLE_PREV_KEY, JSON.stringify(used)); } catch (_) {}
     persist();
     renderAll();
-    showToast("Week shuffled — groceries & budget updated");
+    showToast("Week shuffled. groceries & budget updated");
   }
 
 
-  /* ===== Items 41–42: multi-photo storage sections ===== */
+  /* ===== Items 41 to 42: multi-photo storage sections ===== */
   const FM_PHOTO_KEY = "fm-storage-photos-v1";
   const FM_SEC_KEY = "fm-storage-sections";
   const FM_BUILTIN_STORAGE = [
@@ -6483,25 +6521,16 @@ function sidesBlockHTML(dayId, day) {
         showToast("Category removed");
       });
     }
-    els.addCustom.addEventListener("click", () => {
-      const draftName = (els.customName.value || "").trim();
-      const AIS = window.AddItemSheet;
-      const SL = window.StandingLists;
-      const openSheet = () => {
+    if (els.addCustom) {
+      els.addCustom.addEventListener("click", () => {
+        const AIS = window.AddItemSheet;
+        const SL = window.StandingLists;
         if (!AIS) {
-          // Fallback if sheet script missing
-          const name = draftName;
-          if (!name) { showToast("Type a grocery item first"); els.customName.focus(); return; }
-          const category = resolveCategoryFromForm() || "Other";
-          const id = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-          state.custom.push({ id, name: name.slice(0, 80), category, qty: "1", section: "Menu extras" });
-          persist();
-          renderGrocery();
-          showToast("Added to grocery list");
+          showToast("Add item sheet unavailable");
           return;
         }
         AIS.open({
-          name: draftName,
+          name: "",
           defaultSection: "Menu extras",
           large: false,
           onAdd: (item) => {
@@ -6509,8 +6538,9 @@ function sidesBlockHTML(dayId, day) {
             const section = item.section;
             if (section === "Stock produce") {
               if (!state.stockProduce) state.stockProduce = [];
+              const sid = (SL && SL.stockId(item.name)) || id;
               state.stockProduce.push({
-                id: (SL && SL.stockId(item.name)) || id,
+                id: sid,
                 name: item.name,
                 qty: item.qty || "1",
                 price: item.price,
@@ -6518,8 +6548,8 @@ function sidesBlockHTML(dayId, day) {
                 standing: true,
                 kind: "stock",
               });
-              if (item.price != null) setPrice((SL && SL.stockId(item.name)) || id, item.price);
-              if (item.qty) setQty((SL && SL.stockId(item.name)) || id, item.qty);
+              if (item.price != null) setPrice(sid, item.price);
+              if (item.qty) setQty(sid, item.qty);
             } else if (section === "Miscellaneous munchies") {
               if (!state.munchies) state.munchies = [];
               const mid = (SL && SL.munchId(item.name)) || id;
@@ -6535,38 +6565,42 @@ function sidesBlockHTML(dayId, day) {
               if (item.price != null) setPrice(mid, item.price);
               if (item.qty) setQty(mid, item.qty);
             } else {
-              // Menu extras
               state.custom.push({
                 id,
                 name: item.name,
                 category: "Other",
                 section: "Menu extras",
                 qty: item.qty || "1",
+                price: item.price,
               });
               if (item.price != null) setPrice(id, item.price);
               if (item.qty) setQty(id, item.qty);
             }
-            if (els.customName) els.customName.value = "";
-            if (els.customPrice) els.customPrice.value = "";
+            // Keep lock package customs in sync so reload cannot drop them
+            if (state.weekLocked && state.lockedWeek) {
+              state.lockedWeek.custom = JSON.parse(JSON.stringify(state.custom || []));
+              state.lockedWeek.stockProduce = JSON.parse(JSON.stringify(state.stockProduce || []));
+              state.lockedWeek.munchies = JSON.parse(JSON.stringify(state.munchies || []));
+            }
             persist();
             renderGrocery();
             showToast("Added " + item.name);
           },
         });
-      };
-      openSheet();
-    });
-
-    els.customName.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        els.addCustom.click();
-      }
-    });
+      });
+    }
+    if (els.customName) {
+      els.customName.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          if (els.addCustom) els.addCustom.click();
+        }
+      });
+    }
 
     els.copyShare.addEventListener("click", () => {
       const t = shareUrl();
-      copyText(t, "Share link copied — text it to Ted or Samantha");
+      copyText(t, "Share link copied. text it to Ted or Samantha");
       showCopyPhoto(t, "Share link copied.");
     });
     els.copyGrocery.addEventListener("click", () => {
@@ -6579,7 +6613,7 @@ function sidesBlockHTML(dayId, day) {
       updateWakeLock();
       showToast(
         state.shopMode
-          ? "Shop mode on — larger checkboxes, checked items to the bottom, screen stays on"
+          ? "Shop mode on. larger checkboxes, checked items to the bottom, screen stays on"
           : "Shop mode off"
       );
     });
@@ -6662,7 +6696,7 @@ function sidesBlockHTML(dayId, day) {
     // Hash changes must NOT wipe the mid-flow draft (Steve soft-bar).
     // Share import is opt-in via ?import=1 only (handled at boot).
     window.addEventListener("hashchange", () => {
-      /* intentionally no-op for draft restore — localStorage is source of truth */
+      /* intentionally no-op for draft restore. localStorage is source of truth */
     });
 
     renderAll();
@@ -6689,7 +6723,7 @@ function sidesBlockHTML(dayId, day) {
     try {
       if (welcomeDone && welcomeDone()) return true;
     } catch (_) {}
-    // Mid-flow draft counts as returning — never remount to first-run gate
+    // Mid-flow draft counts as returning. never remount to first-run gate
     if (state && (state.weekLocked || (state.custom && state.custom.length) ||
         (state.stockProduce && state.stockProduce.length) ||
         (state.munchies && state.munchies.length) ||
@@ -6718,7 +6752,7 @@ function sidesBlockHTML(dayId, day) {
     const HH = window.HomeHero;
     const gate = document.getElementById("home-gate");
     if (!HH || !gate) return false;
-    // Returning / mid-flow draft: skip gate remount — restore app (Steve soft-bar)
+    // Returning / mid-flow draft: skip gate remount. restore app (Steve soft-bar)
     if (burnsIsReturning()) {
       enterBurnsApp("week");
       return false;
@@ -6745,13 +6779,11 @@ function sidesBlockHTML(dayId, day) {
   function groceryDollarTotalHTML(items) {
     const list = items || [];
     let priced = 0;
-    let unpriced = 0;
     let sum = 0;
-    const storeKey = state.store === "publix" ? "publix" : state.store === "aldi" ? "aldi" : (state.storeName || "").toLowerCase().includes("publix") ? "publix" : "aldi";
     list.forEach((item) => {
       if (itemHaveIt(item.id)) return;
       const p = itemPrice(item.id, item.price);
-      if (p == null || !isFinite(p)) { unpriced += 1; return; }
+      if (p == null || !isFinite(p)) return;
       priced += 1;
       sum += p;
     });
@@ -6762,16 +6794,15 @@ function sidesBlockHTML(dayId, day) {
       el.innerHTML = "";
       return;
     }
-    const storeLabel = storeKey === "publix" ? "Publix" : (state.storeName || "Aldi");
-    const main = `$${sum.toFixed(2)} at ${storeLabel}`;
+    const storeLabel = (state.storeName || "Aldi");
     el.hidden = false;
-    el.innerHTML = `<p>${main}</p>${unpriced ? `<p class="muted2">Some items unpriced</p>` : ""}`;
+    el.innerHTML = `<p>$${sum.toFixed(2)} at ${escapeHtml(storeLabel)}</p>`;
   }
 
   function renderWeekStrip() {
-    const FA = window.FoodArt;
-    const strip = document.getElementById("week-strip");
-    if (!strip || !FA) return;
+    const WB = window.WeekBoard;
+    const host = document.getElementById("week-board-host");
+    if (!host || !WB) return;
     const plan = currentPlan();
     const today = new Date();
     const todayShort = ["sun","mon","tue","wed","thu","fri","sat"][today.getDay()];
@@ -6784,19 +6815,23 @@ function sidesBlockHTML(dayId, day) {
         name: day.day || td.day,
         title: day.dinner,
         dinner: day.dinner,
+        recipe: day.recipe,
+        tedNote: day.tedNote,
+        tag: day.tag,
         kind: day.overrideType === "leftovers" ? "leftover" : (day.tag && /leftover/i.test(day.tag) ? "leftover" : "cook"),
         today: String(td.id).toLowerCase() === todayShort,
         active: focus === td.id,
         artKey: day.dinner,
       };
     });
-    strip.outerHTML = FA.weekStripHTML(days, { label: "Week at a glance" }).replace(
-      'class="week-strip"',
-      'class="week-strip" id="week-strip"'
-    );
-    const strip2 = document.getElementById("week-strip");
-    if (!strip2) return;
-    strip2.querySelectorAll("[data-strip-day]").forEach((b) => {
+    host.innerHTML = WB.boardHTML(days, {
+      mood: "burns",
+      title: "Burns Family Dinners",
+      weekTitle: state.weekTitle,
+      id: "week-board",
+      tucker: true,
+    });
+    host.querySelectorAll("[data-strip-day]").forEach((b) => {
       b.addEventListener("click", () => {
         if (state.weekLocked) return;
         const id = b.dataset.stripDay;
@@ -6804,8 +6839,8 @@ function sidesBlockHTML(dayId, day) {
         persist();
         renderWeekStrip();
         const card = document.querySelector(`[data-swap-day="${id}"]`);
-        const host = card && card.closest(".day-card");
-        if (host) host.scrollIntoView({ behavior: "smooth", block: "start" });
+        const cardHost = card && card.closest(".day-card");
+        if (cardHost) cardHost.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     });
     document.getElementById("week-section")?.classList.toggle("week-is-locked", !!state.weekLocked);
@@ -6823,6 +6858,11 @@ function sidesBlockHTML(dayId, day) {
       dayOverrides: JSON.parse(JSON.stringify(state.dayOverrides || {})),
       daySides: JSON.parse(JSON.stringify(state.daySides || {})),
       custom: JSON.parse(JSON.stringify(state.custom || [])),
+      stockProduce: JSON.parse(JSON.stringify(state.stockProduce || [])),
+      munchies: JSON.parse(JSON.stringify(state.munchies || [])),
+      haveIt: JSON.parse(JSON.stringify(state.haveIt || {})),
+      itemAlts: JSON.parse(JSON.stringify(state.itemAlts || {})),
+      meatAlts: JSON.parse(JSON.stringify(state.meatAlts || {})),
       checked: JSON.parse(JSON.stringify(state.checked || {})),
       grocery: items.filter((i) => !i.custom).map((i) => ({
         id: i.id, name: i.name, category: i.category, price: i.price, days: i.days, hint: i.hint
@@ -6962,7 +7002,7 @@ function sidesBlockHTML(dayId, day) {
         persist();
       }
       renderGrocery();
-      showToast("Menu for this week refreshed — stock & munchies kept");
+      showToast("Menu for this week refreshed. Stock and munchies kept");
     };
     if (jumpG) jumpG.onclick = () => {
       renderGrocery();

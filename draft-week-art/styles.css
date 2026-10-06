@@ -2708,3 +2708,34 @@ body.show-home-gate .home-gate { display: block; }
   opacity: 1;
   padding: 0 12px 12px;
 }
+
+/* Prevent whole-page sideways scroll; only week-board columns scroll at 390 */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+.app, .wrap, main, #main-app {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+.week-board-utils {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0.5rem 0 1rem;
+}
+.week-board-utils .week-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+.food-art-board {
+  width: 140px;
+  height: 140px;
+}
+.grocery-add-sticky {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}

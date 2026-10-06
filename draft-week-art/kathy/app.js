@@ -383,7 +383,7 @@
   }
 
   function groceryEstTotalHTML(items) {
-    /* Kathy: no invented prices — only user-entered / known prices count. */
+    /* Kathy: user-entered prices only. No estimate wording. */
     const list = (items || []).filter((it) => !itemHaveIt(it.id));
     const priced = list.filter((it) => it.price != null && isFinite(Number(it.price)));
     if (!priced.length) {
@@ -391,10 +391,8 @@
     }
     const store = (state.stores && state.stores[0]) || "";
     const sum = priced.reduce((s, it) => s + Number(it.price), 0);
-    const unpriced = list.length - priced.length;
     const main = store ? `$${sum.toFixed(2)} at ${esc(store)}` : `$${sum.toFixed(2)}`;
-    const some = unpriced ? `<p class="muted">Some items unpriced</p>` : "";
-    return `<div class="est-store-total" id="est-store-total"><p>${main}</p>${some}</div>`;
+    return `<div class="est-store-total" id="est-store-total"><p>${main}</p></div>`;
   }
 
   function grocerySectionsHTML(items) {
@@ -939,7 +937,7 @@
       ${topbar(true)}
       <p class="steps-dot">Setup</p>
       <h1>Budget</h1>
-      <p class="muted">Grocery totals are a rough estimate until you upload receipts.</p>
+      
       <div class="choice-grid cols-2" id="on">
         ${choiceBtn("off", "Off", state.budgetOn ? "on" : "off")}
         ${choiceBtn("on", "On", state.budgetOn ? "on" : "off")}
@@ -1158,9 +1156,35 @@
     );
     const checkedN = items.filter((it) => state.checked[it.id]).length;
     const hiddenHave = items.filter((it) => itemHaveIt(it.id)).length;
-    const stripHtml = FA && FA.weekStripHTML
-      ? FA.weekStripHTML(stripDaysForWeek(), { label: "Week at a glance" })
-      : "";
+    const stripHtml = (() => {
+      const WB = window.WeekBoard;
+      const FA = window.FoodArt;
+      if (!WB || !state.week) return "";
+      const today = new Date().getDay();
+      const focus = state.focusDay != null ? state.focusDay : state.openDay;
+      const order = (FA && FA.MON_SUN_FROM_SUN0) || [1, 2, 3, 4, 5, 6, 0];
+      const days = order.map((i) => {
+        const d = state.week.days[i];
+        return {
+          index: i,
+          short: d.name,
+          name: d.name,
+          title: d.title,
+          note: d.note,
+          kind: d.kind,
+          today: i === today,
+          active: focus === i,
+          artKey: d.title,
+        };
+      });
+      return WB.boardHTML(days, {
+        mood: "kathy",
+        title: "Kathy's Table",
+        weekTitle: weekDatesLabel(),
+        id: "kathy-week-board",
+        tucker: false,
+      });
+    })();
     const lockBlock = locked
       ? `<div class="week-lock-block" id="week-lock-block">
           <button type="button" class="btn-lock-week is-locked" id="lock-week-btn" disabled>${esc(C.locked || "Week locked")}</button>
@@ -1177,8 +1201,8 @@
     app.innerHTML = `
       ${topbar(false)}
       <p class="kicker">Cooking for ${state.people} · ${state.cookDays} ${nightWord} · ${state.prepMinutes} minutes prep</p>
-      <h2 class="week-hero-label">This week</h2>
       ${stripHtml}
+      <div class="week-board-utils">
       <div class="week-actions" id="week-actions-row">
         ${locked ? "" : `<button type="button" class="linkish week-util" id="shuffle">${esc(C.shuffleMeals || "Shuffle meals")}</button>`}
         ${locked ? "" : `<button type="button" class="linkish week-util" id="random-meal">${esc(C.randomMeal || "Random meal")}</button>`}
@@ -1194,6 +1218,7 @@
           <button type="button" class="btn btn-ghost" id="share-app">${esc(C.sharePlan || "Share this plan")}</button>
         </div>
       </div>
+      </div>
       <div class="days-stack">
         ${((FA && FA.MON_SUN_FROM_SUN0) || [1,2,3,4,5,6,0]).map((i) => renderDayCard(state.week.days[i])).join("")}
       </div>
@@ -1202,7 +1227,6 @@
         <button type="button" class="btn" id="add-custom-g">+ Add item</button>
         <button type="button" class="btn btn-ghost" id="hidden-have-btn-top" aria-pressed="${state.showHiddenHave ? "true" : "false"}">${state.showHiddenHave ? "Hide suppressed" : "Show hidden"}</button>
       </div>
-      <div class="est-note">Rough estimate only until you upload receipts. Store prices are not invented here.</div>
       ${state.budgetOn && state.budgetAmt != null ? `<p class="muted">Your weekly budget target is about $${Number(state.budgetAmt).toFixed(0)}.</p>` : ""}
       <p class="muted" id="grocery-count">${checkedN} checked · ${items.length - checkedN} left${hiddenHave ? ` · ${hiddenHave} Have it` : ""}</p>
       <div id="grocery-list-body" class="kathy-large">
@@ -1278,11 +1302,11 @@
         const item = items.find((x) => x.id === id) || { id, name: id };
         if (itemHaveIt(id)) {
           setHaveIt(id, false);
-          toast("Still need it — back on the list");
+          toast("Still need it. Back on the list");
         } else {
           setHaveIt(id, true, item);
           const hint = haveItHint(id);
-          toast(hint ? ("Have it — " + hint) : "Have it — hidden for a while");
+          toast(hint ? ("Have it. " + hint) : "Have it. Hidden for a while");
         }
         save(); render();
       };
@@ -1545,7 +1569,7 @@
       state.lockedWeek.munchies = JSON.parse(JSON.stringify(state.munchies || []));
     }
     save();
-    if (showToastMsg) toast("Menu for this week refreshed — stock & munchies kept");
+    if (showToastMsg) toast("Menu for this week refreshed. Stock and munchies kept");
     render();
   }
 
@@ -1585,7 +1609,7 @@
   }
 
   async function shareGrocery(items) {
-    const lines = ["Kathy's Table grocery list", "Rough estimate only until receipts are uploaded.", ""];
+    const lines = ["Kathy's Table grocery list", ""];
     items.forEach((it) => {
       lines.push(`${state.checked[it.id] ? "[x]" : "[ ]"} ${it.name}${it.qty ? " (" + it.qty + ")" : ""}`);
     });
