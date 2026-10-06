@@ -1541,6 +1541,11 @@
     weekLocked: false,
     lockedWeek: null,
     focusDayId: null,
+    stockProduce: [],
+    munchies: [],
+    itemAlts: {},
+    meatAlts: {},
+    openAltId: null,
   });
 
   let state;
@@ -1997,12 +2002,30 @@
   }
 
   function itemHaveIt(id) {
-    return Boolean(state.haveIt[id]);
+    const HIT = window.HaveItTimed;
+    if (!HIT) return Boolean(state.haveIt && state.haveIt[id]);
+    if (!state.haveIt) state.haveIt = {};
+    HIT.pruneExpired(state.haveIt);
+    return HIT.isSuppressed(state.haveIt[id]);
   }
 
-  function setHaveIt(id, value) {
-    if (value) state.haveIt[id] = true;
-    else delete state.haveIt[id];
+  function setHaveIt(id, value, item) {
+    const HIT = window.HaveItTimed;
+    if (!state.haveIt) state.haveIt = {};
+    if (!value) {
+      if (HIT) HIT.clearHaveIt(state.haveIt, id);
+      else delete state.haveIt[id];
+      return;
+    }
+    // Mark / reset timer from today
+    if (HIT) HIT.markHaveIt(state.haveIt, id, item || { id: id }, Date.now());
+    else state.haveIt[id] = true;
+  }
+
+  function haveItHint(id) {
+    const HIT = window.HaveItTimed;
+    if (!HIT || !state.haveIt) return "";
+    return HIT.entryHint(state.haveIt[id]) || "";
   }
 
   function itemQty(id) {
@@ -3376,9 +3399,12 @@ function sidesBlockHTML(dayId, day) {
       month.weekEdits[key] = state.dayOverrides;
       state.weekEdits[key] = state.dayOverrides;
       if (state.plan) month.picks[state.week] = state.plan;
+      // Mid-flow draft is always full state in localStorage (Steve soft-bar).
+      // Lock-in is a marker on the same object — never a separate wipe.
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch (_) {}
-    writeShareToUrl(false);
+    // Do NOT rewrite location.hash here — share URL is export-only.
+    // Auto hash sync was remounting via hashchange + lossy encode/decode wipe.
   }
 
   function loadFromStorage() {
@@ -3523,7 +3549,9 @@ function sidesBlockHTML(dayId, day) {
       base.weekTitle = WEEKS[base.week].title;
     }
     base.checked = normalizeIdFlags(parsed.checked);
-    base.haveIt = normalizeIdFlags(parsed.haveIt);
+    base.haveIt = (window.HaveItTimed
+      ? window.HaveItTimed.normalizeStore(parsed.haveIt)
+      : normalizeIdFlags(parsed.haveIt));
     base.qty = normalizeStringMap(parsed.qty, 40);
     base.notes = normalizeStringMap(parsed.notes, 80);
     base.dayOverrides = normalizeDayOverrides(parsed.dayOverrides);
@@ -3551,6 +3579,15 @@ function sidesBlockHTML(dayId, day) {
         if (Array.isArray(arr)) base.daySides[d] = arr.map(String).filter(Boolean).slice(0, 6);
       });
     }
+    // Lock + standing grocery + meat alts — must survive reload (was dropped → remount wipe)
+    base.weekLocked = Boolean(parsed.weekLocked);
+    base.lockedWeek = parsed.lockedWeek && typeof parsed.lockedWeek === "object" ? parsed.lockedWeek : null;
+    base.focusDayId = typeof parsed.focusDayId === "string" ? parsed.focusDayId : null;
+    base.stockProduce = Array.isArray(parsed.stockProduce) ? parsed.stockProduce : [];
+    base.munchies = Array.isArray(parsed.munchies) ? parsed.munchies : [];
+    base.itemAlts = parsed.itemAlts && typeof parsed.itemAlts === "object" ? parsed.itemAlts : {};
+    base.meatAlts = parsed.meatAlts && typeof parsed.meatAlts === "object" ? parsed.meatAlts : {};
+    base.openAltId = null;
     linkWeekEdits(base);
     if (parsed.prices && typeof parsed.prices === "object" && !Array.isArray(parsed.prices)) {
       Object.keys(parsed.prices).forEach((id) => {
@@ -3596,7 +3633,7 @@ function sidesBlockHTML(dayId, day) {
       sm: state.shopMode ? 1 : 0,
       hc: state.hideChecked ? 1 : 0,
       c: Object.keys(state.checked).filter((k) => state.checked[k]),
-      h: Object.keys(state.haveIt).filter((k) => state.haveIt[k]),
+      h: state.haveIt || {},
       q: { ...state.qty },
       n: { ...state.notes },
       o: compactOverrides(state.dayOverrides),
@@ -3672,7 +3709,11 @@ function sidesBlockHTML(dayId, day) {
       }
       if (typeof payload.mk === "string" && /^\d{4}-\d{2}$/.test(payload.mk)) next.monthKey = payload.mk;
       const checked = normalizeIdFlags(payload.c);
-      next.haveIt = normalizeIdFlags(payload.h);
+      next.haveIt = window.HaveItTimed
+        ? window.HaveItTimed.normalizeStore(Array.isArray(payload.h)
+            ? Object.fromEntries(payload.h.map((id) => [id, true]))
+            : payload.h)
+        : normalizeIdFlags(payload.h);
       next.qty = normalizeStringMap(payload.q, 40);
       next.notes = normalizeStringMap(payload.n, 80);
       next.dayOverrides = normalizeDayOverrides(payload.o);
@@ -4015,6 +4056,7 @@ function sidesBlockHTML(dayId, day) {
           <span class="emo-row"><span class="meal-emoji" aria-hidden="true">${day.mealEmoji}</span>${prepCookBadge(day)}</span>
           ${typeof calorieBadges === "function" ? calorieBadges(Object.assign({}, day, { _sideDayId: templateDay.id })) : ""}
           <p class="day-dinner">${isFav(day.dinner) ? '<span class="fav-badge">⭐</span> ' : ""}${escapeHtml(day.dinner)}</p>
+          <div class="day-meat-row" data-day-meat="${escapeAttr(templateDay.id)}"></div>
           ${day.tag ? `<p class="day-tag">${escapeHtml(day.tag)}</p>` : ""}
           ${swapBadge}
           ${tedLine}
@@ -4026,6 +4068,54 @@ function sidesBlockHTML(dayId, day) {
         ${typeof mealLogHTML === "function" ? mealLogHTML(templateDay.id, day) : ""}
       `;
       day._sideDayId = templateDay.id;
+      // Meat alt chevron on day card only (not strip chips) — Steve bar
+      try {
+        const IA = window.ItemAlts;
+        const meatHost = card.querySelector("[data-day-meat]");
+        if (IA && meatHost && !holClass && day.dinner) {
+          const saved = state.meatAlts && state.meatAlts[templateDay.id];
+          const info = IA.meatAltsForDay(saved || day.dinner, day.dinner);
+          if (info.alts && info.alts.length) {
+            const cur = saved || info.current || info.key;
+            meatHost.innerHTML = `<span class="meat-label">${escapeHtml(cur)}</span>${IA.chevronHTML(cur, false)}`;
+            const chip = meatHost.querySelector("[data-alt-open]");
+            if (chip) {
+              chip.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const openKey = "meat:" + templateDay.id;
+                const closing = state.openAltId === openKey;
+                state.openAltId = closing ? null : openKey;
+                document.querySelectorAll(".item-alt-pop").forEach((p) => p.remove());
+                if (closing) return;
+                const pop = document.createElement("div");
+                pop.innerHTML = IA.bubbleHTML("Swap meat for…", info.alts, cur, false);
+                const bubble = pop.firstElementChild;
+                meatHost.appendChild(bubble);
+                bubble.querySelectorAll("[data-alt]").forEach((btn) => {
+                  btn.addEventListener("click", (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (!state.meatAlts) state.meatAlts = {};
+                    state.meatAlts[templateDay.id] = btn.dataset.alt;
+                    // Also set grocery item alt for matching meat lines on this day
+                    if (!state.itemAlts) state.itemAlts = {};
+                    allGroceryItems().forEach((gi) => {
+                      if (Array.isArray(gi.days) && gi.days.includes(templateDay.id) && /meat|chicken|beef|pork|fish|salmon|turkey|bacon|steak|shrimp/i.test((gi.category || "") + " " + (gi.baseName || gi.name || ""))) {
+                        state.itemAlts[gi.id] = btn.dataset.alt;
+                      }
+                    });
+                    state.openAltId = null;
+                    persist();
+                    renderAll();
+                    showToast("Meat swapped for " + day.short);
+                  });
+                });
+              });
+            }
+          }
+        }
+      } catch (_) {}
       // re-render calorie badges with side id (already in HTML — patch cal line)
       card.querySelector(".day-body-btn").addEventListener("click", () => openRecipe(day));
       bindRateRow(card, day.dinner);
@@ -4060,6 +4150,22 @@ function sidesBlockHTML(dayId, day) {
     });
     if (typeof renderWeekStrip === "function") renderWeekStrip();
     if (typeof syncLockUI === "function") syncLockUI();
+    const hideTop = document.getElementById("hidden-have-btn-top");
+    if (hideTop && !hideTop._wired) {
+      hideTop._wired = true;
+      hideTop.onclick = () => {
+        state.showHiddenHave = !state.showHiddenHave;
+        persist();
+        renderGrocery();
+        hideTop.setAttribute("aria-pressed", String(state.showHiddenHave));
+        hideTop.textContent = state.showHiddenHave ? "Hide suppressed" : "Show hidden";
+        showToast(state.showHiddenHave ? "Showing Have it items" : "Have it items hidden again");
+      };
+    }
+    if (hideTop) {
+      hideTop.setAttribute("aria-pressed", String(!!state.showHiddenHave));
+      hideTop.textContent = state.showHiddenHave ? "Hide suppressed" : "Show hidden";
+    }
   }
 
   function openSwapPicker(dayId) {
@@ -4281,12 +4387,18 @@ function sidesBlockHTML(dayId, day) {
         }
         return g.days.some((d) => activeDays.has(d));
       })
-      .map((g) => ({
-        ...g,
-        category: normalizeCategory(g.category),
-        custom: false,
-        staple: Boolean(g.staple) || g.category === "Tucker lunchbox",
-      }));
+      .map((g) => {
+        const altName = (state.itemAlts && state.itemAlts[g.id]) || g.name;
+        return {
+          ...g,
+          name: altName,
+          baseName: g.name,
+          category: normalizeCategory(g.category),
+          custom: false,
+          staple: Boolean(g.staple) || g.category === "Tucker lunchbox",
+          section: "Menu for this week",
+        };
+      });
 
     const seenNames = new Set(seeded.map((g) => `${g.category}::${g.name.toLowerCase()}`));
     const injected = [];
@@ -4300,15 +4412,19 @@ function sidesBlockHTML(dayId, day) {
           const dedupe = `${g.category}::${g.name.toLowerCase()}`;
           if (seenNames.has(dedupe)) return;
           seenNames.add(dedupe);
+          const id = `swap-${day.id}-${g.id}`;
           injected.push({
             ...g,
-            id: `swap-${day.id}-${g.id}`,
+            id,
+            name: (state.itemAlts && state.itemAlts[id]) || g.name,
+            baseName: g.name,
             category: normalizeCategory(g.category),
             custom: false,
             staple: false,
             hint: g.hint || `🛍 ${day.short}`,
             fromSwap: true,
             days: [day.id],
+            section: "Menu for this week",
           });
         });
         return;
@@ -4318,18 +4434,50 @@ function sidesBlockHTML(dayId, day) {
         const dedupe = `${g.category}::${g.name.toLowerCase()}`;
         if (seenNames.has(dedupe)) return;
         seenNames.add(dedupe);
+        const id = `swap-${day.id}-${g.id}`;
         injected.push({
           ...g,
-          id: `swap-${day.id}-${g.id}`,
+          id,
+          name: (state.itemAlts && state.itemAlts[id]) || g.name,
+          baseName: g.name,
           category: normalizeCategory(g.category),
           custom: false,
           staple: Boolean(g.staple) || isStapleItem(g),
           hint: g.hint || `for ${day.short} swap`,
           fromSwap: true,
           days: [day.id],
+          section: "Menu for this week",
         });
       });
     });
+
+    const SL = window.StandingLists;
+    const stock = (state.stockProduce || []).map((c) => ({
+      id: c.id,
+      category: "Produce",
+      name: (state.itemAlts && state.itemAlts[c.id]) || c.name,
+      baseName: c.name,
+      price: c.price != null ? String(c.price) : "",
+      hint: "Stock produce",
+      custom: false,
+      staple: true,
+      standing: true,
+      section: "Stock produce",
+      qty: c.qty || "1",
+    }));
+    const munch = (state.munchies || []).map((c) => ({
+      id: c.id,
+      category: "Other",
+      name: (state.itemAlts && state.itemAlts[c.id]) || c.name,
+      baseName: c.name,
+      price: c.price != null ? String(c.price) : "",
+      hint: "Miscellaneous munchies",
+      custom: false,
+      staple: false,
+      standing: true,
+      section: "Miscellaneous munchies",
+      qty: c.qty || "1",
+    }));
 
     const custom = state.custom.map((c) => {
       const rawCat = typeof c.category === "string" ? c.category.trim().slice(0, 40) : "Other";
@@ -4339,14 +4487,18 @@ function sidesBlockHTML(dayId, day) {
       return {
         id: c.id,
         category,
-        name: c.name,
+        name: (state.itemAlts && state.itemAlts[c.id]) || c.name,
+        baseName: c.name,
         price: "",
-        hint: "custom item",
+        hint: "Menu extras",
         custom: true,
         staple: false,
+        section: "Menu extras",
+        qty: c.qty || itemQty(c.id) || "1",
       };
     });
-    return [...seeded, ...injected, ...custom];
+    void SL;
+    return [...seeded, ...injected, ...stock, ...munch, ...custom];
   }
 
   function visibleGroceryItems(items) {
@@ -4595,34 +4747,201 @@ function sidesBlockHTML(dayId, day) {
     });
     els.groceryList.appendChild(totalBar);
 
-    byCat.forEach((group) => {
+    const IA = window.ItemAlts;
+    const SL = window.StandingLists;
+    const SECTION_ORDER = (SL && SL.SECTION_ORDER) || [
+      "Menu for this week",
+      "Stock produce",
+      "Miscellaneous munchies",
+      "Menu extras",
+    ];
+
+    function appendStandingPicker(host, kind) {
+      const catalog = kind === "stock" ? (SL && SL.STOCK_PRODUCE) || [] : (SL && SL.MUNCHIES) || [];
+      const list = kind === "stock" ? state.stockProduce || [] : state.munchies || [];
+      const onIds = new Set(list.map((x) => (x.name || "").toLowerCase()));
+      const wrap = document.createElement("div");
+      wrap.className = "g-section-actions";
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "chip-btn";
+      addBtn.textContent = "+ Add item";
+      addBtn.onclick = () => {
+        const AIS = window.AddItemSheet;
+        if (!AIS) return;
+        AIS.open({
+          defaultSection: kind === "stock" ? "Stock produce" : "Miscellaneous munchies",
+          onAdd: (item) => {
+            const id =
+              kind === "stock"
+                ? (SL && SL.stockId(item.name)) || "stock-" + Date.now()
+                : (SL && SL.munchId(item.name)) || "munch-" + Date.now();
+            const row = {
+              id,
+              name: item.name,
+              qty: item.qty || "1",
+              price: item.price,
+              standing: true,
+              kind: kind === "stock" ? "stock" : "munch",
+            };
+            if (kind === "stock") {
+              if (!state.stockProduce) state.stockProduce = [];
+              state.stockProduce.push(row);
+            } else {
+              if (!state.munchies) state.munchies = [];
+              state.munchies.push(row);
+            }
+            if (item.price != null) setPrice(id, item.price);
+            if (item.qty) setQty(id, item.qty);
+            persist();
+            renderGrocery();
+            showToast("Added " + item.name);
+          },
+        });
+      };
+      wrap.appendChild(addBtn);
+      host.appendChild(wrap);
+      const picker = document.createElement("div");
+      picker.className = "g-picker";
+      catalog.forEach((name) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        const on = onIds.has(name.toLowerCase());
+        b.className = on ? "is-on" : "";
+        b.textContent = name;
+        b.setAttribute("aria-pressed", String(on));
+        b.onclick = () => {
+          if (on) {
+            if (kind === "stock") state.stockProduce = (state.stockProduce || []).filter((x) => x.name.toLowerCase() !== name.toLowerCase());
+            else state.munchies = (state.munchies || []).filter((x) => x.name.toLowerCase() !== name.toLowerCase());
+          } else {
+            const id = kind === "stock" ? (SL && SL.stockId(name)) : (SL && SL.munchId(name));
+            const row = { id: id || kind + "-" + Date.now(), name, qty: "1", price: null, standing: true, kind: kind === "stock" ? "stock" : "munch" };
+            if (kind === "stock") {
+              if (!state.stockProduce) state.stockProduce = [];
+              state.stockProduce.push(row);
+            } else {
+              if (!state.munchies) state.munchies = [];
+              state.munchies.push(row);
+            }
+          }
+          persist();
+          renderGrocery();
+        };
+        picker.appendChild(b);
+      });
+      host.appendChild(picker);
+    }
+
+    function bindAltChevron(li, item) {
+      if (!IA || !IA.hasAlts(item.baseName || item.name)) return;
+      const alts = IA.altsFor(item.baseName || item.name);
+      if (!alts.length) return;
+      const label = item.name;
+      const chipWrap = document.createElement("span");
+      chipWrap.className = "item-alt-wrap";
+      chipWrap.innerHTML = IA.chevronHTML(label, false);
+      const labelEl = li.querySelector("label");
+      if (labelEl) labelEl.appendChild(chipWrap);
+      else li.querySelector(".item-copy")?.appendChild(chipWrap);
+      const chip = chipWrap.querySelector("[data-alt-open]");
+      if (!chip) return;
+      chip.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const openId = state.openAltId === item.id ? null : item.id;
+        state.openAltId = openId;
+        document.querySelectorAll(".item-alt-pop").forEach((p) => p.remove());
+        document.querySelectorAll("[data-alt-open]").forEach((c) => c.setAttribute("aria-expanded", "false"));
+        if (!openId) return;
+        chip.setAttribute("aria-expanded", "true");
+        const pop = document.createElement("div");
+        pop.innerHTML = IA.bubbleHTML("Swap for…", alts, item.name, false);
+        const bubble = pop.firstElementChild;
+        li.querySelector(".item-copy")?.appendChild(bubble);
+        bubble.querySelectorAll("[data-alt]").forEach((btn) => {
+          btn.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            if (!state.itemAlts) state.itemAlts = {};
+            state.itemAlts[item.id] = btn.dataset.alt;
+            state.openAltId = null;
+            persist();
+            renderGrocery();
+            showToast("Swapped to " + btn.dataset.alt);
+          });
+        });
+      });
+    }
+
+    SECTION_ORDER.forEach((secName) => {
+      const secItems = visible.filter((i) => (i.section || "Menu for this week") === secName);
+      const sec = document.createElement("div");
+      sec.className = "g-section-block";
+      sec.dataset.section = secName;
+      const h = document.createElement("h3");
+      h.className = "g-section-title";
+      h.textContent = secName;
+      sec.appendChild(h);
+      if (secName === "Stock produce") appendStandingPicker(sec, "stock");
+      if (secName === "Miscellaneous munchies") appendStandingPicker(sec, "munch");
+      if (!secItems.length && secName === "Menu for this week") {
+        const empty = document.createElement("p");
+        empty.className = "muted2";
+        empty.textContent = "Menu lines come from this week's meals. Generate list refreshes this block only.";
+        sec.appendChild(empty);
+      }
+      els.groceryList.appendChild(sec);
+
+      // Group this section's items by aisle (menu) or flat list (standing/extras)
+      const cats = secName === "Menu for this week" ? allCategories() : [secName];
+      cats.forEach((cat) => {
+        let groupItems =
+          secName === "Menu for this week"
+            ? secItems.filter((i) => i.category === cat)
+            : secItems;
+        if (secName !== "Menu for this week" && cat !== secName) return;
+        if (q) {
+          groupItems = groupItems.filter(
+            (i) =>
+              String(i.name || "").toLowerCase().includes(q) ||
+              String(i.category || "").toLowerCase().includes(q) ||
+              String(i.hint || "").toLowerCase().includes(q)
+          );
+        }
+        if (state.shopMode && !state.hideChecked) {
+          groupItems = [...groupItems].sort((a, b) => Number(itemChecked(a.id)) - Number(itemChecked(b.id)));
+        }
+        if (!groupItems.length) return;
+
       const fold = document.createElement("details");
-      fold.className = "aisle-fold" + (group.cat === "Tucker lunchbox" ? " category-tucker" : "");
-      fold.dataset.aisle = group.cat;
+      fold.className = "aisle-fold" + (cat === "Tucker lunchbox" ? " category-tucker" : "");
+      fold.dataset.aisle = cat;
       const searching = Boolean(q);
-      fold.open = searching ? true : isAisleOpen(group.cat);
+      fold.open = searching ? true : isAisleOpen(cat);
       const sum = document.createElement("summary");
-      const customCat = isCustomCategory(group.cat);
-      sum.innerHTML = `<span class="aisle-sum-lab">${escapeHtml(group.cat)} · ${group.items.length}</span>${
+      const customCat = isCustomCategory(cat);
+      const aisleLab = secName === "Menu for this week" ? cat : secName;
+      sum.innerHTML = `<span class="aisle-sum-lab">${escapeHtml(aisleLab)} · ${groupItems.length}</span>${
         customCat
-          ? `<button type="button" class="aisle-cat-del" data-del-cat="${escapeAttr(group.cat)}" aria-label="Delete category ${escapeAttr(group.cat)}">${DEL_ICO}</button>`
+          ? `<button type="button" class="aisle-cat-del" data-del-cat="${escapeAttr(cat)}" aria-label="Delete category ${escapeAttr(cat)}">${DEL_ICO}</button>`
           : ""
       }${AISLE_CHEV}`;
       fold.appendChild(sum);
       fold.addEventListener("toggle", () => {
-        if (!grocerySearchQuery()) setAisleOpen(group.cat, fold.open);
+        if (!grocerySearchQuery()) setAisleOpen(cat, fold.open);
       });
       const delCatBtn = sum.querySelector("[data-del-cat]");
       if (delCatBtn) {
         delCatBtn.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
-          const cat = delCatBtn.dataset.delCat;
-          const inCat = (state.custom || []).filter((c) => c.category === cat);
-          if (inCat.length && !confirm(`Remove category "${cat}" and its ${inCat.length} item${inCat.length > 1 ? "s" : ""}?`)) return;
-          state.custom = (state.custom || []).filter((c) => c.category !== cat);
-          setCustomCategories(getCustomCategories().filter((c) => c !== cat));
-          setAisleOpen(cat, false);
+          const delCat = delCatBtn.dataset.delCat;
+          const inCat = (state.custom || []).filter((c) => c.category === delCat);
+          if (inCat.length && !confirm(`Remove category "${delCat}" and its ${inCat.length} item${inCat.length > 1 ? "s" : ""}?`)) return;
+          state.custom = (state.custom || []).filter((c) => c.category !== delCat);
+          setCustomCategories(getCustomCategories().filter((c) => c !== delCat));
+          setAisleOpen(delCat, false);
           persist();
           refreshCategoryPicker();
           renderGrocery();
@@ -4632,7 +4951,7 @@ function sidesBlockHTML(dayId, day) {
 
       const ul = document.createElement("ul");
       ul.className = "item-list";
-      group.items.forEach((item) => {
+      groupItems.forEach((item) => {
         const isOn = itemChecked(item.id);
         if (isOn) checkedVisible += 1;
         const price = itemPrice(item.id, item.price);
@@ -4641,6 +4960,7 @@ function sidesBlockHTML(dayId, day) {
         const have = itemHaveIt(item.id);
         const staple = isStapleItem(item);
         const li = document.createElement("li");
+        if (have) li.classList.add("is-have-hidden");
         const dayHit = highlightDayId && Array.isArray(item.days) && item.days.includes(highlightDayId);
         li.className = `item${isOn ? " checked" : ""}${have ? " have-it" : ""}${dayHit ? " day-hit" : ""}`;
         const inputId = `g-${item.id}`;
@@ -4663,11 +4983,9 @@ function sidesBlockHTML(dayId, day) {
                   ${note ? escapeHtml(note) : "Note"}
                 </button>
                 ${
-                  staple
-                    ? `<button type="button" class="meta-chip have-chip${have ? " is-on" : ""}" data-edit="have" aria-pressed="${have}">
-                        ${have ? "Have it ✓" : "Have it"}
-                      </button>`
-                    : ""
+                  `<button type="button" class="meta-chip have-chip${have ? " is-on" : ""}" data-edit="have" aria-pressed="${have}">
+                        ${have ? "Still need it" : "Have it"}
+                      </button>${have ? `<span class="have-back-hint">${escapeHtml(haveItHint(item.id))}</span>` : ""}`
                 }
                 ${
                   item.custom
@@ -4731,11 +5049,18 @@ function sidesBlockHTML(dayId, day) {
         if (haveBtn) {
           haveBtn.addEventListener("click", (e) => {
             e.preventDefault();
-            setHaveIt(item.id, !itemHaveIt(item.id));
-            if (!Object.keys(state.haveIt).length) state.showHiddenHave = false;
+            const was = itemHaveIt(item.id);
+            if (was) {
+              setHaveIt(item.id, false);
+              showToast("Still need it — back on the list");
+            } else {
+              setHaveIt(item.id, true, item);
+              const hint = haveItHint(item.id);
+              showToast(hint ? ("Have it — " + hint) : "Have it — hidden for a while");
+            }
+            if (!Object.keys(state.haveIt || {}).length) state.showHiddenHave = false;
             persist();
             renderGrocery();
-            showToast(itemHaveIt(item.id) ? "Marked Have it — hidden from list" : "Back on the list");
           });
         }
         const delBtn = li.querySelector('.meta-chip[data-edit="del"]');
@@ -4761,12 +5086,14 @@ function sidesBlockHTML(dayId, day) {
           showToast("Saved qty / note");
         });
         ul.appendChild(li);
+        try { bindAltChevron(li, item); } catch (_) {}
       });
       fold.appendChild(ul);
-      els.groceryList.appendChild(fold);
-    });
+      sec.appendChild(fold);
+      }); // cats
+    }); // SECTION_ORDER
 
-    if (!byCat.length) {
+    if (!visible.length) {
       const empty = document.createElement("p");
       empty.className = "grocery-empty";
       empty.textContent = state.hideChecked
@@ -6040,14 +6367,24 @@ function sidesBlockHTML(dayId, day) {
     injectUpgradeStyles();
     const fromUrl = readShareFromUrl();
     const fromStorage = loadFromStorage();
-    if (fromUrl) {
-      state = fromUrl;
-    } else if (fromStorage) {
+    // Prefer local mid-flow draft. Share hash only applies when there is no local draft
+    // (or explicit ?import=1). Never silent-wipe customs/Have-it/stock on remount.
+    const wantImport = /(?:\?|&)import=1(?:&|$)/.test(window.location.search || "");
+    if (fromStorage) {
       state = fromStorage;
+    } else if (fromUrl) {
+      state = fromUrl;
     } else {
       state = defaultState();
     }
+    if (wantImport && fromUrl) {
+      state = fromUrl;
+    }
     if (!state.monthKey) state.monthKey = currentMonthKey();
+    if (!state.stockProduce) state.stockProduce = [];
+    if (!state.munchies) state.munchies = [];
+    if (!state.itemAlts) state.itemAlts = {};
+    if (!state.meatAlts) state.meatAlts = {};
     ensureMonth(state.monthKey);
     linkWeekEdits(state);
     try {
@@ -6147,29 +6484,77 @@ function sidesBlockHTML(dayId, day) {
       });
     }
     els.addCustom.addEventListener("click", () => {
-      const name = els.customName.value.trim();
-      if (!name) {
-        showToast("Type a grocery item first");
-        els.customName.focus();
-        return;
-      }
-      const category = resolveCategoryFromForm();
-      if (!category) return;
-      const id = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-      state.custom.push({
-        id,
-        name: name.slice(0, 80),
-        category,
-      });
-      if (els.customPrice && els.customPrice.value.trim()) {
-        setPrice(id, els.customPrice.value);
-        els.customPrice.value = "";
-      }
-      els.customName.value = "";
-      persist();
-      refreshCategoryPicker(category);
-      renderGrocery();
-      showToast("Added to grocery list");
+      const draftName = (els.customName.value || "").trim();
+      const AIS = window.AddItemSheet;
+      const SL = window.StandingLists;
+      const openSheet = () => {
+        if (!AIS) {
+          // Fallback if sheet script missing
+          const name = draftName;
+          if (!name) { showToast("Type a grocery item first"); els.customName.focus(); return; }
+          const category = resolveCategoryFromForm() || "Other";
+          const id = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+          state.custom.push({ id, name: name.slice(0, 80), category, qty: "1", section: "Menu extras" });
+          persist();
+          renderGrocery();
+          showToast("Added to grocery list");
+          return;
+        }
+        AIS.open({
+          name: draftName,
+          defaultSection: "Menu extras",
+          large: false,
+          onAdd: (item) => {
+            const id = `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+            const section = item.section;
+            if (section === "Stock produce") {
+              if (!state.stockProduce) state.stockProduce = [];
+              state.stockProduce.push({
+                id: (SL && SL.stockId(item.name)) || id,
+                name: item.name,
+                qty: item.qty || "1",
+                price: item.price,
+                section: section,
+                standing: true,
+                kind: "stock",
+              });
+              if (item.price != null) setPrice((SL && SL.stockId(item.name)) || id, item.price);
+              if (item.qty) setQty((SL && SL.stockId(item.name)) || id, item.qty);
+            } else if (section === "Miscellaneous munchies") {
+              if (!state.munchies) state.munchies = [];
+              const mid = (SL && SL.munchId(item.name)) || id;
+              state.munchies.push({
+                id: mid,
+                name: item.name,
+                qty: item.qty || "1",
+                price: item.price,
+                section: section,
+                standing: true,
+                kind: "munch",
+              });
+              if (item.price != null) setPrice(mid, item.price);
+              if (item.qty) setQty(mid, item.qty);
+            } else {
+              // Menu extras
+              state.custom.push({
+                id,
+                name: item.name,
+                category: "Other",
+                section: "Menu extras",
+                qty: item.qty || "1",
+              });
+              if (item.price != null) setPrice(id, item.price);
+              if (item.qty) setQty(id, item.qty);
+            }
+            if (els.customName) els.customName.value = "";
+            if (els.customPrice) els.customPrice.value = "";
+            persist();
+            renderGrocery();
+            showToast("Added " + item.name);
+          },
+        });
+      };
+      openSheet();
     });
 
     els.customName.addEventListener("keydown", (e) => {
@@ -6274,21 +6659,13 @@ function sidesBlockHTML(dayId, day) {
       if (document.visibilityState === "visible" && state.shopMode) updateWakeLock();
     });
 
+    // Hash changes must NOT wipe the mid-flow draft (Steve soft-bar).
+    // Share import is opt-in via ?import=1 only (handled at boot).
     window.addEventListener("hashchange", () => {
-      const shared = readShareFromUrl();
-      if (shared) {
-        state = shared;
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        } catch (_) {}
-        renderAll();
-        updateWakeLock();
-        showToast("Loaded shared plan from link");
-      }
+      /* intentionally no-op for draft restore — localStorage is source of truth */
     });
 
     renderAll();
-    writeShareToUrl(false);
     updateWakeLock();
     loadPricesJson();
     if (els.backBtn) els.backBtn.addEventListener("click", goBackApp);
@@ -6312,6 +6689,12 @@ function sidesBlockHTML(dayId, day) {
     try {
       if (welcomeDone && welcomeDone()) return true;
     } catch (_) {}
+    // Mid-flow draft counts as returning — never remount to first-run gate
+    if (state && (state.weekLocked || (state.custom && state.custom.length) ||
+        (state.stockProduce && state.stockProduce.length) ||
+        (state.munchies && state.munchies.length) ||
+        (state.dayOverrides && Object.keys(state.dayOverrides).length) ||
+        (state.haveIt && Object.keys(state.haveIt).length))) return true;
     return !!(state && state.week && state.plan);
   }
   function enterBurnsApp(mode) {
@@ -6335,14 +6718,18 @@ function sidesBlockHTML(dayId, day) {
     const HH = window.HomeHero;
     const gate = document.getElementById("home-gate");
     if (!HH || !gate) return false;
+    // Returning / mid-flow draft: skip gate remount — restore app (Steve soft-bar)
+    if (burnsIsReturning()) {
+      enterBurnsApp("week");
+      return false;
+    }
     gate.hidden = false;
-    gate.innerHTML = HH.html({ mood: "burns", returning: burnsIsReturning(), primaryId: "home-primary-cta" });
+    gate.innerHTML = HH.html({ mood: "burns", returning: false, primaryId: "home-primary-cta" });
     document.body.classList.add("show-home-gate");
     const app = document.getElementById("main-app") || document.querySelector(".app");
     if (app) app.style.display = "none";
     const primary = document.getElementById("home-primary-cta");
-    if (primary) primary.onclick = () => enterBurnsApp(burnsIsReturning() ? "week" : "build");
-    // build = enter planner (month + week visible); week = scroll to week strip
+    if (primary) primary.onclick = () => enterBurnsApp("build");
     const photos = document.getElementById("home-setup-photos");
     if (photos) photos.onclick = () => enterBurnsApp("photos");
     const qs = document.getElementById("home-setup-questions");
@@ -6560,17 +6947,22 @@ function sidesBlockHTML(dayId, day) {
     };
     if (randBtn) randBtn.onclick = () => randomMealForFocusBurns();
     if (genBtn) genBtn.onclick = () => {
-      // Rebuild from week; customs kept in state.custom
+      // Week-only Generate: refresh Menu for this week only.
+      // Stock produce, Munchies, customs, Have-it suppressions stay.
       if (state.weekLocked && state.lockedWeek) {
-        state.lockedWeek.grocery = weekOnlyGroceryItems().filter((i) => !i.custom).map((i) => ({
-          id: i.id, name: i.name, category: i.category, price: i.price, days: i.days, hint: i.hint
-        }));
+        state.lockedWeek.grocery = weekOnlyGroceryItems()
+          .filter((i) => !i.custom && !i.standing && (i.section || "Menu for this week") === "Menu for this week")
+          .map((i) => ({
+            id: i.id, name: i.name, category: i.category, price: i.price, days: i.days, hint: i.hint
+          }));
         state.lockedWeek.dayOverrides = JSON.parse(JSON.stringify(state.dayOverrides || {}));
         state.lockedWeek.daySides = JSON.parse(JSON.stringify(state.daySides || {}));
+        state.lockedWeek.stockProduce = JSON.parse(JSON.stringify(state.stockProduce || []));
+        state.lockedWeek.munchies = JSON.parse(JSON.stringify(state.munchies || []));
         persist();
       }
       renderGrocery();
-      showToast("Built from this week's meals");
+      showToast("Menu for this week refreshed — stock & munchies kept");
     };
     if (jumpG) jumpG.onclick = () => {
       renderGrocery();

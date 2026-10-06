@@ -2671,3 +2671,40 @@ html[data-theme="dark"] {
 body.show-home-gate .app { display: none; }
 body.show-home-gate .home-gate { display: block; }
 .home-gate[hidden] { display: none !important; }
+
+.grocery-list .is-have-hidden,
+#grocery-list .is-have-hidden {
+  opacity: 0.55;
+}
+.grocery-list .is-have-hidden .g-name,
+#grocery-list .is-have-hidden .item-name,
+.is-have-hidden .item-title {
+  text-decoration: line-through;
+}
+.have-back-hint {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-soft, #3d5566);
+}
+.grocery-add-sticky #hidden-have-btn-top {
+  grid-column: 1 / -1;
+  justify-self: start;
+  border-radius: 4px;
+  min-height: 44px;
+}
+.day-card.is-scroll-open {
+  outline: 2px solid rgba(15, 110, 110, 0.35);
+}
+.day-card .day-inline-details {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.22s ease, opacity 0.18s ease;
+}
+.day-card.is-scroll-open .day-inline-details {
+  max-height: 220px;
+  opacity: 1;
+  padding: 0 12px 12px;
+}

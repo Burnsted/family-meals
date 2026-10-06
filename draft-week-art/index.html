@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="week-strip.css" />
   <link rel="stylesheet" href="lock-week.css" />
   <link rel="stylesheet" href="home-hero.css" />
+  <link rel="stylesheet" href="item-alts.css" />
 </head>
 <body>
   <div id="home-gate" class="home-gate" hidden></div>
@@ -179,6 +180,7 @@
         <label class="visually-hidden" for="custom-price">Optional price</label>
         <input id="custom-price" type="number" min="0" step="1" inputmode="decimal" placeholder="$" aria-label="Optional price estimate" />
         <button type="button" class="btn btn-secondary" id="add-custom">+ Add item</button>
+        <button type="button" class="btn btn-ghost" id="hidden-have-btn-top" aria-pressed="false">Show hidden</button>
       </div>
       <div class="grocery-meta">
         <span class="chip" id="list-store-chip">By aisle</span>
@@ -276,6 +278,11 @@
   </div>
   <script src="food-art.js"></script>
   <script src="home-hero.js"></script>
+  <script src="have-it-timed.js"></script>
+  <script src="item-alts.js"></script>
+  <script src="standing-lists.js"></script>
+  <script src="add-item-sheet.js"></script>
+  <script src="scroll-expand.js"></script>
   <script src="lock-week.js"></script>
   <script src="app.js"></script>
   <script>
