@@ -29,7 +29,8 @@
   .chip{border:2px solid var(--on);background:var(--on);color:#fff;border-radius:999px;padding:10px 14px;font-size:16px;cursor:pointer;user-select:none}
   .chip.off{background:transparent;color:var(--ink);border-color:var(--chip)}
   .chip.drop.off{/* unselected — same look as .chip.off, not struck */}
-  .chip.main{background:var(--gold);border-color:var(--gold)}
+  /* Gold/amber pills: dark text for WCAG AA (white-on-gold fails ~2:1) */
+  .chip.main{background:var(--gold);border-color:var(--gold);color:#1a1a1a}
   .chip.open{outline:3px solid var(--gold);outline-offset:2px}
   .chip.addc{background:transparent;border:2px dashed var(--mut);color:var(--mut)}
   .chip.cust:not(.off){background:#8b5cf6;border-color:#8b5cf6}
@@ -113,7 +114,8 @@
   details.box{background:#0b1222;border:2px solid var(--chip);border-radius:14px;padding:10px 12px;margin:0 0 16px;text-align:left}
   details.box summary{cursor:pointer;font-weight:700}
   details.box ul{margin:8px 0 0;padding-left:20px;font-size:14px;line-height:1.45}
-  .build{background:linear-gradient(135deg,#f59e0b,#d97706);font-size:22px;padding:20px;margin-top:18px;box-shadow:0 6px 0 rgba(146,64,14,.6)}
+  /* Yellow CTA: dark text on amber fill (matches .rcpt-btn contrast) */
+  .build,.next.build{background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1a1a;font-size:22px;padding:20px;margin-top:18px;box-shadow:0 6px 0 rgba(146,64,14,.6)}
   /* ===== week planner: view state ≠ theme ===== */
   #week{display:none;width:100%;max-width:460px;padding:14px 14px 50px}
   body.view-week #week{display:block}
@@ -180,7 +182,7 @@
   .pr span.win{background:#d1fae5;color:#065f46}
   .have{border:2px solid rgba(23,48,66,.15);background:#fff;border-radius:10px;padding:7px 8px;font-weight:800;font-size:12px;color:var(--wsoft);cursor:pointer;white-space:nowrap}
   .gone{opacity:.45}
-  .gone .have{background:var(--wgold);color:var(--wink)}
+  .gone .have{background:var(--wgold,#fbbf24);color:#1a1a1a}
   .gone .nm{text-decoration:line-through}
   .gh{display:block;background:#173042;color:#fff;border-radius:16px;padding:14px;text-decoration:none;margin:0 0 14px;box-shadow:0 8px 22px rgba(23,48,66,.18)}
   .gh b{font-size:16px}.gh span{display:block;font-size:13px;opacity:.85;margin-top:3px;font-weight:650}
@@ -485,7 +487,12 @@
   html[data-theme="dark"] .card,html[data-theme="dark"] .welcome-card{background:var(--card);color:var(--ink);border-color:rgba(255,255,255,.1)}
   html[data-theme="dark"] .chip{background:var(--chip);color:var(--ink)}
   html[data-theme="dark"] .chip.on{background:var(--on);color:#041016}
-  html[data-theme="dark"] .next,html[data-theme="dark"] .welcome-opt{color:#041016}
+  html[data-theme="dark"] .chip.main{background:var(--gold);border-color:var(--gold);color:#1a1a1a}
+  html[data-theme="dark"] .next{color:#041016}
+  /* Welcome opts: dark text only on filled primary (sky/teal); keep readable ink on outline opts */
+  html[data-theme="dark"] .welcome-opt.primary,html[data-theme="dark"] .welcome-opt.on{color:#041016}
+  html[data-theme="dark"] .welcome-opt:not(.primary):not(.on){color:var(--ink)}
+  html[data-theme="dark"] .next.build,.next.build{color:#1a1a1a}
   html[data-theme="dark"] .next.ghost{color:var(--on);background:transparent}
   html[data-theme="dark"] .addrow input,html[data-theme="dark"] .welcome-field,html[data-theme="dark"] input,html[data-theme="dark"] select,html[data-theme="dark"] textarea{
     background:#0b1220;color:var(--ink);border-color:rgba(45,212,191,.35)}
@@ -500,6 +507,7 @@
   body.view-week .hint,body.view-week .stitle span,body.view-week .gnote,body.view-week .pchk{color:var(--wsoft)}
   body.view-week .aisle-fold>summary{color:var(--tealD);border-bottom-color:rgba(45,212,191,.25)}
   body.view-week .have,body.view-week .cpb{color:var(--wink)}
+  body.view-week .gone .have{background:var(--wgold,#fbbf24);color:#1a1a1a}
   body.view-week .grocery-search{background:var(--wbg);color:var(--wink);border-color:rgba(45,212,191,.35)}
   body.view-week .share-list-link{color:var(--tealD)}
   html[data-theme="dark"] body.view-week .budline.over{color:#fca5a5}
@@ -516,6 +524,7 @@
   html[data-theme="dark"] body.view-week .rec h4{color:var(--tealD)}
   html[data-theme="dark"] body.view-week .log button:not([data-ls]),html[data-theme="dark"] body.view-week .have{background:#0b1220;color:var(--wink);border-color:rgba(45,212,191,.35)}
   html[data-theme="dark"] body.view-week .log button.on:not([data-ls]){background:var(--teal);color:#041016}
+  html[data-theme="dark"] body.view-week .gone .have{background:var(--wgold,#fbbf24);color:#1a1a1a;border-color:transparent}
 
   
   /* fix-round snap/shuffle contrast */

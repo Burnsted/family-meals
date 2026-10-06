@@ -363,7 +363,7 @@ button[hidden],
 .btn-ghost[aria-pressed="true"] {
   background: var(--gold);
   border-color: rgba(23, 48, 66, 0.18);
-  color: var(--ink);
+  color: #1a1a1a;
 }
 
 .toast {
