@@ -1254,7 +1254,7 @@ body.shop-mode .price-input {
 .cal-sel { margin: 0 0 0.4rem; font-weight: 800; color: var(--coral-deep); font-size: 0.9rem; }
 .cal-nav { display: flex; align-items: center; justify-content: space-between; margin: 0.25rem 0 0.4rem; }
 .cal-nav b { font-size: 1.12rem; }
-.cal-nav button { width: 48px; height: 44px; border: 2px solid rgba(15, 110, 110, 0.3); border-radius: 12px; background: #fff; font-size: 1.25rem; font-weight: 800; color: var(--teal-deep); cursor: pointer; }
+.cal-nav button { width: 44px; height: 44px; min-width: 44px; min-height: 44px; border: none; border-radius: 0; background: transparent; box-shadow: none; font-size: 1.25rem; font-weight: 800; color: var(--teal-deep); cursor: pointer; padding: 0; }
 .cal-dow, .cal-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
 .cal-dow span { text-align: center; font-size: 0.75rem; font-weight: 800; color: var(--ink-soft); padding: 0.25rem 0; text-transform: uppercase; }
 .cal-row { border-radius: 12px; padding: 2px 0; margin: 1px 0; }
@@ -1676,14 +1676,15 @@ body.shop-mode .price-input {
 
 .month-arrow.icon-btn {
   appearance: none;
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  min-height: 40px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   padding: 0;
-  border: 2px solid rgba(15, 110, 110, 0.3);
-  border-radius: 12px;
-  background: #fff;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   color: var(--teal-deep);
   cursor: pointer;
   display: inline-flex;
@@ -2044,3 +2045,84 @@ body.shop-mode .price-input {
 .side-tile.is-on .sn::after { content: " ✓"; color: var(--teal); }
 .side-credits { font-size: 0.65rem; font-weight: 650; color: var(--ink-soft); margin: 0.25rem 0 0; padding: 0 0.85rem; }
 .month-hol-strip { display: none !important; }
+
+/* Shuffle — plain text link + line ico (not a pill) */
+.shuffle-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 0.35rem 0 0;
+}
+.shuffle-link {
+  appearance: none;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0.35rem 0.25rem;
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--teal-deep, #0f6e6e);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.shuffle-link .ico {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
+.shuffle-link:hover, .shuffle-link:focus-visible { opacity: 0.9; outline: none; }
+
+.week-actions-row { align-items: center; gap: 0.5rem; }
+.week-actions { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.75rem; margin-left: auto; }
+.week-text-link, .shuffle-link {
+  appearance: none; border: none; background: transparent; box-shadow: none; border-radius: 0;
+  padding: 0.35rem 0.15rem; min-height: 44px; display: inline-flex; align-items: center; gap: 0.3rem;
+  cursor: pointer; font: inherit; font-size: 0.85rem; font-weight: 800;
+  color: var(--teal-deep); text-decoration: underline; text-underline-offset: 3px;
+}
+.week-text-link .ico, .shuffle-link .ico { width: 16px; height: 16px; stroke: currentColor; }
+
+/* Month plan — compact nav + hold hint */
+.templates {
+  padding-top: 0.35rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.month-plan-head {
+  margin: 0 0 0.25rem;
+}
+.month-title-row {
+  margin: 0;
+  padding: 0;
+  gap: 0.25rem;
+  min-height: 0;
+}
+.month-ctrl {
+  gap: 0;
+  margin: 0;
+}
+.month-name-btn {
+  min-height: 44px;
+  padding: 0.15rem 0.25rem;
+}
+.month-hold-hint {
+  margin: 0.1rem 0 0.35rem;
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-align: center;
+  line-height: 1.2;
+}
+.month-grid {
+  margin-top: 0.15rem;
+  gap: 0.45rem;
+}

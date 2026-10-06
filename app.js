@@ -2026,6 +2026,7 @@
       inn.innerHTML=shTop("📅 Pick a week")+`
         <p class="cal-sel">${sel?"Selected: "+fmtWeek(sel):"Tap any day to pick its Mon–Sun week"}</p>
         <div class="cal-nav"><button data-cm="-1" aria-label="Previous month">‹</button><b>${MOFULL[view.getMonth()]} ${view.getFullYear()}</b><button data-cm="1" aria-label="Next month">›</button></div>
+        <p class="month-hold-hint">Hold a week to customize</p>
         <div class="cal-dow"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
         ${rows.map(rm=>`<div class="cal-row${sel&&sameDay(rm,sel)?" sel":""}">${[0,1,2,3,4,5,6].map(i=>{const d=addDays(rm,i);
           const hol=holidayOnDate(d);
@@ -3182,14 +3183,6 @@ function sidesBlockHTML(dayId, day) {
         ${[["made","Made"],["skipped","Skipped"],["ateout","Ate out"]].map(([v,l]) =>
           `<button type="button" class="log-chip${log.status===v?" on":""}" data-log-status="${v}" aria-pressed="${log.status===v}">${l}</button>`).join("")}
       </div>
-      <label class="log-left">Leftovers
-        <select data-log-left>${[0,1,2,3].map((n)=>`<option value="${n}" ${log.leftovers===n?"selected":""}>${n}</option>`).join("")}</select>
-      </label>
-      <div class="log-bad" role="group" aria-label="Did leftovers go bad">
-        <span>Went bad?</span>
-        <button type="button" class="log-chip${log.wentBad===true?" on":""}" data-log-bad="1" aria-pressed="${log.wentBad===true}">Yes</button>
-        <button type="button" class="log-chip${log.wentBad===false?" on":""}" data-log-bad="0" aria-pressed="${log.wentBad===false}">No</button>
-      </div>
     </div>`;
   }
   function bindMealLog(card, dayId) {
@@ -3207,20 +3200,6 @@ function sidesBlockHTML(dayId, day) {
           /* nudge only via gentle banner / review — don't auto-rate */
         }
       }
-      persist();
-      renderAll();
-    }));
-    root.querySelector("[data-log-left]")?.addEventListener("change", (e) => {
-      e.stopPropagation();
-      setLog(dayId, { leftovers: Number(e.target.value) });
-      persist();
-      renderWeekReview();
-    });
-    root.querySelectorAll("[data-log-bad]").forEach((b) => b.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const val = b.dataset.logBad === "1";
-      const cur = getLog(dayId).wentBad;
-      setLog(dayId, { wentBad: cur === val ? null : val });
       persist();
       renderAll();
     }));
@@ -3249,7 +3228,7 @@ function sidesBlockHTML(dayId, day) {
     const body = els.weekReviewBody;
     if (!panel || !body) return;
     const plan = currentPlan();
-    let made = 0, planned = 0, skipped = 0, wasted = 0;
+    let made = 0, planned = 0, skipped = 0;
     const skipNames = [];
     plan.days.forEach((td) => {
       const day = effectiveDay(td);
@@ -3258,7 +3237,6 @@ function sidesBlockHTML(dayId, day) {
       const log = getLog(td.id);
       if (log.status === "made") made += 1;
       if (log.status === "skipped") { skipped += 1; skipNames.push(day.dinner); }
-      if (log.wentBad === true) wasted += Math.max(1, log.leftovers || 1);
     });
     const times = timesMadeMap();
     const topRated = Object.keys(state.ratings || {})
@@ -3283,13 +3261,12 @@ function sidesBlockHTML(dayId, day) {
       if (r && r.r === -1) suggestions.push(`Skipped / disliked: ${r.n || k} — swap it?`);
     });
     const uniqSug = [...new Set(suggestions)].slice(0, 4);
-    const hasAny = made + skipped + wasted + topRated.length > 0;
+    const hasAny = made + skipped + topRated.length > 0;
     panel.hidden = !hasAny && planned === 0;
     if (!hasAny && planned > 0) panel.hidden = false;
     body.innerHTML = `
       <div class="wr-stats">
         <p><strong>${made}</strong> made · <strong>${planned}</strong> planned · <strong>${skipped}</strong> skipped</p>
-        <p>Leftovers wasted (went bad): <strong>${wasted}</strong></p>
       </div>
       ${topRated.length ? `<div class="wr-block"><h3>Top-rated</h3><ul>${topRated.map((r) => `<li>${r.r === 2 ? "❤️" : "👍"} ${escapeHtml(r.n || "")}</li>`).join("")}</ul></div>` : ""}
       <div class="wr-block"><h3>All-time times made (from ratings + this week)</h3>
@@ -5197,8 +5174,10 @@ function sidesBlockHTML(dayId, day) {
       ".rcpt-btn .ico{stroke:#fff;width:20px;height:20px}",
       ".cal-btn.icon-btn,.repeat-btn.icon-btn{width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border:2px solid var(--teal);border-radius:14px;background:var(--white);color:var(--teal-deep);cursor:pointer;font-size:0}",
       ".cal-btn .ico,.repeat-btn .ico{width:20px;height:20px;stroke:currentColor}",
-      ".month-arrow.icon-btn{appearance:none;width:40px;height:40px;min-width:40px;min-height:40px;padding:0;border:2px solid rgba(15,110,110,.3);border-radius:12px;background:#fff;color:var(--teal-deep);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}",
+      ".month-arrow.icon-btn{appearance:none;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border:none;border-radius:0;background:transparent;box-shadow:none;color:var(--teal-deep);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}",
       ".month-arrow .ico{width:20px;height:20px;stroke:currentColor}",
+      ".cal-nav button{width:44px;height:44px;min-width:44px;min-height:44px;border:none;border-radius:0;background:transparent;box-shadow:none;font-size:1.25rem;font-weight:800;color:var(--teal-deep);cursor:pointer;padding:0}",
+      ".month-hold-hint{margin:.1rem 0 .35rem;font-size:.75rem;font-weight:700;color:var(--ink-soft);text-align:center;line-height:1.2}",
       ".hero-card{background:linear-gradient(165deg,#fffaf4 0%,#e7f4ef 55%,#f8efe4 100%);border-radius:22px;padding:1.1rem 1rem 1.15rem;box-shadow:var(--shadow);margin-bottom:1rem;text-align:center}",
       ".rcpt-top{display:flex;justify-content:center;align-items:center;gap:.35rem}",
       ".hero-budget{margin:.85rem auto 0;max-width:28rem;padding:.75rem .9rem;border-radius:16px;background:rgba(255,255,255,.72);border:2px solid rgba(15,110,110,.2);cursor:pointer;text-align:left}",
@@ -5233,8 +5212,7 @@ function sidesBlockHTML(dayId, day) {
       ".meal-log{padding:.55rem .85rem .8rem;display:flex;flex-direction:column;gap:.35rem;border-top:1px dashed rgba(23,48,66,.12)}",
       ".log-chip{min-height:36px;border-radius:999px;border:2px solid rgba(15,110,110,.22);background:var(--bg);font:inherit;font-weight:800;font-size:.78rem;padding:.25rem .65rem;cursor:pointer}",
       ".log-chip.on{background:var(--teal-soft);border-color:var(--teal)}",
-      ".log-status,.log-bad{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}",
-      ".log-left{font-weight:800;font-size:.78rem;display:flex;gap:.35rem;align-items:center}",
+      ".log-status{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}",
       ".week-review-panel{background:var(--white);border-radius:20px;box-shadow:var(--shadow);padding:.9rem 1rem;margin:1rem 0}",
       ".gentle-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:1rem;z-index:40;max-width:min(92vw,26rem);background:#124f4f;color:#fff;padding:.75rem 1rem;border-radius:14px;font-weight:750;box-shadow:var(--shadow)}",
       ".gentle-banner .chip-btn{margin-left:.5rem;background:#fff;color:var(--teal-deep)}",
@@ -5254,10 +5232,141 @@ function sidesBlockHTML(dayId, day) {
       ".edited-badge{position:absolute;top:.35rem;right:.35rem;font-size:.65rem;font-weight:900;background:transparent;color:var(--coral-deep);border-radius:0;padding:0}",
       ".list-link{appearance:none;min-width:44px;min-height:44px;padding:0 .35rem;border:none;background:transparent;color:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:.2rem;font:inherit;font-size:.75rem;font-weight:800;text-decoration:underline;text-underline-offset:3px;opacity:.85;border-radius:0;box-shadow:none}",
       ".list-link .ico{stroke:currentColor;width:14px;height:14px}",
+      ".shuffle-row{display:flex;justify-content:flex-end;margin:.35rem 0 0}",
+      ".shuffle-link{appearance:none;border:none;background:transparent;box-shadow:none;border-radius:0;padding:.35rem .25rem;min-height:44px;display:inline-flex;align-items:center;gap:.3rem;cursor:pointer;font:inherit;font-size:.85rem;font-weight:800;color:var(--teal-deep);text-decoration:underline;text-underline-offset:3px}",
+      ".shuffle-link .ico{width:16px;height:16px;stroke:currentColor}",
       ".btn.icon-btn .ico{stroke:currentColor;width:18px;height:18px}",
       ".btn-primary.icon-btn .ico{stroke:#fff}",
     ].join("");
     document.head.appendChild(s);
+  }
+
+  
+  const SHUFFLE_PREV_KEY = "family-meals-shuffle-prev-v1";
+  function shuffleDinnerPool(weekendDayIds) {
+    const weekend = new Set(weekendDayIds || []);
+    return Object.keys(EXTRA_DINNERS).filter((key) => {
+      const ex = EXTRA_DINNERS[key];
+      if (!ex || ex.kind !== "dinner") return false;
+      if (isDown(ex.dinner)) return false;
+      // No spaghetti / meat sauce titles
+      if (/spaghetti|meat sauce|marinara pasta/i.test(ex.dinner)) return false;
+      return true;
+    });
+  }
+  function shuffleWeek() {
+    const plan = currentPlan();
+    if (!plan || !plan.days || !plan.days.length) {
+      showToast("Pick a week template first");
+      return;
+    }
+    const days = plan.days;
+    const weekendIds = days.filter((d) => /^(sat|sun)$/i.test(d.id)).map((d) => d.id);
+    let pool = shuffleDinnerPool(weekendIds);
+    // Prefer favorites lightly (still random)
+    const fav = pool.filter((k) => isFav(EXTRA_DINNERS[k].dinner));
+    const rest = pool.filter((k) => !fav.includes(k));
+    pool = [...fav, ...rest];
+
+    // Avoid immediately previous set when possible
+    let prev = [];
+    try { prev = JSON.parse(localStorage.getItem(SHUFFLE_PREV_KEY) || "[]"); } catch (_) { prev = []; }
+    const prevSet = new Set(prev);
+
+    function pickN(n, opts) {
+      const { allowWeekendChili = false, exclude = new Set() } = opts || {};
+      let candidates = pool.filter((k) => {
+        if (exclude.has(k)) return false;
+        const ex = EXTRA_DINNERS[k];
+        if (ex.weekendOnly && !allowWeekendChili) return false;
+        return true;
+      });
+      // Prefer not reusing previous set
+      const fresh = candidates.filter((k) => !prevSet.has(k));
+      if (fresh.length >= n) candidates = fresh;
+      // Fisher-Yates
+      for (let i = candidates.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+      }
+      return candidates.slice(0, n);
+    }
+
+    // Chili: at most one weekend chili, and not every shuffle (~35% chance)
+    const useChili = Math.random() < 0.35;
+    const chiliKeys = pool.filter((k) => EXTRA_DINNERS[k].weekendOnly);
+    const picked = [];
+    const exclude = new Set();
+
+    // Map day slots that can be filled (skip holidays)
+    const fillable = days.filter((td) => {
+      const eff = effectiveDay(td);
+      return !(eff.holiday || eff.overrideType === "holiday");
+    });
+
+    // Locked / favorite nights stay
+    const locked = new Set();
+    fillable.forEach((td) => {
+      const ov = dayOverride(td.id);
+      const eff = effectiveDay(td);
+      if (ov && (ov.type === "eatout" || ov.type === "removed")) {
+        locked.add(td.id);
+        return;
+      }
+      if (isFav(eff.dinner) && ov && ov.type === "pick") {
+        locked.add(td.id);
+        if (ov.key) exclude.add(ov.key);
+      }
+    });
+
+    const need = fillable.filter((td) => !locked.has(td.id));
+    // Assign chili to one weekend day if chosen
+    let chiliDay = null;
+    let chiliKey = null;
+    if (useChili && chiliKeys.length && weekendIds.some((id) => need.some((d) => d.id === id))) {
+      const weekendNeed = need.filter((d) => /^(sat|sun)$/i.test(d.id));
+      if (weekendNeed.length) {
+        chiliDay = weekendNeed[Math.floor(Math.random() * weekendNeed.length)].id;
+        chiliKey = chiliKeys[Math.floor(Math.random() * chiliKeys.length)];
+        exclude.add(chiliKey);
+      }
+    }
+
+    const dinnerKeys = pickN(need.length + 2, { exclude });
+    let di = 0;
+    const used = [];
+    need.forEach((td) => {
+      let key;
+      if (chiliDay && td.id === chiliDay && chiliKey) key = chiliKey;
+      else {
+        // skip chili keys for weekdays
+        while (di < dinnerKeys.length && EXTRA_DINNERS[dinnerKeys[di]].weekendOnly) di++;
+        key = dinnerKeys[di++] || pickN(1, { exclude: new Set(used) })[0];
+      }
+      if (!key) return;
+      used.push(key);
+      exclude.add(key);
+      state.dayOverrides[td.id] = { type: "pick", key };
+    });
+
+    // Taco leftovers → next dinner: if a taco night is picked, force next fillable to leftovers
+    const ordered = fillable.map((d) => d.id);
+    ordered.forEach((id, idx) => {
+      const ov = state.dayOverrides[id];
+      if (!ov || ov.type !== "pick" || !ov.key) return;
+      const name = (EXTRA_DINNERS[ov.key] && EXTRA_DINNERS[ov.key].dinner) || "";
+      if (!/taco/i.test(name)) return;
+      const nextId = ordered[idx + 1];
+      if (!nextId || locked.has(nextId)) return;
+      const nextEff = effectiveDay(days.find((d) => d.id === nextId) || { id: nextId });
+      if (nextEff.holiday) return;
+      state.dayOverrides[nextId] = { type: "leftovers" };
+    });
+
+    try { localStorage.setItem(SHUFFLE_PREV_KEY, JSON.stringify(used)); } catch (_) {}
+    persist();
+    renderAll();
+    showToast("Week shuffled — groceries & budget updated");
   }
 
   function renderAll() {
@@ -5307,6 +5416,67 @@ function sidesBlockHTML(dayId, day) {
     if (window.history && window.history.length > 1) { window.history.back(); return; }
     updateBackBtn();
   }
+
+  function repeatLastWeek() {
+    const month = activeMonth();
+    const curW = String(state.week || "1");
+    const curP = state.plan || "A";
+    let srcWeek = null;
+    let srcPlan = null;
+    // Prefer previous week number in this month with a pick
+    const n = Number(curW);
+    if (n > 1) {
+      for (let w = n - 1; w >= 1; w--) {
+        const id = String(w);
+        if (month.deletedWeeks && month.deletedWeeks[id]) continue;
+        srcWeek = id;
+        srcPlan = month.picks[id] || curP;
+        break;
+      }
+    }
+    // Else previous month week 4
+    if (!srcWeek) {
+      const prevKey = shiftMonthKey(state.monthKey, -1);
+      const prevMonth = state.months && state.months[prevKey];
+      if (prevMonth) {
+        for (let w = 4; w >= 1; w--) {
+          const id = String(w);
+          if (prevMonth.deletedWeeks && prevMonth.deletedWeeks[id]) continue;
+          if (prevMonth.picks && prevMonth.picks[id]) {
+            srcWeek = id;
+            srcPlan = prevMonth.picks[id];
+            const srcEdits = (prevMonth.weekEdits && prevMonth.weekEdits[id + srcPlan]) || {};
+            loadTemplate(curW, srcPlan, true);
+            state.dayOverrides = JSON.parse(JSON.stringify(srcEdits));
+            month.picks[curW] = srcPlan;
+            const key = curW + srcPlan;
+            month.weekEdits[key] = state.dayOverrides;
+            state.weekEdits[key] = state.dayOverrides;
+            persist();
+            renderAll();
+            showToast("Repeated last week’s plan");
+            return;
+          }
+        }
+      }
+    }
+    if (!srcWeek) {
+      showToast("No previous week to repeat yet");
+      return;
+    }
+    const srcKey = srcWeek + srcPlan;
+    const srcEdits = (month.weekEdits && month.weekEdits[srcKey]) || (state.weekEdits && state.weekEdits[srcKey]) || {};
+    loadTemplate(curW, srcPlan, true);
+    state.dayOverrides = JSON.parse(JSON.stringify(srcEdits));
+    month.picks[curW] = srcPlan;
+    const key = curW + srcPlan;
+    month.weekEdits[key] = state.dayOverrides;
+    state.weekEdits[key] = state.dayOverrides;
+    persist();
+    renderAll();
+    showToast("Repeated last week’s plan");
+  }
+
   function boot() {
     injectUpgradeStyles();
     const fromUrl = readShareFromUrl();
@@ -5334,6 +5504,11 @@ function sidesBlockHTML(dayId, day) {
         if (e.target === els.settingsModal) closeSettings();
       });
     }
+    
+    const shuffleBtn = document.getElementById("shuffle-btn");
+    if (shuffleBtn) shuffleBtn.addEventListener("click", () => shuffleWeek());
+    const repeatBtn = document.getElementById("repeat-btn");
+    if (repeatBtn) repeatBtn.addEventListener("click", () => repeatLastWeek());
     if (els.calBtn) {
       els.calBtn.addEventListener("click", () => {
         openCal({

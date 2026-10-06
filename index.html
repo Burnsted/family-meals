@@ -23,7 +23,7 @@
         <span>Upload receipt</span>
       </button>
       <button type="button" class="gear-btn icon-btn" id="settings-btn" aria-label="Settings">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.2M12 19.3v2.2M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></svg>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
     </div>
 
@@ -43,9 +43,6 @@
         <button type="button" class="cal-btn icon-btn" id="cal-btn" aria-label="Pick a week on a calendar">
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M8 3.5v3M16 3.5v3M3.5 10h17"/></svg>
         </button>
-        <button type="button" class="repeat-btn icon-btn" id="repeat-btn" aria-label="Repeat last week">
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
-        </button>
       </div>
       <p class="tagline">Cook once for dinners · leftover lunches for adults · Tucker’s fixed school kit</p>
 
@@ -64,9 +61,10 @@
     </header>
 
     <section class="templates" aria-labelledby="templates-title">
-      <div class="section-title month-title-row">
-        <h2 id="templates-title">Month plan</h2>
-        <div class="month-ctrl" id="month-ctrl">
+      <div class="month-plan-head">
+        <div class="section-title month-title-row">
+          <h2 id="templates-title">Month plan</h2>
+          <div class="month-ctrl" id="month-ctrl">
           <button type="button" class="month-arrow icon-btn" id="month-prev" aria-label="Previous month">
             <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
           </button>
@@ -82,8 +80,9 @@
           </div>
         </div>
       </div>
+      <p class="month-hold-hint">Hold a week to customize</p>
+      </div>
       <div class="month-grid" id="month-grid" role="group" aria-label="Week templates A and B"></div>
-      <p class="lp-tip">Tip: tap to load · press and hold a week to customize it.</p>
     </section>
 
     <section class="howto" aria-labelledby="howto-title">
@@ -115,9 +114,18 @@
     <div class="copy-photo" id="copy-photo" hidden></div>
 
     <section aria-labelledby="week-title">
-      <div class="section-title">
+      <div class="section-title week-actions-row">
         <h2 id="week-title">This week’s dinners</h2>
-        <span>7-day calendar · Swap night · tap for recipe</span>
+        <div class="week-actions">
+          <button type="button" class="shuffle-link" id="shuffle-btn" aria-label="Shuffle this week">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+            <span>Shuffle</span>
+          </button>
+          <button type="button" class="week-text-link" id="repeat-btn" aria-label="Repeat last week">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+            <span>Repeat last week</span>
+          </button>
+        </div>
       </div>
       <div class="week-grid" id="week-grid"></div>
     </section>
