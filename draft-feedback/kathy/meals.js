@@ -172,11 +172,11 @@ DISHES: [
       { name: "Fresh dill or dried dill", qty: "small bunch or jar", aisle: "Produce" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day dinner", note: "Salmon, potato, broccoli for tonight." },
+      { container: "A", label: "{day} dinner", note: "Salmon, potato, broccoli for tonight." },
       { container: "B", label: "Next day lunch", note: "Cold or gently warmed within two days." },
       { container: "C", label: "Frozen salmon portion", note: "If you cooked extra." }
     ],
-    usedAgain: [{ item: "Cooked salmon", days: ["Cook day dinner", "next day lunch"] }],
+    usedAgain: [{ item: "Cooked salmon", days: ["{day} dinner", "next day lunch"] }],
     freeze: "One salmon fillet portion without vegetables."
   },
   {
@@ -207,11 +207,11 @@ DISHES: [
       { name: "Mild tomato sauce", qty: "1 small can", aisle: "Pantry" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day dinner", note: "Two slices with a simple side." },
+      { container: "A", label: "{day} dinner", note: "Two slices with a simple side." },
       { container: "B", label: "Second dinner within three days", note: "Meatloaf sandwiches or plated slices." },
       { container: "C", label: "Frozen slices", note: "Two single portions." }
     ],
-    usedAgain: [{ item: "Meatloaf slices", days: ["cook day", "day two or three", "freezer"] }],
+    usedAgain: [{ item: "Meatloaf slices", days: ["{day}", "day two or three", "freezer"] }],
     freeze: "Two single slices wrapped flat."
   },
   {
@@ -243,11 +243,11 @@ DISHES: [
       { name: "Lemons", qty: "1", aisle: "Produce" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day dinner", note: "Bowl of soup." },
+      { container: "A", label: "{day} dinner", note: "Bowl of soup." },
       { container: "B", label: "Next day lunch", note: "Within two days." },
       { container: "C", label: "Frozen soup cup", note: "One single meal." }
     ],
-    usedAgain: [{ item: "Soup", days: ["cook day", "next day", "freezer"] }],
+    usedAgain: [{ item: "Soup", days: ["{day}", "next day", "freezer"] }],
     freeze: "One or two single cups."
   },
   {
@@ -278,11 +278,11 @@ DISHES: [
       { name: "Lemons", qty: "1", aisle: "Produce" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day dinner", note: "Fish, beans, rice." },
+      { container: "A", label: "{day} dinner", note: "Fish, beans, rice." },
       { container: "B", label: "Next day lunch", note: "Within two days." },
       { container: "C", label: "Extra rice", note: "For a later breakfast scramble or bowl." }
     ],
-    usedAgain: [{ item: "Rice", days: ["cook day", "next lunch", "optional breakfast bowl"] }],
+    usedAgain: [{ item: "Rice", days: ["{day}", "next lunch", "optional breakfast bowl"] }],
     freeze: "One fish fillet portion."
   },
   {
@@ -315,11 +315,11 @@ DISHES: [
       { name: "Tomato paste", qty: "1 small can", aisle: "Pantry" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day dinner", note: "Stew bowl." },
+      { container: "A", label: "{day} dinner", note: "Stew bowl." },
       { container: "B", label: "Second dinner within three days", note: "Stew warmed gently." },
       { container: "C", label: "Frozen stew", note: "One single bowl." }
     ],
-    usedAgain: [{ item: "Stew", days: ["cook day", "day two or three", "freezer"] }],
+    usedAgain: [{ item: "Stew", days: ["{day}", "day two or three", "freezer"] }],
     freeze: "One single bowl."
   },
   {
@@ -350,11 +350,11 @@ DISHES: [
       { name: "Shredded cheese optional", qty: "small bag", aisle: "Dairy" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day breakfast or dinner", note: "Two squares." },
+      { container: "A", label: "{day} breakfast or dinner", note: "Two squares." },
       { container: "B", label: "Next day breakfast", note: "Within two days." },
       { container: "C", label: "Third day lunch", note: "Within three days. Do not keep longer in the fridge." }
     ],
-    usedAgain: [{ item: "Egg bake squares", days: ["cook day", "day two", "day three"] }],
+    usedAgain: [{ item: "Egg bake squares", days: ["{day}", "day two", "day three"] }],
     freeze: "Usually fridge only. Freeze only if wrapped very well."
   },
   {
@@ -385,11 +385,11 @@ DISHES: [
       { name: "Whole grain bread", qty: "1 loaf if needed", aisle: "Bread" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day dinner", note: "Stew bowl." },
+      { container: "A", label: "{day} dinner", note: "Stew bowl." },
       { container: "B", label: "Next day lunch", note: "Within two days." },
       { container: "C", label: "Frozen bowl", note: "Optional." }
     ],
-    usedAgain: [{ item: "Bean stew", days: ["cook day", "next day"] }],
+    usedAgain: [{ item: "Bean stew", days: ["{day}", "next day"] }],
     freeze: "One single bowl."
   },
   {
@@ -419,11 +419,11 @@ DISHES: [
       { name: "Garlic", qty: "1 head", aisle: "Produce" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day dinner", note: "Sliced pork with apple cabbage." },
+      { container: "A", label: "{day} dinner", note: "Sliced pork with apple cabbage." },
       { container: "B", label: "Second dinner within three days", note: "Cold or gently warmed." },
       { container: "C", label: "Frozen pork slices", note: "If needed." }
     ],
-    usedAgain: [{ item: "Pork slices", days: ["cook day", "day two or three"] }],
+    usedAgain: [{ item: "Pork slices", days: ["{day}", "day two or three"] }],
     freeze: "Two single slice packs."
   },
   {
@@ -454,10 +454,10 @@ DISHES: [
       { name: "Garlic", qty: "1 head", aisle: "Produce" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day dinner", note: "Shrimp and zucchini." },
+      { container: "A", label: "{day} dinner", note: "Shrimp and zucchini." },
       { container: "B", label: "Next day lunch", note: "Within two days only." }
     ],
-    usedAgain: [{ item: "Shrimp", days: ["cook day", "next day"] }],
+    usedAgain: [{ item: "Shrimp", days: ["{day}", "next day"] }],
     freeze: "Prefer fresh cook. Freeze raw shrimp only before cooking."
   },
   {
@@ -488,11 +488,11 @@ DISHES: [
       { name: "Lemons", qty: "1", aisle: "Produce" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day dinner", note: "Chicken and rice." },
+      { container: "A", label: "{day} dinner", note: "Chicken and rice." },
       { container: "B", label: "Second dinner within three days", note: "Same dish." },
       { container: "C", label: "Frozen bowl", note: "One single portion." }
     ],
-    usedAgain: [{ item: "Chicken and rice", days: ["cook day", "day two or three", "freezer"] }],
+    usedAgain: [{ item: "Chicken and rice", days: ["{day}", "day two or three", "freezer"] }],
     freeze: "One single bowl."
   },
   {
@@ -523,11 +523,11 @@ DISHES: [
       { name: "Parsley", qty: "small bunch", aisle: "Produce" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day dinner", note: "Pasta bake plate." },
+      { container: "A", label: "{day} dinner", note: "Pasta bake plate." },
       { container: "B", label: "Next day lunch", note: "Within two days." },
       { container: "C", label: "Third day dinner", note: "Within three days." }
     ],
-    usedAgain: [{ item: "Tuna pasta", days: ["cook day", "day two", "day three"] }],
+    usedAgain: [{ item: "Tuna pasta", days: ["{day}", "day two", "day three"] }],
     freeze: "Fridge preferred. Freeze only if needed."
   },
   {
@@ -557,11 +557,11 @@ DISHES: [
       { name: "Canned black or white beans", qty: "1 can", aisle: "Pantry" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day dinner", note: "Pepper bowl." },
+      { container: "A", label: "{day} dinner", note: "Pepper bowl." },
       { container: "B", label: "Next day lunch", note: "Within two days." },
       { container: "C", label: "Frozen bowl", note: "One single portion." }
     ],
-    usedAgain: [{ item: "Turkey filling", days: ["cook day", "next day", "freezer"] }],
+    usedAgain: [{ item: "Turkey filling", days: ["{day}", "next day", "freezer"] }],
     freeze: "One single bowl of filling."
   },
   {
@@ -592,11 +592,11 @@ DISHES: [
       { name: "Egg", qty: "1 optional", aisle: "Dairy" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day dinner", note: "Two cups." },
+      { container: "A", label: "{day} dinner", note: "Two cups." },
       { container: "B", label: "Second dinner within three days", note: "Two cups." },
       { container: "C", label: "Frozen cups", note: "Remaining singles." }
     ],
-    usedAgain: [{ item: "Lasagna cups", days: ["cook day", "day two or three", "freezer"] }],
+    usedAgain: [{ item: "Lasagna cups", days: ["{day}", "day two or three", "freezer"] }],
     freeze: "Individual cups wrapped well."
   },
   {
@@ -696,11 +696,11 @@ DISHES: [
       { name: "Low sodium broth", qty: "1 cup needed", aisle: "Pantry" }
     ],
     prepPlan: [
-      { container: "A", label: "Cook day dinner", note: "Pie square." },
+      { container: "A", label: "{day} dinner", note: "Pie square." },
       { container: "B", label: "Second dinner within three days", note: "Pie square." },
       { container: "C", label: "Frozen square", note: "One single portion." }
     ],
-    usedAgain: [{ item: "Shepherd pie", days: ["cook day", "day two or three", "freezer"] }],
+    usedAgain: [{ item: "Shepherd pie", days: ["{day}", "day two or three", "freezer"] }],
     freeze: "One single square."
   }
 ]

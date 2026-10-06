@@ -199,7 +199,7 @@
         const d = cookDishes[cookAt];
         return {
           i, name, kind: "cook", dishId: d.id, title: d.name, emoji: d.emoji,
-          note: "Batch cook day. Follow the prep plan and pack labeled containers.",
+          note: "Batch cook. Follow the prep plan and pack labeled containers.",
           light: false,
         };
       }
@@ -258,7 +258,7 @@
       const cookAt = cookIdx.indexOf(i);
       if (cookAt >= 0) {
         const d = cookDishes[cookAt];
-        return { i, name, kind: "cook", dishId: d.id, title: d.name, emoji: d.emoji, note: "Batch cook day. Follow the prep plan and pack labeled containers.", light: false };
+        return { i, name, kind: "cook", dishId: d.id, title: d.name, emoji: d.emoji, note: "Batch cook. Follow the prep plan and pack labeled containers.", light: false };
       }
       return null;
     });
@@ -383,7 +383,7 @@
   /* ---------- Screens ---------- */
 
   function renderFirst() {
-    const q = "Cooking for how many people? How much prep time per cook day? How many cook days a week?";
+    const q = "Cooking for how many people? How much prep time per day? How many days a week?";
     const app = document.getElementById("app");
     app.innerHTML = `
       ${topbar(false)}
@@ -394,13 +394,13 @@
       <div class="choice-grid cols-2" id="people">
         ${choiceBtn(1, "1", state.people)}${choiceBtn(2, "2", state.people)}
       </div>
-      <p class="field-label">Prep time per cook day</p>
+      <p class="field-label">Prep time per day</p>
       <div class="choice-grid cols-3" id="prep">
         ${choiceBtn(10, "10 minutes", state.prepMinutes)}
         ${choiceBtn(20, "20 minutes", state.prepMinutes)}
         ${choiceBtn(30, "30 minutes", state.prepMinutes)}
       </div>
-      <p class="field-label">Cook days a week</p>
+      <p class="field-label">Days a week</p>
       <div class="choice-grid cols-3" id="cooks">
         ${choiceBtn(1, "1", state.cookDays)}
         ${choiceBtn(2, "2", state.cookDays)}
@@ -720,6 +720,11 @@
     return state.ratings[id] || 0;
   }
 
+
+  function plainDayCopy(text, dayName) {
+    return String(text || "").replace(/\{day\}/g, dayName);
+  }
+
   function renderDayCard(day) {
     const dish = day.dishId ? dishById(day.dishId) : null;
     const open = state.openDay === day.i;
@@ -742,10 +747,10 @@
         <button type="button" class="btn btn-soft" id="hear-steps" style="margin-top:10px">${ico.speaker}<span>Hear it again</span></button></div>`;
       if (day.kind === "cook" && dish.prepPlan) {
         body += `<div class="block"><h4>Prep plan</h4>
-          ${(dish.prepPlan || []).map((c) => `<div class="container-row"><strong>Container ${esc(c.container)} · ${esc(c.label)}</strong><span>${esc(c.note)}</span></div>`).join("")}
+          ${(dish.prepPlan || []).map((c) => `<div class="container-row"><strong>Container ${esc(c.container)} · ${esc(plainDayCopy(c.label, day.name))}</strong><span>${esc(c.note)}</span></div>`).join("")}
         </div>`;
         body += `<div class="block"><h4>Used again this week</h4>
-          ${(dish.usedAgain || []).map((u) => `<div class="map-row"><span>${esc(u.item)}</span><span>${esc((u.days || []).join(", "))}</span></div>`).join("")}
+          ${(dish.usedAgain || []).map((u) => `<div class="map-row"><span>${esc(u.item)}</span><span>${esc((u.days || []).map((d) => plainDayCopy(d, day.name)).join(", "))}</span></div>`).join("")}
         </div>`;
         if (dish.freeze) body += `<p class="muted">${esc(dish.freeze)}</p>`;
       }
@@ -765,7 +770,6 @@
     return `<div class="card" data-day="${day.i}">
       <div class="card-head">
         <span class="day-tag">${esc(day.name)}</span>
-        ${day.kind === "cook" ? `<span class="cook-badge">Cook day</span>` : ""}
         <button type="button" class="linkish" data-swap="${day.i}">Swap</button>
       </div>
       <p class="dish-title">${day.emoji ? `<span class="food-emoji">${day.emoji}</span>` : ""}${esc(day.title)}</p>
@@ -783,7 +787,7 @@
     const app = document.getElementById("app");
     app.innerHTML = `
       ${topbar(false)}
-      <p class="kicker">Cooking for ${state.people} · ${state.cookDays} cook day${state.cookDays === 1 ? "" : "s"} · ${state.prepMinutes} minutes prep</p>
+      <p class="kicker">Cooking for ${state.people} · ${state.cookDays} day${state.cookDays === 1 ? "" : "s"} · ${state.prepMinutes} minutes prep</p>
       <div class="week-actions">
         <button type="button" class="linkish" id="shuffle">${ico.shuffle} Shuffle</button>
         <button type="button" class="linkish" id="share-app">${ico.share} Share plan link</button>
@@ -902,7 +906,7 @@
         const d = dishById(b.dataset.pick);
         state.week.days[dayIndex] = {
           i: dayIndex, name: DN[dayIndex], kind: "cook", dishId: d.id, title: d.name, emoji: d.emoji,
-          note: "Batch cook day. Follow the prep plan and pack labeled containers.", light: false,
+          note: "Batch cook. Follow the prep plan and pack labeled containers.", light: false,
         };
         save(); toast("Dinner swapped."); render();
       };
