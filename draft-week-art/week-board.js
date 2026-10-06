@@ -21,20 +21,30 @@
 
   function cleanCopy(s) {
     return String(s == null ? "" : s)
-      .replace(/[—–]/g, " ")
+      .replace(/[—–]/g, " to ")
+      .replace(/\s+to\s+to\s+/gi, " to ")
       .replace(/\s*\/\s*/g, " or ")
       .replace(/\s+/g, " ")
       .trim();
   }
 
+  /** Always: Week of Oct 5 to 11, 2026 (never "Oct 5 11", never en dash). */
   function weekOfLabel(weekTitle) {
-    const raw = cleanCopy(weekTitle || "");
-    if (/^week of /i.test(raw)) {
-      // Normalize "Week of Oct 5 11" → keep if already good; else rebuild
-      const fixed = raw.replace(/^week of /i, "Week of ");
-      if (/\bto\b/.test(fixed) && /\d{4}/.test(fixed)) return fixed;
+    let raw = cleanCopy(weekTitle || "");
+    raw = raw.replace(/^week of\s+/i, "");
+    // Repair "Oct 5 11, 2026" left by old en-dash scrub
+    raw = raw.replace(
+      /\b([A-Za-z]{3,9})\s+(\d{1,2})\s+(\d{1,2}),\s*(\d{4})\b/,
+      "$1 $2 to $3, $4"
+    );
+    // Repair "Oct 5 to Oct 11, 2026" → "Oct 5 to 11, 2026" when same month
+    raw = raw.replace(
+      /\b([A-Za-z]{3,9})\s+(\d{1,2})\s+to\s+\1\s+(\d{1,2}),\s*(\d{4})\b/i,
+      "$1 $2 to $3, $4"
+    );
+    if (/\bto\b/.test(raw) && /\d{4}/.test(raw)) {
+      return "Week of " + raw;
     }
-    if (raw && !/^week of /i.test(weekTitle || "")) return "Week of " + raw;
     try {
       const now = new Date();
       const day = now.getDay();

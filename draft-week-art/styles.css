@@ -560,6 +560,52 @@ button[hidden],
   outline-offset: -3px;
 }
 
+/* Quiet default day details (Steve re-check): photo + name + one note */
+.day-body-quiet {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+}
+.day-photo {
+  display: block;
+  width: 88px;
+  height: 88px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--card, #fffaf4) 70%, #e8dccb);
+}
+.day-photo .food-photo,
+.day-photo img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  display: block;
+  border-radius: 12px;
+}
+.day-body-quiet .day-dinner {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.day-note {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 650;
+  color: var(--ink-soft, #5c5348);
+  line-height: 1.25;
+}
+.day-card .rate-row,
+.day-card .meal-log,
+.day-card .day-lunch,
+.day-card .day-ted,
+.day-card .day-swap-badge,
+.day-card .tap-hint,
+.day-card .fav-badge {
+  /* Quiet default: these stay out of the day card markup */
+}
+
 .day-card-swapped .day-head {
   background: linear-gradient(135deg, var(--coral), var(--coral-deep));
 }

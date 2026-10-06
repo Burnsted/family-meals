@@ -2903,10 +2903,18 @@ function ensureSideOffers(dayId, day) {
       return window.WeekBoard.cleanCopy(s);
     }
     return String(s == null ? "" : s)
-      .replace(/[—–]/g, " ")
+      .replace(/[—–]/g, " to ")
+      .replace(/\s+to\s+to\s+/gi, " to ")
       .replace(/\s*\/\s*/g, " or ")
       .replace(/\s+/g, " ")
       .trim();
+  }
+
+  function weekDatesDisplay(title) {
+    if (window.WeekBoard && typeof window.WeekBoard.weekOfLabel === "function") {
+      return window.WeekBoard.weekOfLabel(title || "");
+    }
+    return uiCopy(title || "This week");
   }
 
   function storeTotals(items) {
@@ -4129,30 +4137,23 @@ function ensureSideOffers(dayId, day) {
         (day.swapped ? " day-card-swapped" : "") +
         (day.holiday || day.overrideType === "holiday" ? " day-card-holiday" : "") +
         (day.overrideType === "pickmeal" ? " day-card-pickmeal" : "");
-      const adultLine =
-        day.adultLunch && day.adultLunch !== "—" && !/adult lunch open/.test(day.adultLunch)
-          ? `<p class="day-lunch">${escapeHtml(uiCopy(day.adultLunch))}</p>`
-          : `<p class="day-lunch day-lunch-muted">adult lunch open</p>`;
-      const tedLine = day.tedNote
-        ? `<p class="day-ted">${escapeHtml(uiCopy(day.tedNote))}</p>`
-        : "";
-      const swapBadge = day.swapped
-        ? `<p class="day-swap-badge">${
-            day.overrideType === "leftovers"
-              ? "Swapped to Leftovers"
-              : day.overrideType === "eatout"
-                ? "Swapped to Eat out"
-                : day.overrideType === "removed"
-                ? "🗑 Removed from this week"
-                : day.overrideType === "pickmeal"
-                ? "Pick a meal"
-                : day.overrideType === "grabgo"
-                ? `🛍 Grab & go`
-                : `Swapped to ${escapeHtml(uiCopy(day.swapLabel || "dinner"))}`
-          }</p>`
-        : "";
       const holClass = day.holiday || day.overrideType === "holiday";
-      const hideRates = !!(holClass || day.overrideType === "eatout" || day.overrideType === "removed" || day.overrideType === "pickmeal");
+      const FA = window.FoodArt;
+      const photo = FA ? FA.art(day.dinner || "default", "lg") : "";
+      const mealName =
+        FA && FA.shortMealName ? uiCopy(FA.shortMealName(day.dinner, 4)) : uiCopy(day.dinner);
+      const oneNote = day.tedNote
+        ? uiCopy(String(day.tedNote).replace(/^Ted:\s*/i, "Ted: "))
+        : day.tag
+          ? uiCopy(day.tag)
+          : day.swapped
+            ? day.overrideType === "leftovers"
+              ? "Leftovers"
+              : day.overrideType === "eatout"
+                ? "Eat out"
+                : "Swapped"
+            : "On the board";
+      // Quiet default day details: photo + name + one note. No rates / Made row / adult lunch / meat pill.
       card.innerHTML = `
         <div class="day-head">
           <span>${day.short}</span>
@@ -4160,73 +4161,16 @@ function ensureSideOffers(dayId, day) {
             ${holClass ? "" : `<button type="button" class="swap-link" data-swap-day="${escapeAttr(templateDay.id)}" aria-label="Swap ${escapeAttr(day.day)} dinner"><span>Swap</span></button>`}
           </div>
         </div>
-        <button type="button" class="day-body day-body-btn${holClass ? " is-holiday" : ""}" aria-label="${escapeAttr(day.day)}: ${escapeAttr(uiCopy(day.dinner))}. Tap for recipe.">
-          <p class="day-dinner">${isFav(day.dinner) ? '<span class="fav-badge">⭐</span> ' : ""}${escapeHtml(uiCopy(day.dinner))}</p>
-          <div class="day-meat-row" data-day-meat="${escapeAttr(templateDay.id)}"></div>
-          ${day.tag ? `<p class="day-tag">${escapeHtml(day.tag)}</p>` : ""}
-          ${swapBadge}
-          ${tedLine}
-          ${adultLine}
-          <p class="tap-hint">${holClass ? "" : "Day note · tap for recipe"}</p>
+        <button type="button" class="day-body day-body-btn day-body-quiet${holClass ? " is-holiday" : ""}" aria-label="${escapeAttr(day.day)}: ${escapeAttr(mealName)}. Tap for recipe.">
+          <span class="day-photo" aria-hidden="true">${photo}</span>
+          <p class="day-dinner">${escapeHtml(mealName)}</p>
+          <p class="day-note">${escapeHtml(oneNote)}</p>
         </button>
         ${typeof sidesBlockHTML === "function" ? sidesBlockHTML(templateDay.id, day) : ""}
-        ${rateRowHTML(day.dinner, templateDay.id, { hideRates })}
-        ${typeof mealLogHTML === "function" ? mealLogHTML(templateDay.id, day) : ""}
       `;
       day._sideDayId = templateDay.id;
-      // Meat alt chevron on day card only (not strip chips). Steve bar
-      try {
-        const IA = window.ItemAlts;
-        const meatHost = card.querySelector("[data-day-meat]");
-        if (IA && meatHost && !holClass && day.dinner) {
-          const saved = state.meatAlts && state.meatAlts[templateDay.id];
-          const info = IA.meatAltsForDay(saved || day.dinner, day.dinner);
-          if (info.alts && info.alts.length) {
-            const cur = saved || info.current || info.key;
-            meatHost.innerHTML = `<span class="meat-label">${escapeHtml(uiCopy(cur))}</span>${IA.chevronHTML(uiCopy(cur), false)}`;
-            const chip = meatHost.querySelector("[data-alt-open]");
-            if (chip) {
-              chip.addEventListener("click", (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const openKey = "meat:" + templateDay.id;
-                const closing = state.openAltId === openKey;
-                state.openAltId = closing ? null : openKey;
-                document.querySelectorAll(".item-alt-pop").forEach((p) => p.remove());
-                if (closing) return;
-                const pop = document.createElement("div");
-                pop.innerHTML = IA.bubbleHTML("Swap meat for", info.alts, cur, false);
-                const bubble = pop.firstElementChild;
-                meatHost.appendChild(bubble);
-                bubble.querySelectorAll("[data-alt]").forEach((btn) => {
-                  btn.addEventListener("click", (ev) => {
-                    ev.preventDefault();
-                    ev.stopPropagation();
-                    if (!state.meatAlts) state.meatAlts = {};
-                    state.meatAlts[templateDay.id] = btn.dataset.alt;
-                    // Also set grocery item alt for matching meat lines on this day
-                    if (!state.itemAlts) state.itemAlts = {};
-                    allGroceryItems().forEach((gi) => {
-                      if (Array.isArray(gi.days) && gi.days.includes(templateDay.id) && /meat|chicken|beef|pork|fish|salmon|turkey|bacon|steak|shrimp/i.test((gi.category || "") + " " + (gi.baseName || gi.name || ""))) {
-                        state.itemAlts[gi.id] = btn.dataset.alt;
-                      }
-                    });
-                    state.openAltId = null;
-                    persist();
-                    renderAll();
-                    showToast("Meat swapped for " + day.short);
-                  });
-                });
-              });
-            }
-          }
-        }
-      } catch (_) {}
-      // re-render calorie badges with side id (already in HTML. patch cal line)
       card.querySelector(".day-body-btn").addEventListener("click", () => openRecipe(day));
-      bindRateRow(card, day.dinner);
       if (typeof bindSidesBlock === "function") bindSidesBlock(card);
-      if (typeof bindMealLog === "function") bindMealLog(card, templateDay.id);
       const swapBtn = card.querySelector("[data-swap-day]");
       if (swapBtn) swapBtn.addEventListener("click", (e) => { e.stopPropagation(); openSwapPicker(templateDay.id); });
       const delBtn = card.querySelector("[data-del-day]");
@@ -6884,7 +6828,7 @@ function ensureSideOffers(dayId, day) {
     }).join("");
     const gCount = pkg.grocery.length + (state.custom || []).length;
     inn.innerHTML = `<h2 id="lock-sheet-title">${escapeHtml(C.sheetTitle || "Lock in this week")}</h2>
-      <p class="lock-dates">${escapeHtml(pkg.weekTitle || "This week")}</p>
+      <p class="lock-dates">${escapeHtml(weekDatesDisplay(pkg.weekTitle))}</p>
       ${rows}
       <p class="lock-grocery-count">${escapeHtml((C.groceryLine || ((n)=>n+" grocery items"))(gCount))}</p>
       <p class="muted2">${escapeHtml(C.localOnly || "Saved on this phone only")}</p>

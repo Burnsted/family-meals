@@ -50,7 +50,7 @@
     if (/tilapia|white fish|fish|tuna/.test(t)) return "fish";
     if (/shrimp|scampi/.test(t)) return "shrimp";
     if (/breakfast|pancake/.test(t)) return "breakfast";
-    if (/egg\b|egg bake|scrambled/.test(t)) return "eggs";
+    if (/egg|eggs|egg bake|scrambled/.test(t)) return "eggs";
     if (/pasta|lasagna|noodle/.test(t)) return "pasta";
     if (/salad/.test(t)) return "salad";
     if (/pie|shepherd/.test(t)) return "pie";
